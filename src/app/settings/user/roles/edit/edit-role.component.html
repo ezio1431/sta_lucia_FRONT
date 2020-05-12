@@ -1,0 +1,46 @@
+<h5 mat-dialog-title>Edit Role</h5>
+
+<mat-dialog-content class="mat-dialog-data" [formGroup]="editForm"  (ngSubmit)="update()">
+
+    <div>
+        <mat-form-field class="full-width" color="primary" appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" placeholder="Name">
+            <mat-error align="start" *ngIf="formErrors?.name" class="form__error">{{ formErrors.name }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="full-width" color="primary" appearance="outline">
+            <mat-label>Display Name</mat-label>
+            <input matInput formControlName="display_name" placeholder="Display Name">
+            <mat-error align="start" *ngIf="formErrors?.display_name" class="form__error">{{ formErrors.display_name }}</mat-error>
+        </mat-form-field>
+    </div>
+
+    <div formArrayName="permissions">
+        <mat-error align="start" *ngIf="formErrors?.permissions" class="form__error">{{ formErrors.permissions }}</mat-error>
+
+        <div class="row">
+            <div *ngFor="let item of items.controls; index as i" class="col-md-3">
+                <mat-checkbox
+                        [formControlName]="i">
+                    {{options[i].label}}
+                </mat-checkbox>
+            </div>
+        </div>
+    </div>
+
+</mat-dialog-content>
+
+<div class="d-flex justify-content-center spinner-container" *ngIf="loader">
+    <mat-progress-bar
+            color="green"
+            mode="query"
+            value=50
+            bufferValue=75>
+    </mat-progress-bar>
+</div>
+
+<mat-dialog-actions align="center">
+    <button [disabled]="loader" mat-button class="mat-raised-button button-separate" [mat-dialog-close]="true" (click)="close()">Close</button>
+    <button class="mat-raised-button mat-primary" (click)="update()" [disabled]="!editForm.valid || loader">Save</button>
+</mat-dialog-actions>

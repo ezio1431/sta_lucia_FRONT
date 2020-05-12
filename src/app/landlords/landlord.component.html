@@ -1,0 +1,162 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="fab-container">
+                <button mat-fab class="fab-toggler" (click)="addDialog('add')">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info">
+                        <h4 class="card-title"> {{ 'robi.landlords.title' | translate }} </h4>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card">
+                                    <div class="card-footer">
+                                        <div class="stats">
+                                            <i class="material-icons text-success">people</i> {{ 'robi.landlords.total' | translate }} (12)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card">
+                                    <div class="card-footer">
+                                        <div class="stats">
+                                            <i class="material-icons text-success">people</i> {{ 'robi.landlords.active' | translate }} (10)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card">
+                                    <div class="card-footer">
+                                        <div class="stats">
+                                            <i class="material-icons">people</i> {{ 'robi.landlords.inactive' | translate }} (2)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <div class="card">
+                                    <div class="card-footer">
+                                        <div class="stats">
+                                            <i class="material-icons text-warning">power</i> {{ 'robi.landlords.logged_in' | translate }} {{ 'robi.landlords.today' | translate }} (1)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row search-form-section">
+                            <div class="col-sm-1">
+                                <button matPrefix mat-raised-button type="submit" class="btn btn-white btn-round btn-just-icon">
+                                    <i class="material-icons">search</i>
+                                    <div class="ripple-container"></div>
+                                </button>
+                            </div>
+
+                            <div class="col-11">
+                                <mat-form-field class="search-form-field">
+                                    <input matInput #search placeholder="{{ 'robi.landlords.filter' | translate }}" autocomplete="off" [disabled]="(meta$ | async)?.total===0">
+                                    <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
+                                        <mat-icon>close</mat-icon></button>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-end">
+                            <div *ngFor="let landlord of landlords$ | async;" class="col-md-6 col-lg-4">
+                                <div class="card card-lift--hover shadow border-0 card-profile">
+
+
+                                    <div class="front">
+                                        <div class="cover">
+                                            <img class="img" src="../../assets/img/images/rotating_card_thumb3.png"/>
+                                        </div>
+                                        <div class="card-avatar">
+                                            <img [src]="landlord.profile_pic"/>
+                                            <!--<img class="img" src="../../assets/img/images/2.jpg"/>-->
+
+                                        </div>
+                                        <div class="content">
+                                            <div class="main">
+                                                <h3 class="name">
+                                                    <a [routerLink]="landlord.id" (click)="onSelected(landlord)">
+                                                        {{landlord.first_name}} {{landlord.last_name}}
+                                                    </a>
+
+                                                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                                                        <mat-icon>more_vert</mat-icon>
+                                                    </button>
+                                                    <mat-menu #menu="matMenu">
+                                                        <button mat-menu-item routerLink="{{landlord.id}}" (click)="onSelected(landlord)">
+                                                            <mat-icon color="primary">visibility</mat-icon>
+                                                            <span>{{ 'robi.landlords.view' | translate }}</span>
+                                                        </button>
+                                                        <button mat-menu-item (click)="addDialog('edit', landlord)">
+                                                            <mat-icon color="primary">edit</mat-icon>
+                                                            <span>{{ 'robi.landlords.edit' | translate }}</span>
+                                                        </button>
+                                                        <button mat-menu-item (click)="openConfirmationDialog(landlord)">
+                                                            <mat-icon color="warn">delete</mat-icon>
+                                                            <span>{{ 'robi.landlords.delete' | translate }}</span>
+                                                        </button>
+                                                    </mat-menu>
+                                                </h3>
+                                                <p class="profession">
+                                                    <button mat-stroked-button disabled>
+                                                        <mat-icon color="accent">phone</mat-icon>
+                                                        <span>{{landlord?.phone}}</span>
+                                                    </button>
+                                                </p>
+
+                                                <div class="text-center">
+                                                    <span class="badge badge-pill badge-success mr-2">
+                                                        {{ 'robi.landlords.properties' | translate }} (10)
+                                                    </span>
+                                                    <span class="badge badge-pill badge-success mr-2">
+                                                        {{ 'robi.landlords.units' | translate }} (315)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="footer">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <ng-container *ngIf="meta$ | async as meta">
+
+                        <button *ngIf="showLoadMoreButton(meta.current_page, meta.last_page)" [disabled]="loading$ | async" mat-raised-button
+                                class="justify-content-center" color="accent" (click)="filter(meta.current_page)">
+                            <ng-container *ngIf="!(loading$ | async)">{{ 'robi.landlords.load_more' | translate }} {{meta.current_page}} of {{meta.last_page}}</ng-container>
+                            <ng-container *ngIf="loading$ | async">{{ 'robi.landlords.loading' | translate }} ...</ng-container>
+                            <mat-icon><mat-spinner color="primary" diameter="20" *ngIf="loading$ | async"></mat-spinner></mat-icon>
+                        </button>
+                    </ng-container>
+                    <div class="d-flex justify-content-center spinner-container" *ngIf="loading$ | async">
+                        <mat-progress-bar
+                                color=primary
+                                mode="indeterminate"
+                                value=20
+                                bufferValue=150>
+                        </mat-progress-bar>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

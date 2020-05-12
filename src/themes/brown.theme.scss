@@ -1,0 +1,9 @@
+$robi-brown-primary: mat-palette($mat-brown, 700, 300, 900);
+$robi-brown-accent: mat-palette($mat-lime, 400);
+$robi-brown-warn: mat-palette($mat-red, 500);
+
+$robi-brown-theme: mat-light-theme(
+                $robi-brown-primary,
+                $robi-brown-accent,
+                $robi-brown-warn
+);

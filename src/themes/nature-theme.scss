@@ -1,0 +1,9 @@
+$robi-nature-primary: mat-palette($mat-brown, 700, 300, 900);
+$robi-nature-accent: mat-palette($mat-deep-purple, 300);
+$robi-nature-warn: mat-palette($mat-red, 600);
+
+$robi-nature-theme: mat-light-theme(
+  $robi-nature-primary,
+  $robi-nature-accent,
+  $robi-nature-warn
+);

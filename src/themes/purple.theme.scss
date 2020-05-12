@@ -1,0 +1,9 @@
+$robi-purple-primary: mat-palette($mat-purple, 700, 300, 900);
+$robi-purple-accent: mat-palette($mat-cyan, 400);
+$robi-purple-warn: mat-palette($mat-red, 500);
+
+$robi-purple-theme: mat-light-theme(
+                $robi-purple-primary,
+                $robi-purple-accent,
+                $robi-purple-warn
+);

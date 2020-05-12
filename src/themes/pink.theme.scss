@@ -1,0 +1,9 @@
+$robi-pink-primary: mat-palette($mat-pink, 700, 300, 900);
+$robi-pink-accent: mat-palette($mat-blue, 400);
+$robi-pink-warn: mat-palette($mat-red, 500);
+
+$robi-pink-theme: mat-light-theme(
+                $robi-pink-primary,
+                $robi-pink-accent,
+                $robi-pink-warn
+);

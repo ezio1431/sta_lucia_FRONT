@@ -1,0 +1,9 @@
+$robi-orange-primary: mat-palette($mat-orange, 700, 300, 900);
+$robi-orange-accent: mat-palette($mat-brown, 400);
+$robi-orange-warn: mat-palette($mat-red, 500);
+
+$robi-orange-theme: mat-light-theme(
+                $robi-orange-primary,
+                $robi-orange-accent,
+                $robi-orange-warn
+);

@@ -1,0 +1,126 @@
+// robi theming
+@import '~@angular/material/theming';
+@include mat-core();
+
+@import '../../themes/default-theme';
+@import '../../themes/light-theme';
+@import '../../themes/black-theme';
+@import '../../themes/nature-theme';
+@import '../../themes/orange.theme';
+@import '../../themes/red.theme';
+@import '../../themes/purple.theme';
+@import '../../themes/green.theme';
+@import '../../themes/brown.theme';
+@import '../../themes/grey.theme';
+@import '../../themes/pink.theme';
+
+@import '../../app/layouts/admin-layout/admin-layout.component';
+
+@mixin custom-components-theme($theme) {
+  @include sidebar-theme($theme);
+  /*
+  @include flip-toggle-button-theme($theme);
+  */
+}
+
+/*@mixin custom-components-theme($theme) {
+ @include robi-styles-reset-theme($theme);
+ @include robi-app-component-theme($theme);
+ @include robi-about-component-theme($theme);
+ @include robi-big-input-component-theme($theme);
+ @include robi-notifications-component-theme($theme);
+ @include robi-todos-container-component-theme($theme);
+ @include robi-stock-market-container-component-theme($theme);
+ @include robi-parent-component-theme($theme);
+ @include robi-child-component-theme($theme);
+ @include robi-examples-component-theme($theme);
+}*/
+
+.default-theme {
+  @include angular-material-theme($robi-theme);
+  @include custom-components-theme($robi-theme);
+  /*@include custom-components-theme($robi-theme);*/
+}
+
+.light-theme {
+  @include angular-material-theme($robi-light-theme);
+  @include custom-components-theme($robi-light-theme);
+  /*@include custom-components-theme($robi-light-theme);*/
+}
+
+.black-theme {
+  @include angular-material-theme($robi-black-theme);
+  @include custom-components-theme($robi-black-theme);
+  /*@include custom-components-theme($robi-black-theme);*/
+}
+
+.nature-theme {
+  @include angular-material-theme($robi-nature-theme);
+  @include custom-components-theme($robi-nature-theme);
+  /*@include custom-components-theme($robi-nature-theme);*/
+}
+
+.orange-theme {
+  @include angular-material-theme($robi-orange-theme);
+  @include custom-components-theme($robi-orange-theme);
+}
+
+.red-theme {
+  @include angular-material-theme($robi-red-theme);
+  @include custom-components-theme($robi-red-theme);
+}
+
+.purple-theme {
+  @include angular-material-theme($robi-purple-theme);
+  @include custom-components-theme($robi-purple-theme);
+}
+
+.green-theme {
+  @include angular-material-theme($robi-green-theme);
+  @include custom-components-theme($robi-green-theme);
+}
+
+.brown-theme {
+  @include angular-material-theme($robi-brown-theme);
+  @include custom-components-theme($robi-brown-theme);
+}
+
+.grey-theme {
+  @include angular-material-theme($robi-grey-theme);
+  @include custom-components-theme($robi-grey-theme);
+}
+
+.pink-theme {
+  @include angular-material-theme($robi-pink-theme);
+  @include custom-components-theme($robi-pink-theme);
+}
+
+.mat-icon {
+  vertical-align: middle;
+}
+
+.profile-photo{
+  width: 120px;
+  height: 120px;
+
+ /* width: 120px;
+  height: 120px;
+  max-width: 130px;
+  max-height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
+  padding: 0;*/
+}
+.file-input{
+  display: none;
+}
+
+
+/*.nav-link{
+ background-color: black;
+}*/
+
+/*.sidebar[data-color=danger] li.active > a {
+ background-color: black;
+ box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(0, 0, 0, 0.56);
+}*/
