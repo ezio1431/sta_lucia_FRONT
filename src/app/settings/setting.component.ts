@@ -11,7 +11,9 @@ declare interface RouteInfo {
 export const ROUTES: RouteInfo[] = [
     { path: '/settings', title: 'Appearance',  icon: '', class: '', permission: ['settings-general'], activeOption: true },
     { path: 'system', title: 'System',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'users', title: 'Users & Roles',  icon: '', class: '', permission: ['settings-users'], activeOption: false }
+    { path: 'property', title: 'Property',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'lease', title: 'Lease',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'user', title: 'Users & Roles',  icon: '', class: '', permission: ['settings-users'], activeOption: false }
 ];
 
 @Component({

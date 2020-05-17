@@ -65,7 +65,19 @@ export const ROUTES: Routes = [
                     .then(m => m.SystemSettingModule)
             },
             {
-                path: 'users',
+                path: 'property',
+                // loadChildren: 'app/settings/user/user-setting.module#UserSettingModule',
+                loadChildren: () => import('app/settings/property/property-setting.module')
+                    .then(m => m.PropertySettingModule)
+            },
+            {
+                path: 'lease',
+                // loadChildren: 'app/settings/user/user-setting.module#UserSettingModule',
+                loadChildren: () => import('app/settings/lease/lease-setting.module')
+                    .then(m => m.LeaseSettingModule)
+            },
+            {
+                path: 'user',
                // loadChildren: 'app/settings/user/user-setting.module#UserSettingModule',
                 loadChildren: () => import('app/settings/user/user-setting.module').then(m => m.UserSettingModule)
             }

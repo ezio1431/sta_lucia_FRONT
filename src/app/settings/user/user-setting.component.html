@@ -8,14 +8,15 @@
             <div class="card-body">
 
                 <nav mat-tab-nav-bar>
-                    <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive" [routerLinkActiveOptions]="{exact: true}"
-                       [routerLink]="['/settings/user']">
+                    <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive"
+                       [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/user']">
                         <span class="nav-text"> Users</span></a>
 
                     <a mat-tab-link routerLinkActive #role="routerLinkActive" [active]="role.isActive" [routerLink]="['roles']">
                         <span class="nav-text"> Roles</span></a>
 
-                    <a mat-tab-link routerLinkActive #permission="routerLinkActive" [active]="permission.isActive" [routerLink]="['permissions']">
+                    <a mat-tab-link routerLinkActive #permission="routerLinkActive" [active]="permission.isActive"
+                       [routerLink]="['permissions']">
                         <span class="nav-text"> Permissions</span></a>
 
                 </nav>

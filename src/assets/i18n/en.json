@@ -12,6 +12,14 @@
   "robi.sidebar.dashboard": "Dashboard",
   "robi.sidebar.setting": "Setting",
   "robi.sidebar.landlords": "Landlords",
+  "robi.sidebar.properties": "Properties",
+  "robi.sidebar.tenants": "Tenants",
+  "robi.sidebar.units": "Units",
+
+  "robi.properties.title": "Properties",
+  "robi.tenants.title": "Tenants",
+
+
 
 
   "robi.landlords.title": "Landlords",
@@ -27,7 +35,7 @@
   "robi.landlords.delete": "Delete",
 
   "robi.landlords.properties": "Properties",
-  "robi.landlords.units": "Units",
+  "robi.landlords.units": "",
 
   "robi.landlords.load_more": "Load More",
   "robi.landlords.loading": "loading",

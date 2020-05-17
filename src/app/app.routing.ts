@@ -25,6 +25,16 @@ const routes: Routes = [
         loadChildren: () => import('./landlords/landlord.module').then(m => m.LandlordModule),
       },
       {
+        path: 'properties',
+        // loadChildren: './settings/setting.module#SettingModule',
+        loadChildren: () => import('./properties/property.module').then(m => m.PropertyModule),
+      },
+      {
+        path: 'tenants',
+        // loadChildren: './settings/setting.module#SettingModule',
+        loadChildren: () => import('./tenants/tenant.module').then(m => m.TenantModule),
+      },
+      {
         path: 'settings',
         // loadChildren: './settings/setting.module#SettingModule',
         loadChildren: () => import('./settings/setting.module').then(m => m.SettingModule),

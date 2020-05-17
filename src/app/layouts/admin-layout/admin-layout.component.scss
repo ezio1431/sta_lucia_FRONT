@@ -48,12 +48,22 @@
     color:  mat-color($primary);
   }
 
+/*  .mat-button-toggle {
+    background-color: mat-color($primary);
+    color: mat-color($primary, default-contrast);
+  }*/
+
+  .mat-button-toggle-checked {
+    background-color: mat-color($accent);
+    color: mat-color($accent, default-contrast);
+  }
 
 
 
 
 
-  big-input {
+
+/*  big-input {
 
     input {
 
@@ -64,7 +74,7 @@
       // or use "default" subvariable by default, oh the puns :)
       border: 1px solid mat-color($accent);
     }
-  }
+  }*/
 }
 
 
@@ -119,7 +129,7 @@
     }
   }
 
-  .error-notification-overlay {
+/*  .error-notification-overlay {
     color: mat-color($warn, default-contrast);
     background-color: mat-color($warn);
   }
@@ -137,5 +147,5 @@
   .warning-notification-overlay {
     color: mat-color($warning-colors, default-contrast);
     background-color: mat-color($warning-colors);
-  }
+  }*/
 }

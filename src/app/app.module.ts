@@ -32,7 +32,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core';
 import {
   DefaultDataServiceConfig,
   EntityCollectionReducerMethodsFactory,
-  EntityDataModule,
+  EntityDataModule, EntityDataService, EntityDefinitionService, EntityMetadataMap,
   HttpUrlGenerator,
   PersistenceResultHandler
 } from '@ngrx/data';
@@ -44,6 +44,9 @@ import {
   EntityCollectionPageReducerMethodsFactory
 } from './shared/services/pagination/entity-collection-page-reducer-methods';
 import { ErrorInterceptor } from './core/error-handler/error.interceptor';
+import { UtilityDataService } from './settings/property/utility/data/utility-data.service';
+import { AmenityDataService } from './settings/property/amenity/data/amenity-data.service';
+import { TypeDataService } from './settings/property/type/data/type-data.service';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -52,6 +55,40 @@ export function createTranslateLoader(http: HttpClient) {
 export const defaultDataServiceConfig: DefaultDataServiceConfig = {
   root: 'http://localhost/2020/Rental/api/public/api/v1',
   timeout: 1000 * 60, // request timeout }
+};
+
+const meta = {
+  current_page: 1,
+  from: 1,
+  last_page: '',
+  path: '',
+  per_page: '',
+  to: '',
+  total: ''
+};
+
+const utilityEntityMetaData: EntityMetadataMap = {
+  Utility: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const amenityEntityMetaData: EntityMetadataMap = {
+  Amenity: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const propertyTypeEntityMetaData: EntityMetadataMap = {
+  PropertyType: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
 };
 
 @NgModule({
@@ -88,4 +125,21 @@ export const defaultDataServiceConfig: DefaultDataServiceConfig = {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor (private eds: EntityDefinitionService,
+               private entityDataService: EntityDataService,
+               private utilityDataService: UtilityDataService,
+               private propertyTypeDataService: TypeDataService,
+               private amenityDataService: AmenityDataService) {
+
+    eds.registerMetadataMap({
+          Utility: utilityEntityMetaData,
+          Amenity: amenityEntityMetaData,
+      PropertyType: propertyTypeEntityMetaData
+        });
+
+    entityDataService.registerService('Utility', utilityDataService);
+    entityDataService.registerService('Amenity', amenityDataService);
+    entityDataService.registerService('PropertyType', propertyTypeDataService);
+  }
+}
