@@ -14,9 +14,9 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { TableListComponent } from './table-list/table-list.component';
 import { TypographyComponent } from './typography/typography.component';
 import { NotificationsComponent } from './notifications/notifications.component';
-import {
+/*import {
   AgmCoreModule
-} from '@agm/core';
+} from '@agm/core';*/
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -195,9 +195,9 @@ const utilityBillEntityMetaData: EntityMetadataMap = {
     RouterModule,
     AppRoutingModule,
     AuthenticationModule,
-    AgmCoreModule.forRoot({
+  /*  AgmCoreModule.forRoot({
       apiKey: 'YOUR_GOOGLE_MAPS_API_KEY'
-    }),
+    }),*/
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EntityDataModule.forRoot({})
   ],
