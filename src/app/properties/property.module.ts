@@ -47,7 +47,7 @@ export class PropertyModule {
 
     constructor (private eds: EntityDefinitionService, private entityDataService: EntityDataService,
                  private landlordDataService: PropertyDataService) {
-        eds.registerMetadataMap(entityMetaData);
-        entityDataService.registerService('Property', landlordDataService)
+     //   eds.registerMetadataMap(entityMetaData);
+     //   entityDataService.registerService('Property', landlordDataService)
     }
 }

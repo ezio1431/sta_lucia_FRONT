@@ -6,16 +6,16 @@ import { BaseService } from '../../../../shared/base-service';
 
 @Injectable({ providedIn: 'root' })
 export class UtilityService extends BaseService<UtilityModel> {
-    private selectedMemberSource = new BehaviorSubject<UtilityModel | null>(null);
-    selectedMemberChanges$ = this.selectedMemberSource.asObservable();
+    private selectedUtilitySource = new BehaviorSubject<UtilityModel | null>(null);
+    selectedUtilityChanges$ = this.selectedUtilitySource.asObservable();
 
     private  localHttpClient: HttpClient;
     constructor(httpClient: HttpClient) {
-        super( httpClient, 'landlords');
+        super( httpClient, 'utilities');
         this.localHttpClient = httpClient;
     }
 
-    changeSelectedMember(selectedMember: UtilityModel | null ): void {
-        this.selectedMemberSource.next(selectedMember);
+    changeSelectedUtility(selectedUtility: UtilityModel | null ): void {
+        this.selectedUtilitySource.next(selectedUtility);
     }
 }

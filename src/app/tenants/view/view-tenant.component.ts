@@ -10,7 +10,7 @@ import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { AddTenantComponent } from '../add/add-tenant.component';
 
 @Component({
-    selector: 'robi-view-tenant',
+    selector: 'robi-view-property',
     styleUrls: ['./view-tenant.component.scss'],
     templateUrl: './view-tenant.component.html'
 })

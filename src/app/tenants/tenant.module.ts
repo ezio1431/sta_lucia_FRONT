@@ -11,6 +11,7 @@ import {
 import { TenantDataService } from './data/tenant-data.service';
 import { ViewTenantGeneralComponent } from './view/general/view-tenant-general.component';
 import { ViewTenantComponent } from './view/view-tenant.component';
+import { TenantUnitDetailsComponent } from './add/unit-details/tenant-unit-details.component';
 
 const entityMetaData: EntityMetadataMap = {
     Tenant: {
@@ -37,18 +38,16 @@ const entityMetaData: EntityMetadataMap = {
         TenantComponent,
         AddTenantComponent,
         ViewTenantGeneralComponent,
-        ViewTenantComponent
-    ],
-    entryComponents: [
-        AddTenantComponent
+        ViewTenantComponent,
+        TenantUnitDetailsComponent
     ]
 })
 
 export class TenantModule {
 
     constructor (private eds: EntityDefinitionService, private entityDataService: EntityDataService,
-                 private landlordDataService: TenantDataService) {
-        eds.registerMetadataMap(entityMetaData);
-        entityDataService.registerService('Tenant', landlordDataService)
+                 private tenantDataService: TenantDataService) {
+       // eds.registerMetadataMap(entityMetaData);
+      //  entityDataService.registerService('Tenant', tenantDataService)
     }
 }

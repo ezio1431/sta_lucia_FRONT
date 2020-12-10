@@ -1,24 +1,21 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild, ViewChildren } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PropertyModel } from '../models/property-model';
 import { PropertyService } from '../data/property.service';
 
 import { NotificationService } from '../../shared/notification.service';
-import * as moment from 'moment';
 import { PropertyEntityService } from '../data/property-entity.service';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { LandlordModel } from '../../landlords/models/landlord-model';
-import { AddLandlordComponent } from '../../landlords/add/add-landlord.component';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { PropertyUnitDetailsComponent } from './unit-details/property-unit-details.component';
 import { tap } from 'rxjs/operators';
-import { TypeDataService } from '../../settings/property/type/data/type-data.service';
 import { TypeEntityService } from '../../settings/property/type/data/type-entity.service';
 import { UtilityEntityService } from '../../settings/property/utility/data/utility-entity.service';
 import { AmenityEntityService } from '../../settings/property/amenity/data/amenity-entity.service';
 import { CheckboxItem } from '../../settings/property/roles/edit/check-box-item';
+import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { UnitTypeEntityService } from '../../settings/property/unit-type/data/unit-type-entity.service';
 
 @Component({
     selector: 'robi-add-member',
@@ -76,19 +73,32 @@ export class AddPropertyComponent implements OnInit  {
 
     utilities$: Observable<any>;
     amenities$: Observable<any>;
+    unitTypes$: Observable<any>;
+    selectedUnitType$: Observable<any>;
 
     allAmenitiesOptions = new Array<CheckboxItem>();
     allUtilitiesOptions = new Array<CheckboxItem>();
     amenities: any;
     utilities: any;
 
+    logoToUpload: File = null;
+    logoUrl = '';
+    showLogo: any;
+
+    photoToUpload: File = null;
+    photoName: any;
+    photoUrl = '';
+    showPhoto: any;
+    progress = 0;
+
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
                 private _formBuilder: FormBuilder,
-                private memberService: PropertyService,
+                private propertyService: PropertyService,
                 private landlordEntityService: PropertyEntityService,
                 private notification: NotificationService,
                 private propertyTypeEntityService: TypeEntityService,
+                private unitTypeEntityService: UnitTypeEntityService,
                 private utilityEntityService: UtilityEntityService,
                 private amenityEntityService: AmenityEntityService) {
     }
@@ -96,6 +106,7 @@ export class AddPropertyComponent implements OnInit  {
     ngOnInit() {
 
         this.loadPropertyTypes();
+        this.loadUnitTypes();
        // this.loadUtilities ();
       //  this.loadAmenities();
 
@@ -155,6 +166,31 @@ export class AddPropertyComponent implements OnInit  {
                     Validators.minLength(2)]],
                 unitFields: this.fb.array([ this.createUnitField() ])
             });
+    }
+
+    /**
+     * Load property Types
+     */
+    loadUnitTypes() {
+        this.unitTypeEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.unitTypeEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.unitTypes$ = this.unitTypeEntityService.entities$;
+        });
+    }
+
+    /**
+     * Load single item
+     * @param id
+     */
+    loadUnitType(id: string) {
+        return this.unitTypeEntityService.selectEntityById(id);
     }
 
     /**
@@ -280,6 +316,7 @@ export class AddPropertyComponent implements OnInit  {
         dialogConfig.data = {unitValue,
             utilities: this.utilities$,
             amenities: this.amenities$,
+            unitTypes: this.unitTypes$,
             amenitiesData: this.amenities,
             amenityOptions: this.allAmenitiesOptions,
             utilityOptions: this.allUtilitiesOptions,
@@ -308,6 +345,7 @@ export class AddPropertyComponent implements OnInit  {
                     this.unitFields.at(number).patchValue({
                         unit_name: result.data.unit_name,
                     });
+                    this.selectedUnitType$ = this.loadUnitType(this.unitValues[number]?.unit_type_id);
 
                     console.log(' *****NEWWWW this.unitValues', this.unitValues);
 
@@ -321,6 +359,8 @@ export class AddPropertyComponent implements OnInit  {
                     this.unitFields.at(number).patchValue({
                         unit_name: result.data.unit_name,
                     });
+                  //  this.selectedUnitType$ = this.loadUnitType(result.data.unit_type_id);
+                    this.selectedUnitType$ = this.loadUnitType(this.unitValues[number]?.unit_type_id);
                 }
             }
         });
@@ -382,6 +422,125 @@ export class AddPropertyComponent implements OnInit  {
 
     /**
      *
+     */
+    getImageFromService() {
+       /* if (this.setting && this.setting.logo !== null) {
+            this.propertyService.fetchPhoto(this.settingId).subscribe(data => {
+                this.createImageFromBlob(data);
+            }, error => {
+            });
+        }*/
+    }
+
+    /**
+     *
+     * @param image
+     */
+    createImageFromBlob(image: Blob) {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+            this.showPhoto = of(reader.result);
+        }, false);
+
+        if (image) {
+            reader.readAsDataURL(image);
+        }
+    }
+
+
+
+
+    /**
+     *
+     * @param file
+     */
+    onProfilePhotoSelect(file: FileList) {
+        if (file.length > 0) {
+            this.photoToUpload = file.item(0);
+            this.photoName = file.item(0).name;
+            const reader = new FileReader();
+            reader.onload = (event: any) => {
+                this.photoUrl = event.target.result;
+            };
+            reader.readAsDataURL(this.photoToUpload);
+
+            this.loader = true;
+            // upload to server
+
+            const formData = new FormData();
+            formData.append('photo', this.photoToUpload);
+          //  formData.append('id',  this.settingId);
+
+            // Upload Photo
+            this.uploadPhoto(formData);
+        }
+    }
+
+    /**
+     * Upload profile image to server
+     * @param formData
+     */
+    private uploadPhoto(formData: FormData) {
+        // Upload photo
+        this.propertyService.uploadPhoto(formData)
+            .subscribe((event: HttpEvent<any>) => {
+
+                    console.log('file upload');
+                    console.log(event.type);
+
+                    if (event.type === HttpEventType.UploadProgress) {
+                        console.log('Progress', event.loaded);
+                      //  console.log('Progress', Math.round(event.loaded / event.total * 100));
+
+                    }
+
+            /*    switch (event.type) {
+                    case HttpEventType.Sent:
+                        console.log('Request has been made!');
+                        break;
+                    case HttpEventType.ResponseHeader:
+                        console.log('Response header has been received!');
+                        break;
+                    case HttpEventType.UploadProgress:
+                        this.progress = Math.round(event.loaded / event.total * 100);
+                        console.log(`Uploaded! ${this.progress}%`);
+                        break;
+                    case HttpEventType.Response:
+                        console.log('User successfully created!', event.body);
+                        setTimeout(() => {
+                            this.progress = 0;
+                        }, 1500);
+                }*/
+
+
+            /*    console.log('file upload');
+                console.log(event);*/
+                 //   this.loader = false;
+                  //  this.getImageFromService();
+                    // notify success
+                    this.notification.showNotification('success', 'Success !! Logo has been updated.');
+                },
+                (error) => {
+                   /* this.loader = false;
+                    if (error.payment === 0) {
+                        return;
+                    }
+                    // An array of all form errors as returned by server
+                    this.formErrors = error;
+
+                    if (this.formErrors) {
+                        // loop through from fields, If has an error, mark as invalid so mat-error can show
+                        for (const prop in this.formErrors) {
+                            if (this.form) {
+                                this.form.controls[prop].setErrors({incorrect: true});
+                            }
+                        }
+                    }*/
+                });
+    }
+
+    /**
+     *
      * @param file
      */
     onMembershipFormInputSelect(file: FileList) {
@@ -439,22 +598,29 @@ export class AddPropertyComponent implements OnInit  {
 
         const formData = new FormData();
         if (this.profilePicFileToUpload != null) {
-            formData.append('passport_photo', this.profilePicFileToUpload);
+            formData.append('property_photo', this.profilePicFileToUpload);
         }
         if (this.membershipFormToUpload != null) {
             formData.append('membership_form', this.membershipFormToUpload);
         }
 
-        for (const key in body) {
+       /* for (const key in body) {
             if (body.hasOwnProperty(key)) {
                 formData.append(key, body[key]);
             }
-        }
+        }*/
         this.loader = true;
 
         this.landlordEntityService.add(body).subscribe((data) => {
                // this.onSaveComplete();
                 this.notification.showNotification('success', 'Success !! Landlord created.');
+
+                // Upload image
+                formData.append('property_id', data.id);
+                this.propertyService.uploadPhoto(formData)
+                    .subscribe((xx) => {
+                        console.log('uploading image after ...xx')
+                    });
             },
             (error) => {
                 this.errorInForm.next(true);

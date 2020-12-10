@@ -20,23 +20,29 @@
                     </div>
                 </div>
 
+                <!--{{(amenities$ | async ) | json}}-->
+                <div *ngFor="let amenity of (amenities$ | async )">
+                    {{amenity.amenity_name}}
+
+                </div>
+
                 <div class="table-responsive">
 
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="name" matSortDirection="asc" matSortDisableClear>
+                    <mat-table #table [dataSource]="amenitiesDataSource" matSort matSortActive="amenity_name" matSortDirection="asc" matSortDisableClear>
 
-                        <ng-container matColumnDef="name">
+                        <ng-container matColumnDef="amenity_name">
                             <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.name}} </mat-cell>
+                            <mat-cell *matCellDef="let row"> {{row.amenity_name}} </mat-cell>
                         </ng-container>
 
-                        <ng-container matColumnDef="display_name">
+                        <ng-container matColumnDef="amenity_display_name">
                             <mat-header-cell *matHeaderCellDef mat-sort-header> Display Name </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.display_name}} </mat-cell>
+                            <mat-cell *matCellDef="let row"> {{row.amenity_display_name}} </mat-cell>
                         </ng-container>
 
-                        <ng-container matColumnDef="permissions">
-                            <mat-header-cell *matHeaderCellDef> Permissions </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.permissions?.length}} / {{allPermissions?.length}}</mat-cell>
+                        <ng-container matColumnDef="amenity_description">
+                            <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{row.amenity_description}}</mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="actions">

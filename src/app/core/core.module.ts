@@ -23,7 +23,6 @@ import {
   metaReducers,
   selectRouterState
 } from './core.state';
-import { AuthEffects } from './auth/auth.effects';
 import { selectIsAuthenticated, selectAuth } from './auth/auth.selectors';
 import { authLogin, authLogout } from './auth/auth.actions';
 import { AuthGuardService } from './auth/auth-guard.service';
@@ -79,13 +78,13 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   imports: [
     // angular
-    SharedModule,
+   // SharedModule,
 
     // ngrx
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreRouterConnectingModule.forRoot(),
     EffectsModule.forRoot([
-      AuthEffects,
+    //  AuthEffects,
       SettingsEffects,
       // GoogleAnalyticsEffects
     ]),

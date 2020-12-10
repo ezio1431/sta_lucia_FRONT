@@ -10,6 +10,7 @@ import { LandlordModel } from './models/landlord-model';
 import { LandlordDataSource } from './data/landlord-data.source';
 import { NotificationService } from '../shared/notification.service';
 import { LandlordEntityService } from './data/landlord-entity.service';
+import { LandlordService } from './data/landlord.service';
 
 @Component({
     selector: 'robi-landlords',
@@ -18,7 +19,24 @@ import { LandlordEntityService } from './data/landlord-entity.service';
 })
 export class LandlordComponent implements OnInit, AfterViewInit {
 
+    displayedColumns = [
+        'first_name',
+        'last_name',
+        'email'
+    ];
+
+    /*'actions',*/
+
+    loader = false;
+
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
+
+    dataSource: LandlordDataSource;
+    // Pagination
+    length: number;
+    pageIndex = 0;
+    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+    meta: any;
 
     // Search field
     @ViewChild('search') search: ElementRef;
@@ -32,8 +50,8 @@ export class LandlordComponent implements OnInit, AfterViewInit {
     nextPage = 1;
     loaded: boolean;
 
-    constructor(private landlordEntityService: LandlordEntityService, private notification: NotificationService,
-                private dialog: MatDialog) {
+    constructor(private landlordService: LandlordService, private landlordEntityService: LandlordEntityService,
+                private notification: NotificationService, private dialog: MatDialog) {
     }
 
     /**
@@ -42,6 +60,14 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
+
+        this.dataSource = new LandlordDataSource(this.landlordService);
+
+        // Load pagination data
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
+
+        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
+        this.dataSource.load('', 0, 0, 'first_name', 'desc');
 
         this.landlords$ = this.landlordEntityService.entities$
             .pipe(

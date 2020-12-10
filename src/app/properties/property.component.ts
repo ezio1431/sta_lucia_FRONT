@@ -14,6 +14,7 @@ import { UtilityEntityService } from '../settings/property/utility/data/utility-
 import { AmenityEntityService } from '../settings/property/amenity/data/amenity-entity.service';
 import { UtilityModel } from '../settings/property/utility/model/utility-model';
 import { TypeEntityService } from '../settings/property/type/data/type-entity.service';
+import { PropertyService } from './data/property.service';
 
 @Component({
     selector: 'robi-properties',
@@ -21,6 +22,28 @@ import { TypeEntityService } from '../settings/property/type/data/type-entity.se
     styleUrls: ['./property.component.scss']
 })
 export class PropertyComponent implements OnInit, AfterViewInit {
+
+    displayedColumns = [
+        'property_name',
+        'location',
+        'property_type_id',
+        'landlord_id',
+        'actions'
+    ];
+    displayedColumnsReduced = [
+        'property_name',
+        'landlord_id',
+        'actions'
+    ];
+    // Pagination
+    length: number;
+    pageIndex = 0;
+    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+    meta: any;
+    @ViewChild(MatSort, {static: true}) sort: MatSort;
+    dataSource$: any;
+    // pagination
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
@@ -43,7 +66,15 @@ export class PropertyComponent implements OnInit, AfterViewInit {
     properties$: Observable<any>;
     propertyTypes$: Observable<any>;
 
-    constructor(private propertyEntityService: PropertyEntityService,
+    imageToShow: any;
+
+    showMaster = false;
+    selectedProperty$: any;
+
+    selectedRow = -1;
+
+    constructor(private propertyService: PropertyService,
+                private propertyEntityService: PropertyEntityService,
                 private propertyTypeEntityService: TypeEntityService,
                 private notification: NotificationService,
                 private dialog: MatDialog, private utilityEntityService: UtilityEntityService,
@@ -57,8 +88,12 @@ export class PropertyComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
 
+       // this.getImageFromService('Quotefancy-1571909-3840x2160_1589749637.jpg');
+
         // load properties
         this.loadProperties();
+
+        this.dataSource$ = this.propertyEntityService.entities$;
 
 
         this.loadPropertyTypes();
@@ -150,6 +185,34 @@ export class PropertyComponent implements OnInit, AfterViewInit {
 
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
        // this.dataSource.load('', 0, 0, 'updated_at', 'desc');
+
+        // Master detail select data
+        this.propertyEntityService.selectedOption$.subscribe(property =>
+            this.selectedProperty$ = this.propertyEntityService.entities$
+                .pipe(
+                    map(entities => entities.find(entity => entity.id === property.id))
+                )
+        );
+    }
+
+    highlight(row) {
+        console.log('highlight', row);
+        this.selectedRow = row.id;
+    }
+
+    toggleShowMaster() {
+        this.showMaster = !this.showMaster;
+    }
+
+    /**
+     * When a property is selected for view
+     * @param property
+     */
+    onSelected(property: PropertyModel): void {
+        console.log('onSelected', property);
+        this.showMaster = true;
+        this.selectedRowIndex = property.id;
+        this.propertyEntityService.changeSelectedProperty(property);
     }
 
     initialLoad() {
@@ -177,6 +240,38 @@ export class PropertyComponent implements OnInit, AfterViewInit {
             ).subscribe(data => {
             this.properties$ = this.propertyEntityService.entities$;
         });
+    }
+
+    /**
+     * Search
+     */
+    filter(currentPage) {
+        const page = currentPage + 1;
+
+        console.log('currentPage', currentPage);
+
+        this.propertyEntityService.getWithQuery({
+            'filter': this.search.nativeElement.value,
+            'page': page.toString(),
+            'limit': '',
+            'sortField': 'updated_at',
+            'sortDirection': 'desc'
+        });
+    }
+
+    /**
+     * Load data from Api
+     */
+    loadData() {
+        this.propertyEntityService.getWithQuery({
+            'filter': this.search.nativeElement.value,
+            'page': this.nextPage.toString(),
+            'limit': '3',
+            'sortField': 'updated_at',
+            'sortDirection': 'desc'
+        });
+
+        this.nextPage++;
     }
 
     /**
@@ -230,6 +325,43 @@ export class PropertyComponent implements OnInit, AfterViewInit {
         });
     }
 
+    getImageFromService(imageName: string) {
+        console.log('called');
+
+  /*      const clicks = fromEvent(document, 'click');
+    * const result = clicks.pipe(first());
+    * result.subscribe(x => console.log(x));*/
+
+        /*const imageUrl = this.propertyService.getImage(imageName)
+            .pipe(first());
+
+        imageUrl.subscribe(url => {
+            return url;
+        });*/
+
+            this.propertyService.getImagePath(imageName).subscribe(data => {
+               // console.log('my image data');
+               /// console.log(data);
+               // return data;
+                this.createImageFromBlob(data);
+            }, error => {
+                console.log(error);
+            });
+    }
+
+    createImageFromBlob(image: Blob) {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+            this.imageToShow = reader.result;
+            console.log('reader.result');
+            console.log(reader.result);
+          //  return reader.result;
+        }, false);
+
+        if (image) {
+            reader.readAsDataURL(image);
+        }
+    }
 
     load(currentPage) {
         const page = currentPage + 1;
@@ -243,35 +375,7 @@ export class PropertyComponent implements OnInit, AfterViewInit {
         });
     }
 
-    /**
-     * Search
-     */
-    filter(currentPage) {
-        const page = currentPage + 1;
 
-            this.propertyEntityService.getWithQuery({
-                'filter': this.search.nativeElement.value,
-                'page': page.toString(),
-                'limit': '',
-                'sortField': 'updated_at',
-                'sortDirection': 'desc'
-            });
-    }
-
-    /**
-     * Load data from Api
-     */
-   loadData() {
-        this.propertyEntityService.getWithQuery({
-           'filter': this.search.nativeElement.value,
-           'page': this.nextPage.toString(),
-           'limit': '3',
-           'sortField': 'updated_at',
-           'sortDirection': 'desc'
-       });
-
-       this.nextPage++;
-   }
 
     /**
      * Show or hide the load more button bar
@@ -285,7 +389,7 @@ export class PropertyComponent implements OnInit, AfterViewInit {
     /**
      * Handle search and pagination
      */
-    ngAfterViewInit() {
+/*    ngAfterViewInit() {
 
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
@@ -298,18 +402,52 @@ export class PropertyComponent implements OnInit, AfterViewInit {
                 })
             ).subscribe();
 
-        /* this.paginator.page.pipe(
+        /!* this.paginator.page.pipe(
              tap(() => this.loadData() )
-         ).subscribe();*/
+         ).subscribe();*!/
 
         // reset the paginator after sorting
         //  this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-        /*  merge(this.sort.sortChange, this.paginator.page)
+        /!*  merge(this.sort.sortChange, this.paginator.page)
               .pipe(
                   tap(() => this.loadData())
               )
-              .subscribe();*/
+              .subscribe();*!/
+    }*/
+
+
+    /**
+     * Handle search and pagination
+     */
+    ngAfterViewInit() {
+
+        console.log('ngAfterViewInit');
+        console.log(this.paginator);
+
+        fromEvent(this.search.nativeElement, 'keyup')
+            .pipe(
+                debounceTime(1000),
+                distinctUntilChanged(),
+                tap(() => {
+                    this.paginator.pageIndex = 0;
+                   // this.loadData();
+                   // this.filter();
+                })
+            ).subscribe();
+
+     /*   this.paginator.page.pipe(
+            tap(() => this.filter(this.paginator.page) )
+        ).subscribe();*/
+
+        // reset the paginator after sorting
+        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+        /*merge(this.sort.sortChange, this.paginator.page)
+            .pipe(
+                tap(() => this.loadData())
+            )
+            .subscribe();*/
     }
 
     /**
@@ -326,12 +464,12 @@ export class PropertyComponent implements OnInit, AfterViewInit {
     /**
      * Add dialog launch
      */
-    addDialog(mode: string, landlord?: PropertyModel) {
+    addDialog(mode: string, property?: PropertyModel) {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
 
-        dialogConfig.data = {landlord,
+        dialogConfig.data = {property,
             mode: mode
         };
 
@@ -343,15 +481,6 @@ export class PropertyComponent implements OnInit, AfterViewInit {
                 }
             }
         );
-    }
-
-    /**
-     * When a landlord is selected for view
-     * @param landlord
-     */
-    onSelected(landlord: PropertyModel): void {
-        this.selectedRowIndex = landlord.id;
-        this.propertyEntityService.changeSelectedLandlord(landlord);
     }
 
     /**
@@ -391,9 +520,9 @@ export class PropertyComponent implements OnInit, AfterViewInit {
 
     /**
      * Open Edit form
-     * @param landlord
+     * @param property
      */
-    openConfirmationDialog(landlord: PropertyModel) {
+    openConfirmationDialog(property: PropertyModel) {
 
         this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true
@@ -401,7 +530,7 @@ export class PropertyComponent implements OnInit, AfterViewInit {
 
         this.dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.delete(landlord);
+                this.delete(property);
             }
             this.dialogRef = null;
         });
@@ -409,11 +538,11 @@ export class PropertyComponent implements OnInit, AfterViewInit {
 
     /**
      * Remove resource from db
-     * @param landlord
+     * @param property
      */
-   delete(landlord: PropertyModel) {
+   delete(property: PropertyModel) {
        // this.loader = true;
-        this.propertyEntityService.delete(landlord);
+        this.propertyEntityService.delete(property);
      /*   this.service.delete(lead)
             .subscribe((data) => {
                     this.loader = false;

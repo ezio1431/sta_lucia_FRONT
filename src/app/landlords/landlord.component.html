@@ -1,17 +1,12 @@
 <div class="main-content">
     <div class="container-fluid">
-        <div class="row">
 
-            <div class="fab-container">
-                <button mat-fab class="fab-toggler" (click)="addDialog('add')">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
+        <div class="row">
 
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-header-info">
-                        <h4 class="card-title"> {{ 'robi.landlords.title' | translate }} </h4>
+                        <h4 class="card-title">{{ 'robi.landlords.title' | translate }}</h4>
                     </div>
                     <div class="card-body">
 
@@ -55,25 +50,115 @@
                         </div>
 
                         <div class="row search-form-section">
-                            <div class="col-sm-1">
-                                <button matPrefix mat-raised-button type="submit" class="btn btn-white btn-round btn-just-icon">
-                                    <i class="material-icons">search</i>
-                                    <div class="ripple-container"></div>
+
+                            <div class="col-5">
+                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
+                                        (click)="addDialog('add')">
+                                    <mat-icon>add</mat-icon>Add Landlord
                                 </button>
                             </div>
 
-                            <div class="col-11">
+                            <div class="col-7">
                                 <mat-form-field class="search-form-field">
-                                    <input matInput #search placeholder="{{ 'robi.landlords.filter' | translate }}" autocomplete="off" [disabled]="(meta$ | async)?.total===0">
+                                    <input matInput #search placeholder="{{ 'robi.landlords.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
                                     <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
                                         <mat-icon>close</mat-icon></button>
                                 </mat-form-field>
                             </div>
                         </div>
 
+                        <div class="table-responsive">
+
+                            <mat-table #table [dataSource]="dataSource" matSort matSortActive="first_name" matSortDirection="desc"
+                                       matSortDisableClear>
+
+                                <ng-container matColumnDef="first_name">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header> First Name </mat-header-cell>
+                                    <mat-cell *matCellDef="let row"> {{row.first_name}} </mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="last_name">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Last Name </mat-header-cell>
+                                    <mat-cell *matCellDef="let row"> {{row.last_name}} </mat-cell>
+                                </ng-container>
+
+                                <ng-container matColumnDef="email">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
+                                    <mat-cell *matCellDef="let row"> {{row.email}} </mat-cell>
+                                </ng-container>
+
+                         <!--       <ng-container matColumnDef="actions">
+                                    <mat-header-cell *matHeaderCellDef> Actions  </mat-header-cell>
+                                    <mat-cell *matCellDef="let row" class="button-row">
+                                        <button mat-icon-button [matMenuTriggerFor]="menu">
+                                            <mat-icon>more_vert</mat-icon>
+                                        </button>
+                                        <mat-menu #menu="matMenu">
+                                            <button mat-menu-item matTooltip="Edit Expense." [matTooltipPosition]="'above'" (click)="editDialog(row)">
+                                                <mat-icon color="primary">edit</mat-icon>
+                                                <span>Edit</span>
+                                            </button>
+                                            <button mat-menu-item matTooltip="Delete Expense." [matTooltipPosition]="'above'" (click)="openConfirmationDialog(row)">
+                                                <mat-icon color="warn">delete</mat-icon>
+                                                <span>Delete</span>
+                                            </button>
+                                        </mat-menu>
+                                    </mat-cell>
+                                </ng-container>-->
+
+                                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                <mat-row *matRowDef="let row; columns: displayedColumns;" routerLink="{{row.id}}" (click)="onSelected(row)"> </mat-row>
+
+                            </mat-table>
+                            <span *ngIf="meta?.total===0">No Data</span>
+
+                        <!--    <div class="d-flex justify-content-center spinner-container" *ngIf="(dataSource?.loading$ | async) || loader">
+                                <mat-spinner [diameter]="40"></mat-spinner>
+                            </div>-->
+
+                            <div class="d-flex justify-content-center spinner-container" *ngIf="(dataSource?.loading$ | async) || loader">
+                                <mat-progress-bar
+                                        color="green"
+                                        mode="query"
+                                        value=50
+                                        bufferValue=75>
+                                </mat-progress-bar>
+                            </div>
+
+                            <mat-paginator #pagination
+                                           [length]="meta?.total"
+                                           [pageIndex]="pageIndex"
+                                           [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
+                            </mat-paginator>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+  <!--      <div class="row">
+
+            <div class="fab-container">
+                <button mat-fab class="fab-toggler" (click)="addDialog('add')">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info">
+                        <h4 class="card-title"> {{ 'robi.landlords.title' | translate }} </h4>
+                    </div>
+                    <div class="card-body">
+
+
                         <div class="row align-items-end">
                             <div *ngFor="let landlord of landlords$ | async;" class="col-md-6 col-lg-4">
-                                <div class="card card-lift--hover shadow border-0 card-profile">
+                                <div class="card card-lift&#45;&#45;hover shadow border-0 card-profile">
 
 
                                     <div class="front">
@@ -82,7 +167,7 @@
                                         </div>
                                         <div class="card-avatar">
                                             <img [src]="landlord.profile_pic"/>
-                                            <!--<img class="img" src="../../assets/img/images/2.jpg"/>-->
+                                            &lt;!&ndash;<img class="img" src="../../assets/img/images/2.jpg"/>&ndash;&gt;
 
                                         </div>
                                         <div class="content">
@@ -157,6 +242,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>-->
+
+
     </div>
 </div>

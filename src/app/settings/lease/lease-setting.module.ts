@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 
+import { SharedModule } from '../../shared/shared.module';
 import { LeaseSettingRoutingModule } from './lease-setting-routing.module';
 import { LeaseSettingComponent } from './lease-setting.component';
-import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
     imports: [

@@ -14,6 +14,11 @@ import { CheckboxItem } from './edit/check-box-item';
 import { RoleSettingService } from '../data/role-setting.service';
 import { NotificationService } from '../../../shared/notification.service';
 import { PermissionSettingService } from '../data/permission-setting.service';
+import { select, Store } from '@ngrx/store';
+import { selectAllAmenities } from './store/amenities.selectors';
+import { AmenityDataSource } from './data/amenity-data.source';
+import { AmenityEntityService } from './data/amenity-entity.service';
+import { PageQuery } from '../utility/utility-setting.component';
 
 @Component({
     selector: 'robi-utility-setting',
@@ -22,9 +27,9 @@ import { PermissionSettingService } from '../data/permission-setting.service';
 })
 export class AmenitySettingComponent implements OnInit, AfterViewInit {
     displayedColumns = [
-        'name',
-        'display_name',
-        'permissions',
+        'amenity_name',
+        'amenity_display_name',
+        'amenity_description',
         'actions'
     ];
 
@@ -39,7 +44,7 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
     // Pagination
     length: number;
     pageIndex = 0;
-    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+    pageSizeOptions: number[] = [3, 5, 10, 25, 50, 100];
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
@@ -51,9 +56,13 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
 
     rolePermissions: any;
 
+    amenities$: any;
+
+    amenitiesDataSource: AmenityDataSource;
 
     constructor(private roleService: RoleSettingService, private permissionService: PermissionSettingService,
-                private notification: NotificationService, private dialog: MatDialog) {
+                private notification: NotificationService, private dialog: MatDialog,
+                private store: Store, private amenityEntityService: AmenityEntityService) {
     }
 
     /**
@@ -62,6 +71,21 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
+
+        this.amenitiesDataSource = new AmenityDataSource(this.store, null, this.amenityEntityService);
+        // Load pagination data
+        this.amenitiesDataSource.meta$.subscribe((res) => this.meta = res);
+
+        const initialPage: PageQuery = {
+            pageIndex: 0,
+            pageSize: 3
+        };
+        this.amenitiesDataSource.loadAmenities(initialPage);
+
+        console.log('this.amenitiesDataSource');
+        console.log(this.amenitiesDataSource);
+
+        this.amenities$ = this.store.pipe(select(selectAllAmenities));
 
       //  this.dataSource = new RoleSettingDataSource(this.roleService);
 
@@ -81,6 +105,15 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
                 () => this.allPermissions = []
             );
 */
+    }
+
+    xxxload() {
+        console.log('load data', (this.paginator.pageIndex + 1).toString());
+        const newPage: PageQuery = {
+            pageIndex: this.paginator.pageIndex,
+            pageSize: this.paginator.pageSize
+        };
+        this.amenitiesDataSource.loadAmenities(newPage);
     }
 
     /**
@@ -147,7 +180,8 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
      */
     ngAfterViewInit() {
 
-        fromEvent(this.search.nativeElement, 'keyup')
+        console.log('gikure ... ngAfterViewInit');
+        /*fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
                 distinctUntilChanged(),
@@ -155,10 +189,10 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
                     this.paginator.pageIndex = 0;
                     this.loadData();
                 })
-            ).subscribe();
+            ).subscribe();*/
 
         this.paginator.page.pipe(
-            tap(() => this.loadData() )
+            tap(() => this.xxxload() )
         ).subscribe();
 
         // reset the paginator after sorting
@@ -166,7 +200,7 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
 
         merge(this.sort.sortChange, this.paginator.page)
             .pipe(
-                tap(() => this.loadData())
+                tap(() => this.xxxload())
             )
             .subscribe();
     }

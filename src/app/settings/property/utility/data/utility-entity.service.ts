@@ -9,12 +9,15 @@ export class UtilityEntityService extends EntityCollectionServiceBase <UtilityMo
     private selectedSource = new BehaviorSubject<UtilityModel | null>(null);
     selectedChanges$ = this.selectedSource.asObservable();
 
-    meta$: Observable<{}>;
+    meta$: any;
 
     constructor(serviceElementsFactory: EntityCollectionServiceElementsFactory) {
         super('Utility', serviceElementsFactory);
 
-        this.meta$ = this.selectors$['meta$'];
+     //   this.meta$ = this.selectors$['meta$'];
+        this.meta$ = this.selectors$;
+
+        console.log('xxxx_META$', this.meta$);
     }
 
     changeSelected(selected: UtilityModel | null ): void {

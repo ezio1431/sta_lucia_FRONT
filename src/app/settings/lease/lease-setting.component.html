@@ -2,24 +2,26 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <p class="card-category">Lease Settings</p>
+                <p class="card-category">Lease / Tenant Settings</p>
             </div>
 
             <div class="card-body">
 
                 <nav mat-tab-nav-bar>
-                    <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive"
+                    <a mat-tab-link routerLinkActive #lease="routerLinkActive" [active]="lease.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/lease']">
-                        <span class="nav-text"> Lease</span></a>
+                        <span class="nav-text"> Lease Types</span></a>
 
-                    <a mat-tab-link routerLinkActive #role="routerLinkActive" [active]="role.isActive" [routerLink]="['roles']">
-                        <span class="nav-text"> Late Fees</span></a>
+                    <a mat-tab-link routerLinkActive #lease_mode="routerLinkActive" [active]="lease_mode.isActive"
+                       [routerLink]="['lease_mode']">
+                        <span class="nav-text"> Lease Mode</span></a>
 
-                    <a mat-tab-link routerLinkActive #permission="routerLinkActive" [active]="permission.isActive"
-                       [routerLink]="['permissions']">
-                        <span class="nav-text"> Other Charges</span></a>
-
+                    <a mat-tab-link routerLinkActive #tenant_type="routerLinkActive" [active]="tenant_type.isActive"
+                       [routerLink]="['tenant_type']">
+                        <span class="nav-text"> Tenant Types</span></a>
                 </nav>
+
+
 
                 <router-outlet></router-outlet>
 

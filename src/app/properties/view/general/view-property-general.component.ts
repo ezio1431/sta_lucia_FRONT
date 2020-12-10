@@ -31,7 +31,7 @@ export class ViewPropertyGeneralComponent implements OnInit {
     ngOnInit() {
       //  this.landlord$ = this.propertyEntityService.selectedLandlordChanges$;
 
-        this.propertyEntityService.selectedChanges$.subscribe(property =>
+        this.propertyEntityService.selectedOption$.subscribe(property =>
             this.landlord$ = this.propertyEntityService.entities$
                 .pipe(
                     map(entities => entities.find(entity => entity.id === property.id))

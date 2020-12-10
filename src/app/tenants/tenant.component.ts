@@ -3,20 +3,47 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { fromEvent, merge, Observable } from 'rxjs';
-import { debounceTime, delay, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { debounceTime, delay, distinctUntilChanged, filter, first, map, tap } from 'rxjs/operators';
 import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialog-component';
 import { AddTenantComponent } from './add/add-tenant.component';
 import { TenantModel } from './models/tenant-model';
 import { TenantDataSource } from './data/tenant-data.source';
 import { NotificationService } from '../shared/notification.service';
 import { TenantEntityService } from './data/tenant-entity.service';
+import { UtilityEntityService } from '../settings/property/utility/data/utility-entity.service';
+import { AmenityEntityService } from '../settings/property/amenity/data/amenity-entity.service';
+import { UtilityModel } from '../settings/property/utility/model/utility-model';
+import { TypeEntityService } from '../settings/property/type/data/type-entity.service';
+import { TenantService } from './data/tenant.service';
 
 @Component({
-    selector: 'robi-tenants',
+    selector: 'robi-properties',
     templateUrl: './tenant.component.html',
     styleUrls: ['./tenant.component.scss']
 })
 export class TenantComponent implements OnInit, AfterViewInit {
+
+    displayedColumns = [
+        'first_name',
+        'last_name',
+        'gender',
+        'contact_phone',
+        'actions'
+    ];
+    displayedColumnsReduced = [
+        'first_name',
+        'last_name',
+        'actions'
+    ];
+    // Pagination
+    length: number;
+    pageIndex = 0;
+    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+    meta: any;
+    @ViewChild(MatSort, {static: true}) sort: MatSort;
+    dataSource$: any;
+    // pagination
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
@@ -32,8 +59,26 @@ export class TenantComponent implements OnInit, AfterViewInit {
     nextPage = 1;
     loaded: boolean;
 
-    constructor(private propertyEntityService: TenantEntityService, private notification: NotificationService,
-                private dialog: MatDialog) {
+   // utilities$: Observable<UtilityModel>;
+    utilities$: any;
+    isLoaded: boolean;
+    amenities$: Observable<any>;
+    properties$: Observable<any>;
+    propertyTypes$: Observable<any>;
+
+    imageToShow: any;
+
+    showMaster = false;
+    selectedProperty$: any;
+
+    selectedRow = -1;
+
+    constructor(private propertyService: TenantService,
+                private tenantEntityService: TenantEntityService,
+                private propertyTypeEntityService: TypeEntityService,
+                private notification: NotificationService,
+                private dialog: MatDialog, private utilityEntityService: UtilityEntityService,
+                private amenityEntityService: AmenityEntityService) {
     }
 
     /**
@@ -43,32 +88,135 @@ export class TenantComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
 
-        this.landlords$ = this.propertyEntityService.entities$
+       // this.getImageFromService('Quotefancy-1571909-3840x2160_1589749637.jpg');
+
+        // load properties
+        this.loadProperties();
+
+        this.dataSource$ = this.tenantEntityService.entities$;
+
+
+        this.loadPropertyTypes();
+
+        // fetch utilities
+        this.loadUtilities ();
+       /*this.utilityEntityService.loaded$
             .pipe(
-                map(landlords => {
-                    this.nextPage++;
-                    return landlords;
-                })
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.utilityEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+               this.utilities$ = this.utilityEntityService.entities$;
+           });*/
+
+        // fetch amenities
+        this.loadAmenities();
+       /* this.amenityEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.amenityEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.amenities$ = this.amenityEntityService.entities$;
+        });*/
+
+    /*    this.amenities$ = this.amenityEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    if (!loaded) {
+                        this.amenityEntityService.getAll();
+                    }
+                }),
+                filter(loaded => !!loaded),
+                first()
+            );*/
+
+
+
+        const loadedx = this.tenantEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    if (!loaded) {
+                         this.tenantEntityService.getAll();
+                    }
+                }),
+                  filter(loaded => !!loaded),
+                  first()
             );
 
-        this.meta$ = this.propertyEntityService.meta$;
+     /*   this.landlords$ = this.tenantEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    if (!loaded) {
+                        return this.tenantEntityService.getAll();
+                    }
+                })
+              //  filter(loaded => !!loaded),
+              //  first()
+            );*/
 
-        // this.initialLoad();
+     if (loadedx) {
+         this.landlords$ = this.tenantEntityService.entities$
+             .pipe(
+                 map(landlords => {
+                     this.nextPage++;
+                     return landlords;
+                 })
+             );
 
-        // Loading indicator
-        this.loading$ = this.propertyEntityService.loading$.pipe(
-            delay(0)
-        );
+         this.meta$ = this.tenantEntityService.meta$;
+
+         // this.initialLoad();
+
+         // Loading indicator
+         this.loading$ = this.tenantEntityService.loading$.pipe(
+             delay(0)
+         );
+     }
 
         // Load pagination data
     //    this.dataSource.meta$.subscribe((res) => this.meta = res);
 
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
        // this.dataSource.load('', 0, 0, 'updated_at', 'desc');
+
+        // Master detail select data
+        this.tenantEntityService.selectedOption$.subscribe(property =>
+            this.selectedProperty$ = this.tenantEntityService.entities$
+                .pipe(
+                    map(entities => entities.find(entity => entity.id === property.id))
+                )
+        );
+    }
+
+    highlight(row) {
+        console.log('highlight', row);
+        this.selectedRow = row.id;
+    }
+
+    toggleShowMaster() {
+        this.showMaster = !this.showMaster;
+    }
+
+    /**
+     * When a property is selected for view
+     * @param property
+     */
+    onSelected(property: TenantModel): void {
+        console.log('onSelected', property);
+        this.showMaster = true;
+        this.selectedRowIndex = property.id;
+        this.tenantEntityService.changeSelectedProperty(property);
     }
 
     initialLoad() {
-        this.landlords$ = this.propertyEntityService.entities$
+        this.landlords$ = this.tenantEntityService.entities$
             .pipe(
                 map(landlords => {
                    // this.nextPage++;
@@ -77,16 +225,20 @@ export class TenantComponent implements OnInit, AfterViewInit {
             );
     }
 
-
-    load(currentPage) {
-        const page = currentPage + 1;
-
-        this.propertyEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': page.toString(),
-            'limit': '',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
+    /**
+     * Load Property entities either from store or API
+     */
+    loadProperties() {
+        this.tenantEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.tenantEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.properties$ = this.tenantEntityService.entities$;
         });
     }
 
@@ -96,29 +248,134 @@ export class TenantComponent implements OnInit, AfterViewInit {
     filter(currentPage) {
         const page = currentPage + 1;
 
-            this.propertyEntityService.getWithQuery({
-                'filter': this.search.nativeElement.value,
-                'page': page.toString(),
-                'limit': '',
-                'sortField': 'updated_at',
-                'sortDirection': 'desc'
-            });
+        console.log('currentPage', currentPage);
+
+        this.tenantEntityService.getWithQuery({
+            'filter': this.search.nativeElement.value,
+            'page': page.toString(),
+            'limit': '',
+            'sortField': 'updated_at',
+            'sortDirection': 'desc'
+        });
     }
 
     /**
      * Load data from Api
      */
-   loadData() {
-        this.propertyEntityService.getWithQuery({
-           'filter': this.search.nativeElement.value,
-           'page': this.nextPage.toString(),
-           'limit': '3',
-           'sortField': 'updated_at',
-           'sortDirection': 'desc'
-       });
+    loadData() {
+        this.tenantEntityService.getWithQuery({
+            'filter': this.search.nativeElement.value,
+            'page': this.nextPage.toString(),
+            'limit': '3',
+            'sortField': 'updated_at',
+            'sortDirection': 'desc'
+        });
 
-       this.nextPage++;
-   }
+        this.nextPage++;
+    }
+
+    /**
+     * Load property Types
+     */
+    loadPropertyTypes() {
+        this.propertyTypeEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.propertyTypeEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.propertyTypes$ = this.propertyTypeEntityService.entities$;
+        });
+    }
+
+    /**
+     * Load Amenity entities either from store or API
+     */
+    loadAmenities() {
+        this.amenityEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.amenityEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.amenities$ = this.amenityEntityService.entities$;
+        });
+    }
+
+    /**
+     * Load Utility entities either from API or store
+     */
+    loadUtilities () {
+        this.utilityEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.utilityEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.utilities$ = this.utilityEntityService.entities$;
+        });
+    }
+
+    getImageFromService(imageName: string) {
+        console.log('called');
+
+  /*      const clicks = fromEvent(document, 'click');
+    * const result = clicks.pipe(first());
+    * result.subscribe(x => console.log(x));*/
+
+        /*const imageUrl = this.propertyService.getImage(imageName)
+            .pipe(first());
+
+        imageUrl.subscribe(url => {
+            return url;
+        });*/
+
+            this.propertyService.getImagePath(imageName).subscribe(data => {
+               // console.log('my image data');
+               /// console.log(data);
+               // return data;
+                this.createImageFromBlob(data);
+            }, error => {
+                console.log(error);
+            });
+    }
+
+    createImageFromBlob(image: Blob) {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+            this.imageToShow = reader.result;
+            console.log('reader.result');
+            console.log(reader.result);
+          //  return reader.result;
+        }, false);
+
+        if (image) {
+            reader.readAsDataURL(image);
+        }
+    }
+
+    load(currentPage) {
+        const page = currentPage + 1;
+
+        this.tenantEntityService.getWithQuery({
+            'filter': this.search.nativeElement.value,
+            'page': page.toString(),
+            'limit': '',
+            'sortField': 'updated_at',
+            'sortDirection': 'desc'
+        });
+    }
+
+
 
     /**
      * Show or hide the load more button bar
@@ -132,7 +389,7 @@ export class TenantComponent implements OnInit, AfterViewInit {
     /**
      * Handle search and pagination
      */
-    ngAfterViewInit() {
+/*    ngAfterViewInit() {
 
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
@@ -145,18 +402,52 @@ export class TenantComponent implements OnInit, AfterViewInit {
                 })
             ).subscribe();
 
-        /* this.paginator.page.pipe(
+        /!* this.paginator.page.pipe(
              tap(() => this.loadData() )
-         ).subscribe();*/
+         ).subscribe();*!/
 
         // reset the paginator after sorting
         //  this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-        /*  merge(this.sort.sortChange, this.paginator.page)
+        /!*  merge(this.sort.sortChange, this.paginator.page)
               .pipe(
                   tap(() => this.loadData())
               )
-              .subscribe();*/
+              .subscribe();*!/
+    }*/
+
+
+    /**
+     * Handle search and pagination
+     */
+    ngAfterViewInit() {
+
+        console.log('ngAfterViewInit');
+        console.log(this.paginator);
+
+        fromEvent(this.search.nativeElement, 'keyup')
+            .pipe(
+                debounceTime(1000),
+                distinctUntilChanged(),
+                tap(() => {
+                    this.paginator.pageIndex = 0;
+                   // this.loadData();
+                   // this.filter();
+                })
+            ).subscribe();
+
+     /*   this.paginator.page.pipe(
+            tap(() => this.filter(this.paginator.page) )
+        ).subscribe();*/
+
+        // reset the paginator after sorting
+        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+        /*merge(this.sort.sortChange, this.paginator.page)
+            .pipe(
+                tap(() => this.loadData())
+            )
+            .subscribe();*/
     }
 
     /**
@@ -190,15 +481,6 @@ export class TenantComponent implements OnInit, AfterViewInit {
                 }
             }
         );
-    }
-
-    /**
-     * When a landlord is selected for view
-     * @param landlord
-     */
-    onSelected(landlord: TenantModel): void {
-        this.selectedRowIndex = landlord.id;
-        this.propertyEntityService.changeSelectedLandlord(landlord);
     }
 
     /**
@@ -260,7 +542,7 @@ export class TenantComponent implements OnInit, AfterViewInit {
      */
    delete(landlord: TenantModel) {
        // this.loader = true;
-        this.propertyEntityService.delete(landlord);
+        this.tenantEntityService.delete(landlord);
      /*   this.service.delete(lead)
             .subscribe((data) => {
                     this.loader = false;

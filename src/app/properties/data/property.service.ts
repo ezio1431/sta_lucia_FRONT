@@ -42,6 +42,15 @@ export class PropertyService extends BaseService<PropertyModel> {
         return this.localHttpClient.post<any>(url, {file_path}, { responseType: 'blob' as 'json'});
     }
 
+    getImagePath(file_path: any): any {
+
+        const imageUrl = 'profile_pic';
+
+        const url =  `${super.getResourceUrl()}/${imageUrl}`;
+
+        return this.localHttpClient.post<any>(url, {file_path}, {});
+    }
+
     /**
      *
      * @param item
@@ -65,8 +74,8 @@ export class PropertyService extends BaseService<PropertyModel> {
      * Create a new resource
      * @param item
      */
-    public updatePhoto(item: any): Observable<UserProfileModel> {
-        const itemUrl = 'update_photo';
+    public uploadPhoto(item: any): any {
+        const itemUrl = 'upload_photo';
         return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 

@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class TenantEntityService extends EntityCollectionServiceBase <TenantModel> {
 
     private selectedSource = new BehaviorSubject<TenantModel | null>(null);
-    selectedChanges$ = this.selectedSource.asObservable();
+    selectedOption$ = this.selectedSource.asObservable();
 
     meta$: Observable<{}>;
 
@@ -17,7 +17,7 @@ export class TenantEntityService extends EntityCollectionServiceBase <TenantMode
         this.meta$ = this.selectors$['meta$'];
     }
 
-    changeSelectedLandlord(selected: TenantModel | null ): void {
+    changeSelectedProperty(selected: TenantModel | null ): void {
         this.selectedSource.next(selected);
     }
 }

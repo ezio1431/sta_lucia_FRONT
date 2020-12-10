@@ -9,10 +9,11 @@ export const ROUTES: Routes = [
     {
         path: '',
         component: TenantComponent,
-        resolve: {
-            landlords: TenantResolverService
-        }
+       /* resolve: {
+            landlords: PropertyResolverService
+        }*/
     },
+    { path: 'create', component: AddTenantComponent },
     {
         path: ':id',
         component: ViewTenantComponent,
@@ -21,7 +22,6 @@ export const ROUTES: Routes = [
             { path: '', component: ViewTenantGeneralComponent }
         ]
     },
-    { path: 'create', component: AddTenantComponent },
 ];
 
 

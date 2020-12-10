@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-    selector: 'robi-view-tenant-general',
+    selector: 'robi-view-property-general',
     templateUrl: './view-tenant-general.component.html',
     styleUrls: ['./view-tenant-general.component.css']
 })
@@ -31,7 +31,7 @@ export class ViewTenantGeneralComponent implements OnInit {
     ngOnInit() {
       //  this.landlord$ = this.propertyEntityService.selectedLandlordChanges$;
 
-        this.propertyEntityService.selectedChanges$.subscribe(property =>
+        this.propertyEntityService.selectedOption$.subscribe(property =>
             this.landlord$ = this.propertyEntityService.entities$
                 .pipe(
                     map(entities => entities.find(entity => entity.id === property.id))

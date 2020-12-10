@@ -13,6 +13,7 @@ export const ROUTES: RouteInfo[] = [
     { path: 'system', title: 'System',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
     { path: 'property', title: 'Property',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
     { path: 'lease', title: 'Lease',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'payment', title: 'Payment',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
     { path: 'user', title: 'Users & Roles',  icon: '', class: '', permission: ['settings-users'], activeOption: false }
 ];
 

@@ -17,7 +17,7 @@ export class AuthEffects {
     private router: Router
   ) {}
 
-  login = createEffect(
+/*  login = createEffect(
     () =>
       this.actions$.pipe(
         ofType(authLogin),
@@ -26,7 +26,7 @@ export class AuthEffects {
         )
       ),
     { dispatch: false }
-  );
+  );*/
 
   logout = createEffect(
     () =>

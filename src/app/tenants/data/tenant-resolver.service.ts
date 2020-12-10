@@ -7,15 +7,15 @@ import { filter, first, map, tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class TenantResolverService implements Resolve<boolean> {
 
-    constructor(private propertyService: TenantEntityService) {}
+    constructor(private tenantService: TenantEntityService) {}
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
 
-        return this.propertyService.loaded$
+        return this.tenantService.loaded$
             .pipe(
                 tap(loaded => {
                     if (!loaded) {
-                         this.propertyService.getAll();
+                         this.tenantService.getAll();
                     }
                 }),
                filter(loaded => !!loaded),

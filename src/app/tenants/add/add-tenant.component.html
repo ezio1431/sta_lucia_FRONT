@@ -1,175 +1,409 @@
-<h5 mat-dialog-title *ngIf="mode==='add'">Add Tenant
-    <ng-container *ngIf="formError$ | async">
-        <mat-icon color="warn">error_outline</mat-icon>
-    </ng-container>
-</h5>
-<h5 mat-dialog-title *ngIf="mode==='edit'">Edit Tenant
-    <ng-container *ngIf="formError$ | async">
-        <mat-icon color="warn">error_outline</mat-icon>
-    </ng-container>
-</h5>
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info">
+                        <h4 class="card-title">{{ 'robi.tenants.title' | translate }}</h4>
+                        <p class="card-category"></p>
+                    </div>
+                    <div class="card-body">
+
+                        <mat-vertical-stepper [linear]="isLinear" #stepper>
+                            <mat-step [stepControl]="personalFormGroup">
+                                <form [formGroup]="personalFormGroup">
+                                <ng-template matStepLabel>Tenant Info</ng-template>
+
+                           <!--     <form [formGroup]="existingTenantFormGroup">
+
+                                    <div class="row mb-2">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-button-toggle-group formControlName='new_tenant' #group="matButtonToggleGroup"
+                                                                     (change)="onToggleChange(group.value)">
+                                                <mat-button-toggle value="new" aria-label="Text align left">
+                                                    <mat-icon>add</mat-icon>
+                                                    <span>New Tenant</span>
+                                                </mat-button-toggle>
+                                                <mat-button-toggle value="old" aria-label="Text align right">
+                                                    <mat-icon>person</mat-icon>
+                                                    <span>Existing Tenant</span>
+                                                </mat-button-toggle>
+                                            </mat-button-toggle-group>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" *ngIf="newTenant=='old'">
+
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Tenant</mat-label>
+                                                <mat-select placeholder="Search Tenant" formControlName="tenant_id">
+                                                    <mat-option *ngFor="let tenantType of tenantTypes$ | async" [value]="tenantType.id">
+                                                        {{tenantType.tenant_type_display_name}}
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-error align="start" *ngIf="formErrors?.tenant_id" class="form__error">{{ formErrors.tenant_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>First Name</mat-label>
+                                                <input matInput formControlName="first_name" placeholder="First Name">
+                                                <mat-error align="start" *ngIf="formErrors?.first_name" class="form__error">{{ formErrors.first_name }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Other Names</mat-label>
+                                                <input matInput formControlName="other_names" placeholder="Other Names">
+                                                <mat-error align="start" *ngIf="formErrors?.other_names" class="form__error">{{ formErrors.other_names }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                </form>-->
 
 
-<mat-dialog-content class="mat-dialog-data" [formGroup]="form"  (ngSubmit)="create()">
+                                    <ng-container>
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Tenant Type *</mat-label>
+                                                            <mat-select placeholder="Tenant Type *" formControlName="tenant_type_id">
+                                                                <mat-option *ngFor="let tenantType of tenantTypes$ | async" [value]="tenantType.id">
+                                                                    {{tenantType.tenant_type_display_name}}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                            <mat-error align="start" *ngIf="formErrors?.tenant_type_id" class="form__error">{{ formErrors.tenant_type_id }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>First Name</mat-label>
+                                                            <input matInput formControlName="first_name" placeholder="First Name">
+                                                            <mat-error align="start" *ngIf="formErrors?.first_name" class="form__error">{{ formErrors.first_name }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Middle Name</mat-label>
+                                                            <input matInput formControlName="middle_name" placeholder="Middle Name">
+                                                            <mat-error align="start" *ngIf="formErrors?.middle_name" class="form__error">{{ formErrors.middle_name }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
 
-    <div class="row">
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>First Name</mat-label>
-                <input matInput formControlName="first_name" placeholder="First Name">
-                <mat-error align="start" *ngIf="formErrors?.first_name" class="form__error">{{ formErrors.first_name }}</mat-error>
-            </mat-form-field>
-        </div>
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Middle Name</mat-label>
-                <input matInput formControlName="middle_name" placeholder="Middle Name">
-                <mat-error align="start" *ngIf="formErrors?.middle_name" class="form__error">{{ formErrors.middle_name }}</mat-error>
-            </mat-form-field>
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Last Name</mat-label>
+                                                    <input matInput formControlName="last_name" placeholder="Last Name">
+                                                    <mat-error align="start" *ngIf="formErrors?.last_name" class="form__error">{{ formErrors.last_name }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Gender</mat-label>
+                                                    <input matInput formControlName="gender" placeholder="Gender">
+                                                    <mat-error align="start" *ngIf="formErrors?.gender" class="form__error">{{ formErrors.gender }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field  class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Date of Birth</mat-label>
+                                                    <input matInput (click)="date_of_birth.open()" [matDatepicker]="date_of_birth" formControlName="date_of_birth" placeholder="Date of Birth">
+                                                    <mat-datepicker-toggle matSuffix [for]="date_of_birth"></mat-datepicker-toggle>
+                                                    <mat-datepicker touchUi #date_of_birth></mat-datepicker>
+                                                    <mat-error align="start" *ngIf="formErrors?.date_of_birth" class="form__error">{{ formErrors.date_of_birth }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>ID Passport Number</mat-label>
+                                                    <input matInput formControlName="id_passport_number" placeholder="ID Passport Number">
+                                                    <mat-error align="start" *ngIf="formErrors?.id_passport_number" class="form__error">{{ formErrors.id_passport_number }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Marital Status</mat-label>
+                                                    <input matInput formControlName="marital_status" placeholder="Marital Status">
+                                                    <mat-error align="start" *ngIf="formErrors?.marital_status" class="form__error">{{ formErrors.marital_status }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Contact Phone</mat-label>
+                                                    <input matInput formControlName="contact_phone" placeholder="Contact Phone">
+                                                    <mat-error align="start" *ngIf="formErrors?.contact_phone" class="form__error">{{ formErrors.contact_phone }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Contact Email</mat-label>
+                                                    <input matInput formControlName="contact_email" placeholder="Contact Email">
+                                                    <mat-error align="start" *ngIf="formErrors?.contact_email" class="form__error">{{ formErrors.contact_email }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Nationality</mat-label>
+                                                    <input matInput formControlName="nationality" placeholder="Nationality">
+                                                    <mat-error align="start" *ngIf="formErrors?.nationality" class="form__error">{{ formErrors.nationality }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>City State</mat-label>
+                                                    <input matInput formControlName="city_state" placeholder="City State">
+                                                    <mat-error align="start" *ngIf="formErrors?.city_state" class="form__error">{{ formErrors.city_state }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Postal Code</mat-label>
+                                                    <input matInput formControlName="postal_code" placeholder="Postal Code">
+                                                    <mat-error align="start" *ngIf="formErrors?.postal_code" class="form__error">{{ formErrors.postal_code }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Postal Address</mat-label>
+                                                    <input matInput formControlName="postal_address" placeholder="Postal Address">
+                                                    <mat-error align="start" *ngIf="formErrors?.postal_address" class="form__error">{{ formErrors.postal_address }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Physical Address</mat-label>
+                                                    <input matInput formControlName="physical_address" placeholder="Physical Address">
+                                                    <mat-error align="start" *ngIf="formErrors?.physical_address" class="form__error">{{ formErrors.physical_address }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+
+                                    <div>
+                                        <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                            <span>Next</span>
+                                            <mat-icon color="material-icons">arrow_right</mat-icon>
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </mat-step>
+                            <mat-step [stepControl]="nextOfKinFormGroup">
+                                <form [formGroup]="nextOfKinFormGroup">
+                                    <ng-template matStepLabel>Kin & Relation</ng-template>
+                                                  <div class="row">
+                                                      <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                          <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                              <mat-label>Next of Kin Name</mat-label>
+                                                              <input matInput formControlName="next_of_kin_name" placeholder="Next of Kin Name">
+                                                              <mat-error align="start" *ngIf="formErrors?.next_of_kin_name" class="form__error">{{ formErrors.next_of_kin_name }}</mat-error>
+                                                          </mat-form-field>
+                                                      </div>
+                                                      <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                          <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                              <mat-label>Next of Kin Phone</mat-label>
+                                                              <input matInput formControlName="next_of_kin_phone" placeholder="Next of Kin Phone">
+                                                              <mat-error align="start" *ngIf="formErrors?.next_of_kin_phone" class="form__error">{{ formErrors.next_of_kin_phone }}</mat-error>
+                                                          </mat-form-field>
+                                                      </div>
+                                                      <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                          <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                              <mat-label>Next of Kin Relation</mat-label>
+                                                              <input matInput formControlName="next_of_kin_relation" placeholder="Next of Kin Relation">
+                                                              <mat-error align="start" *ngIf="formErrors?.next_of_kin_relation" class="form__error">{{ formErrors.next_of_kin_relation }}</mat-error>
+                                                          </mat-form-field>
+                                                      </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Rent Payment Contact</mat-label>
+                                                            <input matInput formControlName="rent_payment_contact" placeholder="Rent Payment Contact">
+                                                            <mat-error align="start" *ngIf="formErrors?.rent_payment_contact" class="form__error">{{ formErrors.rent_payment_contact }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Rent Payment Contact Postal Address</mat-label>
+                                                            <input matInput formControlName="rent_payment_contact_postal_address" placeholder="Rent Payment Contact Postal Address">
+                                                            <mat-error align="start" *ngIf="formErrors?.rent_payment_contact_postal_address" class="form__error">{{ formErrors.rent_payment_contact_postal_address }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Rent Payment Contact Physical Address</mat-label>
+                                                            <input matInput formControlName="rent_payment_contact_physical_address" placeholder="Rent Payment Contact Physical Address">
+                                                            <mat-error align="start" *ngIf="formErrors?.rent_payment_contact_physical_address" class="form__error">{{ formErrors.rent_payment_contact_physical_address }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Emergency Name</mat-label>
+                                                            <input matInput formControlName="emergency_contact_name" placeholder="Emergency Name">
+                                                            <mat-error align="start" *ngIf="formErrors?.emergency_contact_name" class="form__error">{{ formErrors.emergency_contact_name }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Emergency Phone</mat-label>
+                                                            <input matInput formControlName="emergency_contact_phone" placeholder="Emergency Phone">
+                                                            <mat-error align="start" *ngIf="formErrors?.emergency_contact_phone" class="form__error">{{ formErrors.emergency_contact_phone }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Emergency Email</mat-label>
+                                                            <input matInput formControlName="emergency_contact_email" placeholder="Emergency Email">
+                                                            <mat-error align="start" *ngIf="formErrors?.emergency_contact_email" class="form__error">{{ formErrors.emergency_contact_email }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Emergency Relation</mat-label>
+                                                            <input matInput formControlName="emergency_contact_relationship" placeholder="Emergency Relation">
+                                                            <mat-error align="start" *ngIf="formErrors?.emergency_contact_relationship" class="form__error">{{ formErrors.emergency_contact_relationship }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Emergency Postal Address</mat-label>
+                                                            <input matInput formControlName="emergency_contact_phone" placeholder="Emergency Postal Address">
+                                                            <mat-error align="start" *ngIf="formErrors?.emergency_contact_postal_address" class="form__error">{{ formErrors.emergency_contact_postal_address }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Emergency Physical Address</mat-label>
+                                                            <input matInput formControlName="emergency_contact_physical_address" placeholder="Emergency Physical Address">
+                                                            <mat-error align="start" *ngIf="formErrors?.emergency_contact_physical_address" class="form__error">{{ formErrors.emergency_contact_physical_address }}</mat-error>
+                                                        </mat-form-field>
+                                                    </div>
+                                                </div>
+
+                                    <div>
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                            <mat-icon color="material-icons">arrow_left</mat-icon>
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                            <span>Next</span>
+                                            <mat-icon color="material-icons">arrow_right</mat-icon>
+                                        </button>
+                                    </div>
+                                </form>
+                            </mat-step>
+                            <mat-step [stepControl]="employmentFormGroup">
+                                <form [formGroup]="employmentFormGroup">
+                                    <ng-template matStepLabel>Employment</ng-template>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Employment Status</mat-label>
+                                                <input matInput formControlName="employment_status" placeholder="Employment Status">
+                                                <mat-error align="start" *ngIf="formErrors?.employment_status" class="form__error">{{ formErrors.employment_status }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Employment Position</mat-label>
+                                                <input matInput formControlName="employment_position" placeholder="Employment Position">
+                                                <mat-error align="start" *ngIf="formErrors?.employment_position" class="form__error">{{ formErrors.employment_position }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Employment Contact Phone</mat-label>
+                                                <input matInput formControlName="employer_contact_phone" placeholder="Employment Contact Phone">
+                                                <mat-error align="start" *ngIf="formErrors?.employer_contact_phone" class="form__error">{{ formErrors.employer_contact_phone }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Employment Contact Email</mat-label>
+                                                <input matInput formControlName="employer_contact_email" placeholder="Employment Contact Email">
+                                                <mat-error align="start" *ngIf="formErrors?.employer_contact_email" class="form__error">{{ formErrors.employer_contact_email }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Employment Postal Address</mat-label>
+                                                <input matInput formControlName="employment_postal_address" placeholder="Employment Postal Address">
+                                                <mat-error align="start" *ngIf="formErrors?.employment_postal_address" class="form__error">{{ formErrors.employment_postal_address }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Employment Physical Address</mat-label>
+                                                <input matInput formControlName="employment_physical_address" placeholder="Employment Physical Address">
+                                                <mat-error align="start" *ngIf="formErrors?.employment_physical_address" class="form__error">{{ formErrors.employment_physical_address }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                            <mat-icon color="material-icons">arrow_left</mat-icon>
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                            <span>Next</span>
+                                            <mat-icon color="material-icons">arrow_right</mat-icon>
+                                        </button>
+                                    </div>
+                                </form>
+                            </mat-step>
+                            <mat-step [stepControl]="tenantSettingsFormGroup">
+                                <form [formGroup]="tenantSettingsFormGroup">
+                                    <ng-template matStepLabel>Lease Settings</ng-template>
+                                    <mat-form-field>
+                                        <mat-label>Address</mat-label>
+                                        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
+                                               required>
+                                    </mat-form-field>
+
+                                    <div>
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                            <mat-icon color="material-icons">arrow_left</mat-icon>
+                                            <span>Back</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </mat-step>
+                        </mat-vertical-stepper>
+
+                        <div>
+                            <button class="mat-raised-button mat-primary float-right" mat-button type="button" (click)="create()">
+                                <span>Save Tenant</span>
+
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="row">
-
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Last Name</mat-label>
-                <input matInput formControlName="last_name" placeholder="Last Name">
-                <mat-error align="start" *ngIf="formErrors?.last_name" class="form__error">{{ formErrors.last_name }}</mat-error>
-            </mat-form-field>
-        </div>
-
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Phone</mat-label>
-                <input matInput formControlName="phone" placeholder="Phone">
-                <mat-error align="start" *ngIf="formErrors?.phone" class="form__error">{{ formErrors.phone }}</mat-error>
-            </mat-form-field>
-        </div>
-    </div>
-
-    <div class="row">
-        <!--<div class="col-4">
-
-           <mat-form-field  class="full-width" color="primary" appearance="outline">
-                <mat-label>Date of Birth</mat-label>
-                <input matInput [matDatepicker]="date_of_birth" formControlName="date_of_birth" placeholder="Date of Birth">
-                <mat-datepicker-toggle matSuffix [for]="date_of_birth"></mat-datepicker-toggle>
-                <mat-datepicker #date_of_birth></mat-datepicker>
-                <mat-error align="start" *ngIf="formErrors?.date_of_birth" class="form__error">{{ formErrors.date_of_birth }}</mat-error>
-            </mat-form-field>
-        </div>-->
-
-
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Email</mat-label>
-                <input matInput formControlName="email" placeholder="Email">
-                <mat-error align="start" *ngIf="formErrors?.email" class="form__error">{{ formErrors.email }}</mat-error>
-            </mat-form-field>
-        </div>
-
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>National ID or Passport</mat-label>
-                <input matInput formControlName="id_number" placeholder="National ID or Passport">
-                <mat-error align="start" *ngIf="formErrors?.id_number" class="form__error">{{ formErrors.id_number }}</mat-error>
-            </mat-form-field>
-
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Nationality</mat-label>
-                <input matInput formControlName="nationality" placeholder="Nationality">
-                <mat-error align="start" *ngIf="formErrors?.nationality" class="form__error">{{ formErrors.nationality }}</mat-error>
-            </mat-form-field>
-        </div>
-
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>County / State</mat-label>
-                <input matInput formControlName="county" placeholder="County / State">
-                <mat-error align="start" *ngIf="formErrors?.county" class="form__error">{{ formErrors.county }}</mat-error>
-            </mat-form-field>
-        </div>
-
-     <!--   <div class="col-4">
-            <mat-form-field  class="full-width" color="primary" appearance="outline">
-                <mat-label>Date Became Member</mat-label>
-                <input matInput [matDatepicker]="date_became_member" formControlName="date_became_member" placeholder="Date Became Member">
-                <mat-datepicker-toggle matSuffix [for]="date_became_member"></mat-datepicker-toggle>
-                <mat-datepicker #date_became_member></mat-datepicker>
-                <mat-error align="start" *ngIf="formErrors?.date_became_member" class="form__error">{{ formErrors.date_became_member }}</mat-error>
-            </mat-form-field>
-        </div>-->
-
-    </div>
-
-    <div class="row">
-
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>City / Town</mat-label>
-                <input matInput formControlName="city" placeholder="City / Town">
-                <mat-error align="start" *ngIf="formErrors?.city" class="form__error">{{ formErrors.city }}</mat-error>
-            </mat-form-field>
-        </div>
-        <div class="col-sm-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>City / Town</mat-label>
-                <input matInput formControlName="city" placeholder="Zip Code">
-                <mat-error align="start" *ngIf="formErrors?.city" class="form__error">{{ formErrors.city }}</mat-error>
-            </mat-form-field>
-        </div>
-     <!--   <div class="col-4">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Member Group</mat-label>
-                <mat-select placeholder="Member Group" formControlName="group_id">
-                    <mat-option value="">None</mat-option>
-                    <mat-option *ngFor="let group of groups" [value]="group.id">
-                        {{group.name}}
-                    </mat-option>
-                </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.group_id" class="form__error">{{ formErrors.group_id }}</mat-error>
-            </mat-form-field>
-        </div>-->
-    </div>
-
-    <div class="row">
-    <div class="col-sm-12">
-        <mat-form-field class="full-width" color="primary" appearance="outline">
-            <mat-label>Postal Address</mat-label>
-            <input matInput formControlName="postal_address" placeholder="Postal Address">
-            <mat-error align="start" *ngIf="formErrors?.postal_address" class="form__error">{{ formErrors.postal_address }}</mat-error>
-        </mat-form-field>
-    </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Residential Address</mat-label>
-                <input matInput formControlName="residential_address" placeholder="Residential Address">
-                <mat-error align="start" *ngIf="formErrors?.residential_address" class="form__error">{{ formErrors.residential_address }}</mat-error>
-            </mat-form-field>
-        </div>
-    </div>
-
-
-</mat-dialog-content>
-
-<div class="d-flex justify-content-center spinner-container" *ngIf="loader">
-    <mat-progress-bar
-            color="primary"
-            mode="query"
-            value=50
-            bufferValue=75>
-    </mat-progress-bar>
 </div>
-
-<mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mat-raised-button mr-2" [mat-dialog-close]="true" (click)="close()">Close</button>
-    <button class="mat-raised-button mat-primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
-</mat-dialog-actions>

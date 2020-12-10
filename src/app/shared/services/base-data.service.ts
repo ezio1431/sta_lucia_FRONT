@@ -112,12 +112,17 @@ export class BaseDataService<T extends BaseModel>  extends DefaultDataService<T>
             );
     }
 
+    /**
+     * Fetch paginated data from API
+     * @param queryParams
+     */
     getWithQuery(queryParams): Observable<any> {
+        console.log('gikure ... getWithQuery');
         const httpOptions = {
             headers: { 'Content-Type': 'application/json' },
             params: { ...queryParams}
         };
-        const pageIndex = queryParams['page'] || '1';
+       // const pageIndex = queryParams['page'] || '1';
         return this.http.get(this.getResourceUrl(), httpOptions)
             .pipe(map((res: any) => {
             const containers = res.data;

@@ -7,6 +7,8 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { selectEffectiveTheme } from '../../core/settings/settings.selectors';
+import { selectorScopes } from '../../authentication/auth.selectors';
+import { AppState } from '../../core/core.state';
 
 @Component({
   selector: 'robi-admin-layout',
@@ -22,8 +24,9 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
     stickyHeader$: Observable<boolean>;
     language$: Observable<string>;
     theme$: Observable<string>;
+    scopesAdmin$: Observable<string>;
 
-  constructor( public location: Location, private router: Router, private store: Store) {}
+  constructor( public location: Location, private router: Router, private store: Store<AppState>) {}
 
   ngOnInit() {
       const isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
@@ -65,10 +68,15 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
 
 
       this.theme$ = this.store.pipe(select(selectEffectiveTheme));
+      this.scopesAdmin$ = this.store.pipe(select(selectorScopes));
+
+      this.scopesAdmin$.subscribe(scopes => {
+          console.log('scopesAdmin', scopes);
+      });
 
       this.theme$.subscribe(theme => {
           console.log(theme);
-      })
+      });
   }
 
     /**

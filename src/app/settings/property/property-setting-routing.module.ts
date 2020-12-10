@@ -2,6 +2,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { PropertySettingComponent } from './property-setting.component';
 import { UtilityResolverService } from './utility/data/utility-resolver.service';
 import { AmenityResolverService } from './amenity/data/amenity-resolver.service';
+import { UnitTypeResolverService } from './unit-type/data/unit-type-resolver.service';
 
 export const ROUTES: Routes = [
     {
@@ -32,7 +33,7 @@ export const ROUTES: Routes = [
                 loadChildren: () => import('app/settings/property/type/type-setting.module')
                     .then(m => m.TypeSettingModule),
                 resolve: {
-                    amenities: AmenityResolverService
+                    property_types: AmenityResolverService
                 }
             },
             {
@@ -52,6 +53,15 @@ export const ROUTES: Routes = [
                 resolve: {
                     utilities: UtilityResolverService
                 }
+            },
+            {
+                path: 'unit_types',
+                //  loadChildren: 'app/settings/user/permissions/user-permissions-setting.module#UserPermissionsSettingModule'
+                loadChildren: () => import('app/settings/property/unit-type/unit-type-setting.module')
+                    .then(m => m.UnitTypeSettingModule),
+               /* resolve: {
+                    utilities: UnitTypeResolverService
+                }*/
             }
         ]
     }

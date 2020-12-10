@@ -6,25 +6,29 @@ import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation
 
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { RoleSettingDataSource } from '../data/role-setting-data.source';
-import { AddUtilityComponent } from './add/add-utility.component';
-import { RoleSettingModel } from '../model/role-setting-model';
-import { EditUtilityComponent } from './edit/edit-utility.component';
-import { CheckboxItem } from './edit/check-box-item';
-import { RoleSettingService } from '../data/role-setting.service';
 import { NotificationService } from '../../../shared/notification.service';
-import { PermissionSettingService } from '../data/permission-setting.service';
+import { UtilityEntityService } from './data/utility-entity.service';
+import { UtilityModel } from './model/utility-model';
+import { AddUtilityComponent } from './add/add-utility.component';
+import { UtilityDataSource } from './data/utility-data.source';
+import { select, Store } from '@ngrx/store';
+import { selectorUtilityPage, utilitySelectors } from './data/ulitity-selectors';
+
+export interface PageQuery {
+    pageIndex: number,
+    pageSize: number
+}
 
 @Component({
     selector: 'robi-utility-setting',
     templateUrl: './utility-setting.component.html',
-    styleUrls: ['./utility-setting.component.css']
+    styleUrls: ['./utility-setting.component.scss']
 })
 export class UtilitySettingComponent implements OnInit, AfterViewInit {
     displayedColumns = [
-        'name',
-        'display_name',
-        'permissions',
+        'utility_name',
+        'utility_display_name',
+        'utility_description',
         'actions'
     ];
 
@@ -39,21 +43,24 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
     // Pagination
     length: number;
     pageIndex = 0;
-    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
-    meta: any;
+    pageSizeOptions: number[] = [3, 5, 10, 25, 50, 100];
+
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-    // Data for the list table display
-    dataSource: RoleSettingDataSource;
+    utilities$: any;
+    isLoaded: boolean;
+    dataSource$: any;
+    utilitiesDataSource: UtilityDataSource;
+    loading$: any;
 
-    allPermissions: any;
-    allPermissionsOptions = new Array<CheckboxItem>();
-
-    rolePermissions: any;
+    meta: any;
+    metax: any;
 
 
-    constructor(private roleService: RoleSettingService, private permissionService: PermissionSettingService,
-                private notification: NotificationService, private dialog: MatDialog) {
+    paginator$: any;
+
+    constructor(private utilityEntityService: UtilityEntityService, private notification: NotificationService,
+                private dialog: MatDialog, private store: Store) {
     }
 
     /**
@@ -63,91 +70,100 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
 
-        this.dataSource = new RoleSettingDataSource(this.roleService);
+        this.utilitiesDataSource = new UtilityDataSource(this.store, null, this.utilityEntityService);
 
-        // Load pagination data
-        this.dataSource.meta$.subscribe((res) => this.meta = res);
-
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.dataSource.load('', 0, 0, 'updated_at', 'desc');
-
-        // Fetch all permissions
-        this.permissionService.list(['name', 'display_name'])
-            .subscribe((res) => {
-                    this.allPermissions = res;
-                    this.allPermissionsOptions = this.allPermissions.map(
-                        x => new CheckboxItem(x.id, x.display_name));
-                },
-                () => this.allPermissions = []
-            );
-
-    }
-
-    /**
-     * Add dialog launch
-     */
-    addDialog() {
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-
-        const dialogRef = this.dialog.open(AddUtilityComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    this.loadData();
-                }
-            }
-        );
-    }
-
-    /**
-     * Edit dialog launch
-     */
-    editDialog(role: RoleSettingModel) {
-
-        const id = role.id;
-
-        const data = {
-            role,
-            permOptions: this.allPermissionsOptions
+        const initialPage: PageQuery = {
+          pageIndex: 0,
+          pageSize: 3
         };
 
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.data = {role,
-            permOptions: this.allPermissionsOptions};
+        this.utilitiesDataSource.loadUtilities(initialPage);
 
-        const dialogRef = this.dialog.open(EditUtilityComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    this.loadData();
-                }
-            }
-        );
+      /*  console.log('utilitySelectors');
+        console.log(utilitySelectors);
+      //  console.log(selectorUtilityPage);
+        console.log();
+        this.store.pipe(select(selectorUtilityPage(initialPage))).subscribe(xxx => console.log(xxx));*/
+
+        // load Utilities
+      //  this.loadUtilities();
+      //  this.loadData();
+
+      //  this.dataSource$ = this.utilityEntityService.entities$;
+        this.loading$ = this.utilityEntityService.loading$;
+        this.paginator$ = this.utilityEntityService.selectors$.collection$;
+
+       /* this.utilityEntityService.selectors$.collection$.subscribe(xxx => {
+
+
+            console.log('mettaaxxx', xxx['meta']);
+            this.meta = xxx;
+        });
+        this.metax = this.meta.meta;*/
+
+    }
+
+    /**
+     * Load Property entities either from store or API
+     */
+    loadUtilities() {
+        this.utilityEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                        this.utilityEntityService.getAll();
+                    }
+                }),
+            ).subscribe(data => {
+            this.utilities$ = this.utilityEntityService.entities$;
+        });
     }
 
     /**
      * Fetch data from data source
      */
     loadData() {
-        this.dataSource.load(
-            this.search.nativeElement.value,
-            (this.paginator.pageIndex + 1),
-            (this.paginator.pageSize),
-            this.sort.active,
-            this.sort.direction
-        );
+        this.utilityEntityService.loaded$
+            .pipe(
+                tap(loaded => {
+                    this.isLoaded = loaded;
+                    if (!loaded) {
+                       // this.utilityEntityService.getWithQuery();
+
+
+                        this.utilityEntityService.getWithQuery({
+                            'filter': '',
+                            'page': (this.paginator.pageIndex + 1).toString(),
+                            'limit': (this.paginator.pageSize).toString(),
+                            'sortField': '',
+                            'sortDirection': ''
+                        });
+
+
+
+                    }
+                }),
+            ).subscribe(data => {
+            this.utilities$ = this.utilityEntityService.entities$;
+        });
+    }
+
+    xxxload() {
+        console.log('load data', (this.paginator.pageIndex + 1).toString());
+        const newPage: PageQuery = {
+            pageIndex: this.paginator.pageIndex,
+            pageSize: this.paginator.pageSize
+        };
+        this.utilitiesDataSource.loadUtilities(newPage);
     }
 
     /**
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
-        fromEvent(this.search.nativeElement, 'keyup')
+        console.log('gikure ... ngAfterViewInit');
+        /*fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
                 distinctUntilChanged(),
@@ -155,10 +171,10 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
                     this.paginator.pageIndex = 0;
                     this.loadData();
                 })
-            ).subscribe();
+            ).subscribe();*/
 
         this.paginator.page.pipe(
-            tap(() => this.loadData() )
+            tap(() => this.xxxload() )
         ).subscribe();
 
         // reset the paginator after sorting
@@ -166,23 +182,45 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
 
         merge(this.sort.sortChange, this.paginator.page)
             .pipe(
-                tap(() => this.loadData())
+                tap(() => this.xxxload())
             )
             .subscribe();
     }
 
     /**
-     * Open Edit form
-     * @param role
+     * Add dialog launch
      */
-    openConfirmationDialog(role: RoleSettingModel) {
+    addDialog(mode: string, utility?: UtilityModel) {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {utility,
+            mode: mode
+        };
+
+        const dialogRef = this.dialog.open(AddUtilityComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe(
+            (val) => {
+                if ((val)) {
+                     this.xxxload();
+                }
+            }
+        );
+    }
+
+    /**
+     * Open Edit form
+     * @param utility
+     */
+    openConfirmationDialog(utility: UtilityModel) {
 
         this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true
         });
         this.dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.delete(role);
+                this.delete(utility);
             }
             this.dialogRef = null;
         });
@@ -190,25 +228,9 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
 
     /**
      * Remove resource from db
-     * @param role
+     * @param utility
      */
-    delete(role: RoleSettingModel) {
-        this.loader = true;
-        this.roleService.delete(role)
-            .subscribe((data) => {
-                    this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! Role has been deleted.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
-                    }
-                });
+    delete(utility: UtilityModel) {
     }
 
     /**

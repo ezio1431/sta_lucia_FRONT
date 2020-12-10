@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import * as Chartist from 'chartist';
+import { select, Store } from '@ngrx/store';
+import { selectorAccessToken, selectorScopes } from '../authentication/auth.selectors';
+import { LocalStorageService } from '../core/local-storage/local-storage.service';
+import * as jwt_decode from 'jwt-decode';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -8,8 +13,10 @@ import * as Chartist from 'chartist';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor() { }
-  startAnimationForLineChart(chart){
+    scopes$: any;
+
+  constructor(private store: Store, private localStorageService: LocalStorageService) { }
+  startAnimationForLineChart(chart) {
       let seq: any, delays: any, durations: any;
       seq = 0;
       delays = 80;
@@ -66,6 +73,8 @@ export class DashboardComponent implements OnInit {
       seq2 = 0;
   };
   ngOnInit() {
+      this.scopes$ = this.store.pipe(select(selectorScopes));
+
       /* ----------==========     Daily Sales Chart initialization For Documentation    ==========---------- */
 
       const dataDailySalesChart: any = {

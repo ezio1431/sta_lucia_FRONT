@@ -4,6 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from './material.module';
 import { HttpClientModule } from '@angular/common/http';
+import { HasPermissionDirective } from './directives/has-permission-directive';
 
 @NgModule({
     imports: [
@@ -20,7 +21,11 @@ import { HttpClientModule } from '@angular/common/http';
         ReactiveFormsModule,
         TranslateModule,
         MaterialModule,
-        HttpClientModule
+        HttpClientModule,
+        HasPermissionDirective
+    ],
+    declarations: [
+        HasPermissionDirective,
     ]
 })
 export class SharedModule { }

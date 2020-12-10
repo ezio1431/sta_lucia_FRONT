@@ -13,8 +13,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { TableListComponent } from './table-list/table-list.component';
 import { TypographyComponent } from './typography/typography.component';
-import { IconsComponent } from './icons/icons.component';
-import { MapsComponent } from './maps/maps.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import {
   AgmCoreModule
@@ -47,6 +45,18 @@ import { ErrorInterceptor } from './core/error-handler/error.interceptor';
 import { UtilityDataService } from './settings/property/utility/data/utility-data.service';
 import { AmenityDataService } from './settings/property/amenity/data/amenity-data.service';
 import { TypeDataService } from './settings/property/type/data/type-data.service';
+import { PropertyDataService } from './properties/data/property-data.service';
+import { TenantDataService } from './tenants/data/tenant-data.service';
+import { UnitTypeDataService } from './settings/property/unit-type/data/unit-type-data.service';
+import { LeaseTypeDataService } from './settings/lease/lease-type/data/lease-type-data.service';
+import { LeaseModeDataService } from './settings/lease/lease-mode/data/lease-mode-data.service';
+import { TenantTypeDataService } from './settings/lease/tenant-type/data/tenant-type-data.service';
+import { PaymentMethodDataService } from './settings/payment/payment-method/data/payment-method-data.service';
+import { PaymentFrequencyDataService } from './settings/payment/payment-frequency/data/payment-frequency-data.service';
+import { LeaseDataService } from './leases/data/lease-data.service';
+import { UtilityBillDataService } from './utility-bills/data/utility-bill-data.service';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -56,6 +66,10 @@ export const defaultDataServiceConfig: DefaultDataServiceConfig = {
   root: 'http://localhost/2020/Rental/api/public/api/v1',
   timeout: 1000 * 60, // request timeout }
 };
+
+export function sortByUpdatedAtField(item1: any, item2: any) {
+ return item2.updated_at - item1.updated_at;
+}
 
 const meta = {
   current_page: 1,
@@ -69,6 +83,7 @@ const meta = {
 
 const utilityEntityMetaData: EntityMetadataMap = {
   Utility: {
+      sortComparer: sortByUpdatedAtField,
     additionalCollectionState: {
       meta: meta
     }
@@ -91,30 +106,114 @@ const propertyTypeEntityMetaData: EntityMetadataMap = {
   }
 };
 
+const unitTypeEntityMetaData: EntityMetadataMap = {
+  UnitType: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const propertyEntityMetaData: EntityMetadataMap = {
+  Property: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const tenantEntityMetaData: EntityMetadataMap = {
+  Tenant: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const leaseEntityMetaData: EntityMetadataMap = {
+  Lease: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const leaseTypeEntityMetaData: EntityMetadataMap = {
+  LeaseType: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const leaseModeEntityMetaData: EntityMetadataMap = {
+  LeaseMode: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const tenantTypeEntityMetaData: EntityMetadataMap = {
+  TenantType: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const paymentMethodEntityMetaData: EntityMetadataMap = {
+  PaymentMethod: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const paymentFrequencyEntityMetaData: EntityMetadataMap = {
+  PaymentFrequency: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
+const utilityBillEntityMetaData: EntityMetadataMap = {
+  UtilityBill: {
+    additionalCollectionState: {
+      meta: meta
+    }
+  }
+};
+
 @NgModule({
   imports: [
     BrowserAnimationsModule,
     SharedModule,
+    CoreModule,
     ComponentsModule,
     RouterModule,
     AppRoutingModule,
+    AuthenticationModule,
     AgmCoreModule.forRoot({
       apiKey: 'YOUR_GOOGLE_MAPS_API_KEY'
     }),
-    CoreModule,
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EntityDataModule.forRoot({})
   ],
   declarations: [
     AppComponent,
     AdminLayoutComponent,
-      ConfirmationDialogComponent
-
+    ConfirmationDialogComponent
   ],
   providers: [
-/*
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: { showError: true }
+    },
+
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-*/
+
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HttpUrlGenerator, useClass: AppHttpUrlGenerator },
 
@@ -130,16 +229,49 @@ export class AppModule {
                private entityDataService: EntityDataService,
                private utilityDataService: UtilityDataService,
                private propertyTypeDataService: TypeDataService,
+               private unitTypeDataService: UnitTypeDataService,
+               private propertyDataService: PropertyDataService,
+               private tenantDataService: TenantDataService,
+               private leaseTypeDataService: LeaseTypeDataService,
+               private leaseModeDataService: LeaseModeDataService,
+               private tenantTypeDataService: TenantTypeDataService,
+               private paymentMethodDataService: PaymentMethodDataService,
+               private paymentFrequencyDataService: PaymentFrequencyDataService,
+               private leaseDataService: LeaseDataService,
+               private utilityBillDataService: UtilityBillDataService,
                private amenityDataService: AmenityDataService) {
 
     eds.registerMetadataMap({
           Utility: utilityEntityMetaData,
           Amenity: amenityEntityMetaData,
-      PropertyType: propertyTypeEntityMetaData
+          PropertyType: propertyTypeEntityMetaData,
+          UnitType: unitTypeEntityMetaData,
+          Property: propertyEntityMetaData,
+          Tenant: tenantEntityMetaData,
+          LeaseType: leaseTypeEntityMetaData,
+          LeaseMode: leaseModeEntityMetaData,
+          TenantType: tenantTypeEntityMetaData,
+          PaymentMethod: paymentMethodEntityMetaData,
+          PaymentFrequency: paymentFrequencyEntityMetaData,
+          UtilityBill: utilityBillEntityMetaData,
+          Lease: leaseEntityMetaData,
         });
 
     entityDataService.registerService('Utility', utilityDataService);
     entityDataService.registerService('Amenity', amenityDataService);
     entityDataService.registerService('PropertyType', propertyTypeDataService);
+    entityDataService.registerService('UnitType', unitTypeDataService);
+    entityDataService.registerService('Property', propertyDataService);
+    entityDataService.registerService('Tenant', tenantDataService);
+    entityDataService.registerService('LeaseType', leaseTypeDataService);
+    entityDataService.registerService('LeaseMode', leaseModeDataService);
+    entityDataService.registerService('TenantType', tenantTypeDataService);
+    entityDataService.registerService('PaymentMethod', paymentMethodDataService);
+    entityDataService.registerService('PaymentFrequency', paymentFrequencyDataService);
+    entityDataService.registerService('Lease', leaseDataService);
+    entityDataService.registerService('UtilityBill', utilityBillDataService);
+
+
+
   }
 }

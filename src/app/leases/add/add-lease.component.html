@@ -1,0 +1,314 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header card-header-info">
+                        <h4 class="card-title">{{ 'robi.leases.title' | translate }}</h4>
+                        <p class="card-category"></p>
+                    </div>
+                    <div class="card-body">
+
+                        <mat-vertical-stepper [linear]="isLinear" #stepper>
+                            <mat-step [stepControl]="leaseDetailsFormGroup">
+                                <ng-template matStepLabel>Lease Info</ng-template>
+
+                                    <form [formGroup]="leaseDetailsFormGroup">
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Property</mat-label>
+                                                <input matInput formControlName="property_id" placeholder="Property">
+                                                <mat-error align="start" *ngIf="formErrors?.property_id" class="form__error">{{ formErrors.property_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Unit</mat-label>
+                                                <input matInput formControlName="unit_id" placeholder="Unit">
+                                                <mat-error align="start" *ngIf="formErrors?.unit_id" class="form__error">{{ formErrors.unit_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Lease Type *</mat-label>
+                                                <mat-select placeholder="Lease Type *" formControlName="lease_type_id">
+                                                    <mat-option *ngFor="let leaseType of leaseTypes$ | async" [value]="leaseType.id">
+                                                        {{leaseType.lease_type_display_name}}
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-error align="start" *ngIf="formErrors?.lease_type_id" class="form__error">{{ formErrors.lease_type_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Lease Mode *</mat-label>
+                                                <mat-select placeholder="Lease Mode *" formControlName="lease_mode_id">
+                                                    <mat-option *ngFor="let leaseMode of leaseModes$ | async" [value]="leaseMode.id">
+                                                        {{leaseMode.lease_mode_display_name}}
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-error align="start" *ngIf="formErrors?.lease_mode_id" class="form__error">{{ formErrors.lease_mode_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Start Date</mat-label>
+                                                <input matInput formControlName="start_date" placeholder="Start Date">
+                                                <mat-error align="start" *ngIf="formErrors?.start_date" class="form__error">{{ formErrors.start_date }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>End Date</mat-label>
+                                                <input matInput formControlName="end_date" placeholder="End Date">
+                                                <mat-error align="start" *ngIf="formErrors?.end_date" class="form__error">{{ formErrors.end_date }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Rent Amount</mat-label>
+                                                <input matInput formControlName="rent_amount" placeholder="Rent Amount">
+                                                <mat-error align="start" *ngIf="formErrors?.rent_amount" class="form__error">{{ formErrors.rent_amount }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Payment Frequency *</mat-label>
+                                                <mat-select placeholder="Payment Frequency *" formControlName="payment_frequency_id">
+                                                    <mat-option *ngFor="let paymentFrequency of paymentFrequencies$ | async" [value]="paymentFrequency.id">
+                                                        {{paymentFrequency.payment_frequency_display_name}}
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-error align="start" *ngIf="formErrors?.payment_frequency_id" class="form__error">{{ formErrors.payment_frequency_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Due Date</mat-label>
+                                                <input matInput formControlName="due_date" placeholder="Due Date">
+                                                <mat-error align="start" *ngIf="formErrors?.due_date" class="form__error">{{ formErrors.due_date }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Agreement Document</mat-label>
+                                                <input matInput formControlName="agreement_doc" placeholder="Agreement Document">
+                                                <mat-error align="start" *ngIf="formErrors?.agreement_doc" class="form__error">{{ formErrors.agreement_doc }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Rent Deposit</mat-label>
+                                                <input matInput formControlName="rent_deposit" placeholder="Rent Deposit">
+                                                <mat-error align="start" *ngIf="formErrors?.rent_deposit" class="form__error">{{ formErrors.rent_deposit }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Due On</mat-label>
+                                                <input matInput formControlName="due_on" placeholder="Due On">
+                                                <mat-error align="start" *ngIf="formErrors?.due_on" class="form__error">{{ formErrors.due_on }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                            <span>Next</span>
+                                            <mat-icon color="material-icons">arrow_right</mat-icon>
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </mat-step>
+
+
+                            <ng-container>
+                                <mat-step [stepControl]="depositsFormGroup">
+                                    <form [formGroup]="depositsFormGroup">
+                                        <ng-template matStepLabel>Deposits</ng-template>
+
+
+                                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label>Rent Deposit Amount</mat-label>
+                                                    <input matInput formControlName="rent_deposit" placeholder="Rent Deposit Amount">
+                                                    <mat-error align="start" *ngIf="formErrors?.rent_deposit" class="form__error">{{ formErrors.rent_deposit }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                        <div formArrayName="utilityDeposits"
+                                             *ngFor="let utilityField of depositsFormGroup.get('utilityDeposits').controls; let i = index;">
+                                            <div class="row col-sm-12" [formGroupName]="i">
+                                                <div class="col-5 col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                                                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                        <mat-label> {{i+1}}. Utility Name  *</mat-label>
+                                                        <mat-select placeholder="Utility Name *" formControlName="utility_id">
+                                                            <mat-option *ngFor="let utility of utilities$ | async" [value]="utility.id">
+                                                                {{utility.utility_display_name}}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-error align="start" *ngIf="formErrors?.utility_id" class="form__error">{{ formErrors.utility_id }}</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-5 col-sm-5 col-md-5 col-lg-5 col-xl-5">
+                                                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                        <mat-label>Deposit Amount</mat-label>
+                                                        <input matInput formControlName="deposit_amount" placeholder="Deposit Amount">
+                                                        <mat-error align="start" *ngIf="formErrors?.deposit_amount" class="form__error">{{ formErrors.deposit_amount }}</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <div class="col-1 mt-3">
+                                                  <!--  <button (click)="copyUnitField(i)"
+                                                            mat-icon-button aria-label="Copy to New Unit"
+                                                            matTooltip="Copy to New Unit" [matTooltipPosition]="'above'">
+                                                        <mat-icon>file_copy</mat-icon>
+                                                    </button>-->
+                                                    <button class="btn btn-link btn-sm btn-just-icon" (click)="removeUtilityDepositField(i)"
+                                                            mat-icon-button color="accent" aria-label="Remove Unit"
+                                                            matTooltip="Remove Unit" [matTooltipPosition]="'above'">
+                                                        <mat-icon color="warn">close</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <button (click)="addUtilityDepositField()"
+                                                        class="mat-stroked-button mat-accent mb-3" mat-button type="button"
+                                                        matTooltip="Add Unit" [matTooltipPosition]="'above'">
+                                                    <mat-icon color="material-icons">add</mat-icon>
+                                                    <span>Another Utility Deposit</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+
+                                        <div>
+                                            <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                                <mat-icon color="material-icons">arrow_left</mat-icon>
+                                                <span>Back</span>
+                                            </button>
+                                            <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                                <span>Next</span>
+                                                <mat-icon color="material-icons">arrow_right</mat-icon>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </mat-step>
+                            </ng-container>
+
+                            <ng-container>
+                                <mat-step [stepControl]="tenantsFormGroup">
+                                    <form [formGroup]="tenantsFormGroup">
+                                        <ng-template matStepLabel>Tenants</ng-template>
+
+                                        <div formArrayName="tenants"
+                                             *ngFor="let tenant of tenantsFormGroup.get('tenants').controls; let i = index;">
+                                            <div class="row col-sm-12" [formGroupName]="i">
+                                                <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4">
+                                                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                        <mat-label> {{i+1}}. Tenant First Name  *</mat-label>
+                                                        <mat-select placeholder="Tenant First Name *" formControlName="tenant_id">
+                                                            <mat-option *ngFor="let tenant of tenants$ | async" [value]="tenant.id">
+                                                                {{tenant.first_name}}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                        <mat-error align="start" *ngIf="formErrors?.tenant_id" class="form__error">{{ formErrors.tenant_id }}</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                                                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                        <mat-label>Tenant Other Names</mat-label>
+                                                        <input matInput formControlName="first_name" placeholder="Tenant Other Names">
+                                                        <mat-error align="start" *ngIf="formErrors?.first_name" class="form__error">{{ formErrors.first_name }}</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+                                                <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+                                                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                        <mat-label>ID / Passport</mat-label>
+                                                        <input matInput formControlName="id_passport_number" placeholder="ID / Passport">
+                                                        <mat-error align="start" *ngIf="formErrors?.id_passport_number" class="form__error">{{ formErrors.id_passport_number }}</mat-error>
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <div class="col-1 mt-3">
+                                                    <button class="btn btn-link btn-sm btn-just-icon" (click)="removeTenantField(i)"
+                                                            mat-icon-button color="accent" aria-label="Remove Unit"
+                                                            matTooltip="Remove Unit" [matTooltipPosition]="'above'">
+                                                        <mat-icon color="warn">close</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <button (click)="addTenantField()"
+                                                        class="mat-stroked-button mat-accent mb-3" mat-button type="button"
+                                                        matTooltip="Add Unit" [matTooltipPosition]="'above'">
+                                                    <mat-icon color="material-icons">add</mat-icon>
+                                                    <span>Another Tenant</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+
+                                        <div>
+                                            <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                                <mat-icon color="material-icons">arrow_left</mat-icon>
+                                                <span>Back</span>
+                                            </button>
+                                            <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                                <span>Next</span>
+                                                <mat-icon color="material-icons">arrow_right</mat-icon>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </mat-step>
+                            </ng-container>
+
+                            <mat-step [stepControl]="leaseSettingsFormGroup">
+                                <form [formGroup]="leaseSettingsFormGroup">
+                                    <ng-template matStepLabel>Lease Settings</ng-template>
+                                    <mat-form-field>
+                                        <mat-label>Address</mat-label>
+                                        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
+                                               required>
+                                    </mat-form-field>
+
+                                    <div>
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                            <mat-icon color="material-icons">arrow_left</mat-icon>
+                                            <span>Back</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </mat-step>
+                        </mat-vertical-stepper>
+
+                        <div>
+                            <button class="mat-raised-button mat-primary float-right" mat-button type="button" (click)="create()">
+                                <span>Save Lease</span>
+
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

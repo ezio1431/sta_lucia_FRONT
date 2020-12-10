@@ -14,10 +14,13 @@
   "robi.sidebar.landlords": "Landlords",
   "robi.sidebar.properties": "Properties",
   "robi.sidebar.tenants": "Tenants",
+  "robi.sidebar.leases": "Leases",
+  "robi.sidebar.utility-bills": "Utility Bills",
   "robi.sidebar.units": "Units",
 
   "robi.properties.title": "Properties",
   "robi.tenants.title": "Tenants",
+  "robi.leases.title": "Leases",
 
 
 

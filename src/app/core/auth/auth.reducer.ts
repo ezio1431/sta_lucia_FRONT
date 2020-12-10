@@ -12,9 +12,6 @@ const reducer = createReducer(
   on(authLogout, state => ({ ...state, isAuthenticated: false }))
 );
 
-export function authReducer(
-  state: AuthState | undefined,
-  action: Action
-): AuthState {
+export function authReducer(state: AuthState | undefined, action: Action): AuthState {
   return reducer(state, action);
 }

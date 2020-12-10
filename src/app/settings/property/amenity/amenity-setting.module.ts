@@ -8,12 +8,18 @@ import { SharedModule } from '../../../shared/shared.module';
 import { EntityDataService, EntityDefinitionService, EntityMetadataMap } from '@ngrx/data';
 import { LandlordDataService } from '../../../landlords/data/landlord-data.service';
 import { AmenityDataService } from './data/amenity-data.service';
+import { EffectsModule } from '@ngrx/effects';
+import { AmenitiesEffects } from './store/amenities.effects';
+import { StoreModule } from '@ngrx/store';
+import { amenitiesReducer } from './store/reducers/amenity.reducers';
 
 
 @NgModule({
     imports: [
         SharedModule,
         AmenitySettingRoutingModule,
+        EffectsModule.forFeature([AmenitiesEffects]),
+        StoreModule.forFeature('amenities', amenitiesReducer)
     ],
     declarations: [
         AmenitySettingComponent,

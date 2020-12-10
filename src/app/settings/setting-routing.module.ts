@@ -77,6 +77,12 @@ export const ROUTES: Routes = [
                     .then(m => m.LeaseSettingModule)
             },
             {
+                path: 'payment',
+                // loadChildren: 'app/settings/user/user-setting.module#UserSettingModule',
+                loadChildren: () => import('app/settings/payment/payment-setting.module')
+                    .then(m => m.PaymentSettingModule)
+            },
+            {
                 path: 'user',
                // loadChildren: 'app/settings/user/user-setting.module#UserSettingModule',
                 loadChildren: () => import('app/settings/user/user-setting.module').then(m => m.UserSettingModule)

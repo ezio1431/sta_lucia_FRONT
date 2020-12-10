@@ -1,10 +1,21 @@
 <div class="logo">
-    <a href="https://www.creative-tim.com" class="simple-text">
+    <a href="https://www.creative-tim.com" class="simple-text" style="">
         <div class="logo-img">
             <img src="/assets/img/angular2-logo-red.png"/>
         </div>
-        Creative Tim
+        <div>
+            Creative Tim
+        </div>
+
     </a>
+ <!--   <div style="
+    font-size: 18px;
+    white-space: nowrap;
+    font-weight: 400;
+    overflow: hidden;
+    text-align: center;
+    display: block;">Devtest Devtest <span class="material-icons">power_settings_new</span></div>-->
+
 </div>
 <div class="sidebar-wrapper">
   <div *ngIf="isMobileMenu()">
@@ -55,10 +66,25 @@
     </ul>
   </div>
     <ul class="nav">
-        <li routerLinkActive="active" *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item">
-            <a class="nav-link" [routerLink]="[menuItem.path]">
-                <i class="material-icons">{{menuItem.icon}}</i>
-                <p> {{menuItem.title | translate}}</p>
+        <ng-container *ngFor="let menuItem of menuItems">
+            <li routerLinkActive="active" *robiPermission = menuItem?.permission class="{{menuItem.class}} nav-item">
+                <a class="nav-link" [routerLink]="[menuItem.path]">
+                    <i class="material-icons">{{menuItem.icon}}</i>
+                    <p> {{menuItem.title | translate}}</p>
+                </a>
+            </li>
+        </ng-container>
+
+
+        <mat-divider></mat-divider>
+        <li routerLinkActive="active" class="nav-item">
+            <a class="nav-link pointer" *ngIf="!loading" (click)="logout()">
+                <i class="material-icons">power_settings_new</i>
+                <p>Logout</p>
+            </a>
+            <a class="nav-link" *ngIf="loading">
+                <i class="material-icons">clear_all</i>
+                <p>clean up ...</p>
             </a>
         </li>
     </ul>

@@ -170,6 +170,6 @@
 </div>
 
 <mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mat-raised-button mr-2" [mat-dialog-close]="true" (click)="close()">Close</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="primary" [mat-dialog-close]="true" (click)="close()">Close</button>
     <button class="mat-raised-button mat-primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
 </mat-dialog-actions>

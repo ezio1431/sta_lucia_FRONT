@@ -4,7 +4,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-header-info">
-                        <h4 class="card-title">Add Property</h4>
+                        <h4 class="card-title">Properties</h4>
                         <p class="card-category"></p>
                     </div>
                     <div class="card-body">
@@ -12,9 +12,22 @@
                         <mat-horizontal-stepper [linear]="isLinear" #stepper>
                             <mat-step [stepControl]="firstFormGroup">
                                 <form [formGroup]="firstFormGroup">
-                                    <ng-template matStepLabel>Details</ng-template>
+                                    <ng-template matStepLabel>New Property</ng-template>
                                     <div class="row col-sm-12">
-                                        <div class="col-sm-3">Photo here</div>
+                                        <div class="col-sm-3">
+
+                                            <div class="col-4">
+                                                <input type="file" #profileFileInput class="file-input" accept="image/*"  (change)="onProfilePicSelect($event.target.files)">
+                                                <button mat-button class="mat-stroked-button" (click)="profileFileInput.click()">
+                                                    <i class="material-icons">attachment</i>
+                                                    Photo
+                                                </button>
+
+                                                <img alt="Member Photo" *ngIf="profilePicUrl" [src]="profilePicUrl" style="width: 120px; height: 120px;" class="member-photo">
+                                            </div>
+
+
+                                        </div>
                                         <div class="col-sm-9">
                                             <form [formGroup] = "form">
                                                 <div class="row">
@@ -61,28 +74,33 @@
 
                                                 <div formArrayName="unitFields"
                                                      *ngFor="let unitField of form.get('unitFields').controls; let i = index;">
-                                                    <div class="row col-sm-12" [formGroupName]="i">
+                                                    <div class="row" [formGroupName]="i">
 
-                                                        <div class="col-9">
+                                                        <div class="col-9 col-sm-9 col-md-9 col-lg-9 col-xl-9">
                                                             <mat-form-field (click)="addUnitDetails(i)" class="full-width" color="primary" appearance="outline">
                                                                 <mat-label> {{i+1}}. Unit Name</mat-label>
                                                                 <input [readonly]="true"  matInput formControlName="unit_name" placeholder="e.g Suit 001">
+                                                                <span class="float-right mr-1 ml-5" style="margin-top:-20px;">
+                                                                    <ng-container>
+                                                                        {{(selectedUnitType$ | async)?.unit_type_display_name}}
+                                                                    </ng-container>
+                                                                </span>
                                                                 <span matSuffix class="material-icons">menu</span>
                                                                 <!--<mat-hint align="start"><strong> <mat-icon>file_copy</mat-icon>copy</strong> </mat-hint>-->
                                                                 <mat-error align="start" *ngIf="formErrors?.unit_name" class="form__error">{{ formErrors.unit_name }}</mat-error>
                                                             </mat-form-field>
                                                         </div>
 
-                                                        <div class="col-2">
-                                                            <button (click)="copyUnitField(i)"
+                                                        <div class="col-2 col-sm-2 col-md-3 col-lg-3 col-xl-3 mt-md-3 mt-lg-3 mt-xl-3">
+                                                            <button class="btn btn-link btn-sm btn-just-icon" (click)="copyUnitField(i)"
                                                                     mat-icon-button aria-label="Copy to New Unit"
                                                                     matTooltip="Copy to New Unit" [matTooltipPosition]="'above'">
                                                                 <mat-icon>file_copy</mat-icon>
                                                             </button>
-                                                            <button (click)="removeUnitField(i)"
+                                                            <button class="btn btn-link btn-sm btn-just-icon" (click)="removeUnitField(i)"
                                                                     mat-icon-button color="accent" aria-label="Remove Unit"
                                                                     matTooltip="Remove Unit" [matTooltipPosition]="'above'">
-                                                                <mat-icon color="warn">delete</mat-icon>
+                                                                <mat-icon color="warn">close</mat-icon>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -90,8 +108,8 @@
 
                                                 <div class="row">
                                                     <div class="col-6">
-                                                        <button (click)="addUnitField()" style="margin-bottom: 20px;"
-                                                                class="mat-stroked-button mat-accent" mat-button type="button"
+                                                        <button (click)="addUnitField()"
+                                                                class="mat-stroked-button mat-accent mb-3" mat-button type="button"
                                                                 matTooltip="Add Unit" [matTooltipPosition]="'above'">
                                                             <mat-icon color="material-icons">add</mat-icon>
                                                             <span>Add Another Unit</span>
@@ -113,7 +131,7 @@
                             </mat-step>
                             <mat-step [stepControl]="secondFormGroup">
                                 <form [formGroup]="secondFormGroup">
-                                    <ng-template matStepLabel>Settings</ng-template>
+                                    <ng-template matStepLabel>Property Settings</ng-template>
                                     <mat-form-field>
                                         <mat-label>Address</mat-label>
                                         <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"

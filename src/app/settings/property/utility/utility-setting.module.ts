@@ -1,13 +1,8 @@
 import { NgModule } from '@angular/core';
-
 import { UtilitySettingRoutingModule } from './utility-setting-routing.module';
 import { UtilitySettingComponent } from './utility-setting.component';
-import { AddUtilityComponent } from './add/add-utility.component';
-import { EditUtilityComponent } from './edit/edit-utility.component';
 import { SharedModule } from '../../../shared/shared.module';
-import { EntityDataService, EntityDefinitionService, EntityMetadataMap } from '@ngrx/data';
-import { LandlordDataService } from '../../../landlords/data/landlord-data.service';
-import { UtilityDataService } from './data/utility-data.service';
+import { AddUtilityComponent } from './add/add-utility.component';
 
 
 @NgModule({
@@ -17,15 +12,12 @@ import { UtilityDataService } from './data/utility-data.service';
     ],
     declarations: [
         UtilitySettingComponent,
-        AddUtilityComponent,
-        EditUtilityComponent
+        AddUtilityComponent
     ],
     entryComponents: [
-        AddUtilityComponent,
-        EditUtilityComponent
+        AddUtilityComponent
     ]
 })
 
 export class UtilitySettingModule {
-
 }

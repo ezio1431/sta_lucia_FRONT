@@ -62,6 +62,7 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
 
     utilities$: any;
     amenities$: any;
+    unitTypes$: any;
 
   //  amenities: any;
     amenities = Array<CheckboxItem>();
@@ -80,6 +81,7 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
             this.unitValue = row.unitValue;
             this.utilities$ = row.utilities;
             this.amenities$ = row.amenities;
+            this.unitTypes$ = row.unitTypes;
             this.amenities = row.amenitiesData;
             this.optionsAmenity = row.amenityOptions;
             this.optionsUtility = row.utilityOptions;
@@ -96,6 +98,7 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
 
             this.form = this.fb.group({
                 unit_type: [this.selectedUnitType],
+                unit_type_id: [this.unitValue?.unit_type_id],
                 unit_name: [this.unitValue?.unit_name, [Validators.required,
                     Validators.minLength(1)]],
                 bed_rooms: [this.unitValue?.bed_rooms],

@@ -7,8 +7,8 @@ import { UserProfileModel } from '../../user-profile/model/user-profile.model';
 
 @Injectable({ providedIn: 'root' })
 export class TenantService extends BaseService<TenantModel> {
-    private selectedMemberSource = new BehaviorSubject<TenantModel | null>(null);
-    selectedMemberChanges$ = this.selectedMemberSource.asObservable();
+    private selectedTenantSource = new BehaviorSubject<TenantModel | null>(null);
+    selectedTenantChanges$ = this.selectedTenantSource.asObservable();
 
     private  localHttpClient: HttpClient;
     constructor(httpClient: HttpClient) {
@@ -16,8 +16,8 @@ export class TenantService extends BaseService<TenantModel> {
         this.localHttpClient = httpClient;
     }
 
-    changeSelectedMember(selectedMember: TenantModel | null ): void {
-        this.selectedMemberSource.next(selectedMember);
+    changeSelectedTenant(selectedTenant: TenantModel | null ): void {
+        this.selectedTenantSource.next(selectedTenant);
     }
 
 
@@ -42,11 +42,20 @@ export class TenantService extends BaseService<TenantModel> {
         return this.localHttpClient.post<any>(url, {file_path}, { responseType: 'blob' as 'json'});
     }
 
+    getImagePath(file_path: any): any {
+
+        const imageUrl = 'profile_pic';
+
+        const url =  `${super.getResourceUrl()}/${imageUrl}`;
+
+        return this.localHttpClient.post<any>(url, {file_path}, {});
+    }
+
     /**
      *
      * @param item
      */
-    public updateMembershipForm(item: any): Observable<UserProfileModel> {
+    public updateTenantshipForm(item: any): Observable<UserProfileModel> {
         const itemUrl = 'membership_form_update';
         return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
@@ -55,7 +64,7 @@ export class TenantService extends BaseService<TenantModel> {
      *
      * @param file_path
      */
-    public fetchMembershipForm(file_path: any): Observable<any> {
+    public fetchTenantshipForm(file_path: any): Observable<any> {
         const imageUrl = 'membership_form';
         const url =  `${super.getResourceUrl()}/${imageUrl}`;
         return this.localHttpClient.post<any>(url, {file_path}, { responseType: 'blob' as 'json'});
@@ -65,8 +74,8 @@ export class TenantService extends BaseService<TenantModel> {
      * Create a new resource
      * @param item
      */
-    public updatePhoto(item: any): Observable<UserProfileModel> {
-        const itemUrl = 'update_photo';
+    public uploadPhoto(item: any): any {
+        const itemUrl = 'upload_photo';
         return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 

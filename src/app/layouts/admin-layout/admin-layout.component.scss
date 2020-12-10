@@ -42,6 +42,10 @@
   &.card-rotate.bg-info .back{
     background: linear-gradient(60deg, mat-color($primary), mat-color($primary));
     box-shadow: 0 4px 20px 0px mat-color($accent, 100), 0 7px 10px -5px mat-color($accent, 100);
+
+    /*
+    box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(156, 39, 176, 0.4);
+    */
   }
 
   .text-color-primary{
@@ -58,23 +62,32 @@
     color: mat-color($accent, default-contrast);
   }
 
+  .mat-row:hover {
+    background-color: mat-color($accent, A100);
+    cursor: pointer;
+  }
+
+  .highlight{
+    /* background: red;  green */
+    background: mat-color($accent, A200);
+  }
 
 
 
 
 
-/*  big-input {
+  /*  big-input {
 
-    input {
+      input {
 
-      // retrieve particular color from variable, rg: text, base, divider, ...
-      color: mat-color($foreground, text);
-      background-color: mat-color($background, card);
+        // retrieve particular color from variable, rg: text, base, divider, ...
+        color: mat-color($foreground, text);
+        background-color: mat-color($background, card);
 
-      // or use "default" subvariable by default, oh the puns :)
-      border: 1px solid mat-color($accent);
-    }
-  }*/
+        // or use "default" subvariable by default, oh the puns :)
+        border: 1px solid mat-color($accent);
+      }
+    }*/
 }
 
 
