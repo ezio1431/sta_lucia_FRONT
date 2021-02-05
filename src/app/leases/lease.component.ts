@@ -15,6 +15,8 @@ import { AmenityEntityService } from '../settings/property/amenity/data/amenity-
 import { UtilityModel } from '../settings/property/utility/model/utility-model';
 import { TypeEntityService } from '../settings/property/type/data/type-entity.service';
 import { LeaseService } from './data/lease.service';
+import { StatementComponent } from '../accounting/statement/statement.component';
+import { LandlordDataSource } from '../landlords/data/landlord-data.source';
 
 @Component({
     selector: 'robi-properties',
@@ -24,6 +26,7 @@ import { LeaseService } from './data/lease.service';
 export class LeaseComponent implements OnInit, AfterViewInit {
 
     displayedColumns = [
+        'lease_number',
         'rent_amount',
         'start_date',
         'location',
@@ -42,6 +45,8 @@ export class LeaseComponent implements OnInit, AfterViewInit {
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
     dataSource$: any;
+
+    dataSource: LeaseDataSource;
     // pagination
     @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
 
@@ -73,7 +78,7 @@ export class LeaseComponent implements OnInit, AfterViewInit {
 
     selectedRow = -1;
 
-    constructor(private propertyService: LeaseService,
+    constructor(private leaseService: LeaseService,
                 private propertyEntityService: LeaseEntityService,
                 private propertyTypeEntityService: TypeEntityService,
                 private notification: NotificationService,
@@ -88,7 +93,11 @@ export class LeaseComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
 
-       // this.getImageFromService('Quotefancy-1571909-3840x2160_1589749637.jpg');
+        this.dataSource = new LeaseDataSource(this.leaseService);
+        // Load pagination data
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
+        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
+        this.dataSource.load('', 0, 0, 'lease_number', 'desc');
 
         // load properties
         this.loadProperties();
@@ -215,6 +224,27 @@ export class LeaseComponent implements OnInit, AfterViewInit {
         this.propertyEntityService.changeSelectedProperty(property);
     }
 
+    /**
+     *
+     * @param row
+     */
+    accountBalance(row) {
+        const id = row.id;
+
+        console.log(id);
+
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {
+            id: id,
+            type: 'lease'
+        };
+
+        const dialogRef = this.dialog.open(StatementComponent, dialogConfig);
+    }
+
     initialLoad() {
         this.landlords$ = this.propertyEntityService.entities$
             .pipe(
@@ -323,44 +353,6 @@ export class LeaseComponent implements OnInit, AfterViewInit {
             ).subscribe(data => {
             this.utilities$ = this.utilityEntityService.entities$;
         });
-    }
-
-    getImageFromService(imageName: string) {
-        console.log('called');
-
-  /*      const clicks = fromEvent(document, 'click');
-    * const result = clicks.pipe(first());
-    * result.subscribe(x => console.log(x));*/
-
-        /*const imageUrl = this.propertyService.getImage(imageName)
-            .pipe(first());
-
-        imageUrl.subscribe(url => {
-            return url;
-        });*/
-
-            this.propertyService.getImagePath(imageName).subscribe(data => {
-               // console.log('my image data');
-               /// console.log(data);
-               // return data;
-                this.createImageFromBlob(data);
-            }, error => {
-                console.log(error);
-            });
-    }
-
-    createImageFromBlob(image: Blob) {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-            this.imageToShow = reader.result;
-            console.log('reader.result');
-            console.log(reader.result);
-          //  return reader.result;
-        }, false);
-
-        if (image) {
-            reader.readAsDataURL(image);
-        }
     }
 
     load(currentPage) {

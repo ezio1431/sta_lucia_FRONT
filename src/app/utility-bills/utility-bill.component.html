@@ -76,25 +76,30 @@
                             </div>
                             <div class="table-responsive">
 
-                                <mat-table #table [dataSource]="dataSource$ | async" matSort matSortActive="rent_amount" matSortDirection="asc" matSortDisableClear>
-                                    <ng-container matColumnDef="rent_amount">
-                                        <mat-header-cell *matHeaderCellDef> Rent Amount </mat-header-cell>
-                                        <mat-cell *matCellDef="let row"> {{ row.rent_amount}} </mat-cell>
+                                <mat-table #table [dataSource]="dataSource" matSort matSortActive="property_id" matSortDirection="asc" matSortDisableClear>
+                                    <ng-container matColumnDef="property_id">
+                                        <mat-header-cell *matHeaderCellDef> Property </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{ row.property?.property_name}} </mat-cell>
                                     </ng-container>
 
-                                    <ng-container matColumnDef="start_date">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Start Date </mat-header-cell>
-                                        <mat-cell *matCellDef="let row"> {{row.start_date}} </mat-cell>
+                                    <ng-container matColumnDef="utility_id">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Utility </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.utility?.utility_display_name}} </mat-cell>
                                     </ng-container>
 
-                                    <ng-container matColumnDef="location">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Location </mat-header-cell>
-                                        <mat-cell *matCellDef="let row"> {{row.location}} </mat-cell>
+                                    <ng-container matColumnDef="unit_id">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.unit?.unit_name}} </mat-cell>
                                     </ng-container>
 
-                                    <ng-container matColumnDef="landlord_id">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Landlord </mat-header-cell>
-                                        <mat-cell *matCellDef="let row"> {{row.landlord_id}} </mat-cell>
+                                    <ng-container matColumnDef="reading_date">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Reading Date </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.reading_date}} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="current_reading">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Reading </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.current_reading}} </mat-cell>
                                     </ng-container>
 
                                     <ng-container matColumnDef="actions">

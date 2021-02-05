@@ -3,7 +3,7 @@
   "user-profilexx": "User Profile",
   "sidebar": {
     "dashboard": "Dashboard",
-    "user-profile": "User Profile"
+    "profile": "Profile"
   },
   "login": {
     "username": "Enter your user name",
@@ -15,13 +15,26 @@
   "robi.sidebar.properties": "Properties",
   "robi.sidebar.tenants": "Tenants",
   "robi.sidebar.leases": "Leases",
-  "robi.sidebar.utility-bills": "Utility Bills",
+  "robi.sidebar.utility-bills": "Utility Readings",
   "robi.sidebar.units": "Units",
 
   "robi.properties.title": "Properties",
-  "robi.tenants.title": "Tenants",
-  "robi.leases.title": "Leases",
 
+  "robi.tenants.title": "Tenants",
+  "robi.tenants.new": "New Tenant",
+
+
+  "robi.leases.title": "Leases",
+  "robi.leases.title.new": "New Lease",
+
+  "robi.invoices.title": "Invoices",
+  "robi.invoices.title.new": "New Invoice",
+
+
+
+  "robi.sidebar.invoices": "Invoices",
+
+  "robi.sidebar.payments": "Payments",
 
 
 
@@ -42,6 +55,8 @@
 
   "robi.landlords.load_more": "Load More",
   "robi.landlords.loading": "loading",
+
+  "robi.tasks.title": "Tasks",
 
 
 

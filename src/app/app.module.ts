@@ -10,10 +10,6 @@ import { ComponentsModule } from './components/components.module';
 import { AppComponent } from './app.component';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { UserProfileComponent } from './user-profile/user-profile.component';
-import { TableListComponent } from './table-list/table-list.component';
-import { TypographyComponent } from './typography/typography.component';
-import { NotificationsComponent } from './notifications/notifications.component';
 /*import {
   AgmCoreModule
 } from '@agm/core';*/
@@ -57,6 +53,7 @@ import { LeaseDataService } from './leases/data/lease-data.service';
 import { UtilityBillDataService } from './utility-bills/data/utility-bill-data.service';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http);

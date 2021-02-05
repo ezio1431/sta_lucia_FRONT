@@ -12,6 +12,9 @@ import { LeaseDataService } from './data/lease-data.service';
 import { ViewLeaseGeneralComponent } from './view/general/view-lease-general.component';
 import { ViewLeaseComponent } from './view/view-lease.component';
 import { LeaseUnitDetailsComponent } from './add/unit-details/lease-unit-details.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
+import { StatementComponent } from '../accounting/statement/statement.component';
 
 const entityMetaData: EntityMetadataMap = {
     Tenant: {
@@ -32,14 +35,17 @@ const entityMetaData: EntityMetadataMap = {
 @NgModule({
     imports: [
         SharedModule,
-        LeaseRoutingModule
+        LeaseRoutingModule,
+        NgxMatSelectSearchModule,
+        AngularMultiSelectModule
     ],
     declarations: [
         LeaseComponent,
         AddLeaseComponent,
         ViewLeaseGeneralComponent,
         ViewLeaseComponent,
-        LeaseUnitDetailsComponent
+        LeaseUnitDetailsComponent,
+        StatementComponent
     ]
 })
 

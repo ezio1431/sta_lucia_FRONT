@@ -12,6 +12,7 @@ import { PropertyDataService } from './data/property-data.service';
 import { ViewPropertyGeneralComponent } from './view/general/view-property-general.component';
 import { ViewPropertyComponent } from './view/view-property.component';
 import { PropertyUnitDetailsComponent } from './add/unit-details/property-unit-details.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 const entityMetaData: EntityMetadataMap = {
     Property: {
@@ -32,7 +33,8 @@ const entityMetaData: EntityMetadataMap = {
 @NgModule({
     imports: [
         SharedModule,
-        PropertyRoutingModule
+        PropertyRoutingModule,
+        NgxMatSelectSearchModule
     ],
     declarations: [
         PropertyComponent,

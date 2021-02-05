@@ -1,0 +1,365 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="fab-container">
+                <button mat-fab class="fab-toggler" [routerLink]="['create']">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </div>
+
+            <div class="col-md-12">
+                <!--summary card-->
+                <div class="card">
+                    <div class="card-header card-header-info">
+                        <h4 class="card-title"> {{ 'robi.sidebar.payments' | translate }} </h4>
+                    </div>
+                    <div class="card-body" style="max-height: 100px;">
+
+
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-xs-6 border-right">
+                                <h4 class="bold">12</h4>
+                                <span class="text-dark">Total</span>
+                            </div>
+                            <div class="col-md-2 col-xs-6 border-right">
+                                <h4 class="bold">8</h4>
+                                <span class="text-success">Units</span>
+                            </div>
+                            <div class="col-md-2 col-xs-6 border-right">
+                                <h4 class="bold">4</h4>
+                                <span class="text-danger">Inactive</span>
+                            </div>
+                            <div class="col-md-2 col-xs-6 border-right">
+                                <h4 class="bold">12</h4>
+                                <span class="text-info">Active Contacts</span>
+                            </div>
+                            <div class="col-md-2  col-xs-6 border-right">
+                                <h4 class="bold">0</h4>
+                                <span class="text-danger">Inactive Contacts</span>
+                            </div>
+                            <div class="col-md-2 col-xs-6">
+                                <h4 class="bold">2</h4>
+                                <span class="text-muted">
+                        <span class="pointer text-has-action" data-toggle="popover"
+                              data-title="Contacts Logged In Today" data-html="true"
+                              data-content="<p class=&quot;mbot5&quot;>
+						<a href='https://perfexcrm.com/demo/admin/clients/client/1?contactid=1' target='_blank'>Ryann Leuschke</a><br /><small>2020-05-18 18:34:29</small><br /></p><p class=&quot;mbot5&quot;><a href='https://perfexcrm.com/demo/admin/clients/client/12?contactid=12' target='_blank'>omverma verma</a><br /><small>2020-05-18 16:38:49</small><br /></p>" data-placement="bottom">Contacts Logged In Today</span>
+                        </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!--Table card-->
+                <div class="card" style="margin-bottom: 0 !important;">
+                    <!-- material table of long ass variety-->
+                    <ng-container *ngIf="!showMaster">
+                        <div class="card-body">
+                            <div class="row search-form-section">
+                               <!-- <div class="col-sm-1">
+                                   &lt;!&ndash; <button matPrefix mat-raised-button type="submit" class="btn btn-white btn-round btn-just-icon">
+                                        <i class="material-icons">search</i>
+                                        <div class="ripple-container"></div>
+                                    </button>&ndash;&gt;
+                                </div>-->
+
+                                <div class="col-12">
+                                    <mat-form-field class="search-form-field">
+                                        <input matInput #search placeholder="{{ 'robi.landlords.filter' | translate }}" autocomplete="off" [disabled]="(meta$ | async)?.total===0">
+                                        <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
+                                            <mat-icon>close</mat-icon></button>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+
+                                <mat-table #table [dataSource]="dataSource" matSort matSortActive="property_id" matSortDirection="asc" matSortDisableClear>
+                                    <ng-container matColumnDef="property_id">
+                                        <mat-header-cell *matHeaderCellDef> Property </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{ row.property?.property_name}} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="utility_id">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Utility </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.utility?.utility_display_name}} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="unit_id">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.unit?.unit_name}} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="reading_date">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Reading Date </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.reading_date}} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="current_reading">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Reading </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{row.current_reading}} </mat-cell>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="actions">
+                                        <mat-header-cell *matHeaderCellDef> Actions  </mat-header-cell>
+
+                                        <mat-cell *matCellDef="let row" class="button-row">
+                                           <!-- <button [disabled]="loader" mat-raised-button routerLink="{{row.id}}"
+                                                    (click)="onSelected(row)" type="button" matTooltip="View Member Details" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                                <mat-icon color="primary">visibility</mat-icon>
+                                            </button>-->
+
+                                            <button [disabled]="loader" mat-raised-button
+                                                    (click)="toggleShowMaster()" type="button"
+                                                    matTooltip="View Member Details" [matTooltipPosition]="'above'"
+                                                    class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                                <mat-icon color="primary">visibility</mat-icon>
+                                            </button>
+                                            <button [disabled]="loader" mat-icon-button [matMenuTriggerFor]="menu">
+                                                <mat-icon>more_vert</mat-icon>
+                                            </button>
+                                            <mat-menu #menu="matMenu">
+                                                <button [disabled]="loader" mat-menu-item matTooltip="Edit Member." [matTooltipPosition]="'above'"  (click)="editDialog(row)">
+                                                    <mat-icon color="primary">edit</mat-icon>
+                                                    <span>Edit</span>
+                                                </button>
+                                                <button [disabled]="loader" mat-menu-item matTooltip="Download Deposit Account Statement." [matTooltipPosition]="'above'" (click)="downloadStatement(row)">
+                                                    <mat-icon color="primary">picture_as_pdf</mat-icon>
+                                                    <span>Statement</span>
+                                                </button>
+                                            </mat-menu>
+                                        </mat-cell>
+                                    </ng-container>
+
+                                    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                                    <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onSelected(row)"
+                                             [ngClass]="{'clickable highlight': selectedRowIndex == row.id}"
+                                    ></mat-row>
+
+
+                                </mat-table>
+                                <span *ngIf="meta?.total===0">No Data</span>
+
+                                <div class="d-flex justify-content-center spinner-container" *ngIf="(dataSource?.loading$ | async) || loader">
+                                    <mat-progress-bar
+                                            color="green"
+                                            mode="query"
+                                            value=50
+                                            bufferValue=75>
+                                    </mat-progress-bar>
+                                </div>
+
+                                <!--<mat-paginator *ngIf="meta$ | async as meta" #pagination
+                                               [length]="meta?.total"
+                                               [pageIndex]="pageIndex"
+                                               [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
+                                </mat-paginator>-->
+
+                            </div>
+                        </div>
+                        <ng-container *ngIf="meta$ | async as meta">
+                            <button *ngIf="showLoadMoreButton(meta.current_page, meta.last_page)" [disabled]="loading$ | async" mat-raised-button
+                                    class="justify-content-center" color="accent" (click)="filter(meta.current_page)">
+                                <ng-container *ngIf="!(loading$ | async)">{{ 'robi.landlords.load_more' | translate }} {{meta.current_page}} of {{meta.last_page}}</ng-container>
+                                <ng-container *ngIf="loading$ | async">{{ 'robi.landlords.loading' | translate }} ...</ng-container>
+                                <mat-icon><mat-spinner color="primary" diameter="20" *ngIf="loading$ | async"></mat-spinner></mat-icon>
+                            </button>
+                        </ng-container>
+                        <div class="d-flex justify-content-center spinner-container" *ngIf="loading$ | async">
+                            <mat-progress-bar
+                                    color=primary
+                                    mode="indeterminate"
+                                    value=20
+                                    bufferValue=150>
+                            </mat-progress-bar>
+                        </div>
+                    </ng-container>
+                </div>
+
+
+                <!-- slave master section -->
+                <ng-container *ngIf="showMaster">
+
+                    <div class="row">
+
+                        <div class="col-md-5">
+                            <div class="card" style="margin-top: 0 !important;">
+
+                                <div class="card-body">
+                                    <div class="row search-form-section">
+                                        <!--<div class="col-1">
+                                           &lt;!&ndash; <button matPrefix mat-raised-button type="submit" class="btn btn-white btn-round btn-just-icon">
+                                                <i class="material-icons">search</i>
+                                                <div class="ripple-container"></div>
+                                            </button>&ndash;&gt;
+                                        </div>-->
+
+                                        <div class="col-12">
+                                            <mat-form-field class="search-form-field">
+                                                <input matInput #search placeholder="{{ 'robi.landlords.filter' | translate }}" autocomplete="off" [disabled]="(meta$ | async)?.total===0">
+                                                <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
+                                                    <mat-icon>close</mat-icon></button>
+
+                                                <button [disabled]="loader" mat-raised-button matSuffix
+                                                        (click)="toggleShowMaster()" type="button"
+                                                        matTooltip="View Member Details" [matTooltipPosition]="'above'"
+                                                        class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                                    <mat-icon color="primary">double_arrow</mat-icon>
+                                                </button>
+                                            </mat-form-field>
+                                        </div>
+                                      <!--  <div class="col-1">
+                                            &lt;!&ndash;<span (click)="toggleShowMaster()" class="material-icons clickable">double_arrow</span>&ndash;&gt;
+
+                                          &lt;!&ndash;  <button [disabled]="loader" mat-raised-button
+                                                    (click)="toggleShowMaster()" type="button"
+                                                    matTooltip="View Member Details" [matTooltipPosition]="'above'"
+                                                    class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                                <mat-icon color="primary">double_arrow</mat-icon>
+                                            </button>&ndash;&gt;
+
+                                        </div>-->
+                                    </div>
+                                    <div class="table-responsive">
+
+                                        <mat-table #table [dataSource]="dataSource$ | async" matSort matSortActive="rent_amount" matSortDirection="asc" matSortDisableClear>
+                                            <ng-container matColumnDef="rent_amount">
+                                                <mat-header-cell *matHeaderCellDef> Rent Amount </mat-header-cell>
+                                                <mat-cell *matCellDef="let row"> {{ row.rent_amount}} </mat-cell>
+                                            </ng-container>
+
+                                        <!--    <ng-container matColumnDef="property_type_id">
+                                                <mat-header-cell *matHeaderCellDef mat-sort-header> Property Type </mat-header-cell>
+                                                <mat-cell *matCellDef="let row"> {{row.property_type_id}} </mat-cell>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="location">
+                                                <mat-header-cell *matHeaderCellDef mat-sort-header> Location </mat-header-cell>
+                                                <mat-cell *matCellDef="let row"> {{row.location}} </mat-cell>
+                                            </ng-container>
+        -->
+                                            <ng-container matColumnDef="start_date">
+                                                <mat-header-cell *matHeaderCellDef mat-sort-header> Start Date </mat-header-cell>
+                                                <mat-cell *matCellDef="let row"> {{row.start_date}} </mat-cell>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="actions">
+                                                <mat-header-cell *matHeaderCellDef> Actions  </mat-header-cell>
+
+                                                <mat-cell *matCellDef="let row" class="button-row">
+                                                   <!-- <button [disabled]="loader" mat-raised-button routerLink="{{row.id}}"
+                                                            (click)="toggleShowMaster()" type="button" matTooltip="View Member Details" [matTooltipPosition]="'above'" class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                                        <mat-icon color="primary">visibility</mat-icon>
+                                                    </button>-->
+
+                                                   <!-- <button [disabled]="loader" mat-raised-button
+                                                            (click)="toggleShowMaster()" type="button"
+                                                            matTooltip="View Member Details" [matTooltipPosition]="'above'"
+                                                            class="btn btn-primary btn-link btn-sm btn-just-icon">
+                                                        <mat-icon color="primary">visibility</mat-icon>
+                                                    </button>-->
+                                                    <button [disabled]="loader" mat-icon-button [matMenuTriggerFor]="menu">
+                                                        <mat-icon>more_vert</mat-icon>
+                                                    </button>
+                                                    <mat-menu #menu="matMenu">
+                                                        <button [disabled]="loader" mat-menu-item matTooltip="Edit Member." [matTooltipPosition]="'above'"  (click)="editDialog(row)">
+                                                            <mat-icon color="primary">edit</mat-icon>
+                                                            <span>Edit</span>
+                                                        </button>
+                                                        <button [disabled]="loader" mat-menu-item matTooltip="Download Deposit Account Statement." [matTooltipPosition]="'above'" (click)="downloadStatement(row)">
+                                                            <mat-icon color="primary">picture_as_pdf</mat-icon>
+                                                            <span>Statement</span>
+                                                        </button>
+                                                    </mat-menu>
+                                                </mat-cell>
+                                            </ng-container>
+
+                                            <mat-header-row *matHeaderRowDef="displayedColumnsReduced"></mat-header-row>
+                                            <mat-row *matRowDef="let tiny_row; columns: displayedColumnsReduced;" (click)="onSelected(tiny_row)"
+                                                     [ngClass]="{'highlight': selectedRowIndex == tiny_row.id}"
+                                            ></mat-row>
+
+                                        </mat-table>
+                                        <span *ngIf="meta?.total===0">No Data</span>
+
+                                        <div class="d-flex justify-content-center spinner-container" *ngIf="(dataSource?.loading$ | async) || loader">
+                                            <mat-progress-bar
+                                                    color="green"
+                                                    mode="query"
+                                                    value=50
+                                                    bufferValue=75>
+                                            </mat-progress-bar>
+                                        </div>
+
+                                        <!--<mat-paginator *ngIf="meta$ | async as meta" #pagination
+                                                       [length]="meta?.total"
+                                                       [pageIndex]="pageIndex"
+                                                       [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
+                                        </mat-paginator>-->
+
+                                    </div>
+                                </div>
+                                <ng-container *ngIf="meta$ | async as meta">
+                                    <button *ngIf="showLoadMoreButton(meta.current_page, meta.last_page)" [disabled]="loading$ | async" mat-raised-button
+                                            class="col text-center" color="accent" (click)="filter(meta.current_page)">
+                                        <ng-container *ngIf="!(loading$ | async)">{{ 'robi.landlords.load_more' | translate }} {{meta.current_page}} of {{meta.last_page}}</ng-container>
+                                        <ng-container *ngIf="loading$ | async">{{ 'robi.landlords.loading' | translate }} ...</ng-container>
+                                        <mat-icon><mat-spinner color="primary" diameter="20" *ngIf="loading$ | async"></mat-spinner></mat-icon>
+                                    </button>
+                                </ng-container>
+                                <div class="d-flex justify-content-center spinner-container" *ngIf="loading$ | async">
+                                    <mat-progress-bar
+                                            color=primary
+                                            mode="indeterminate"
+                                            value=20
+                                            bufferValue=150>
+                                    </mat-progress-bar>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--Move this to master component-->
+                        <div class="col-md-7">
+                            <div class="card" style="margin-top: 0 !important;">
+                                <div class="card-body">
+                               <!-- {{selectedProperty$|async|json}}-->
+                                <ng-container *ngIf="selectedProperty$ | async as property">
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h3>{{property?.rent_amount}}</h3>
+                                        <p>{{property?.start_date}}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <!--<h6><strong>Total Units: </strong> 24</h6>
+                                        <h6><strong>Vacant: </strong> 2</h6>-->
+                                        <p><strong>Total Units: </strong> 24</p>
+                                        <p><strong>Occupied: </strong> 20</p>
+                                        <p><strong>Vacant: </strong> 4</p>
+                                    </div>
+                                </div>
+                                    <hr>
+
+                                    <p><strong>Owner: </strong>{{property?.landlord_id}}</p>
+                                    <p><strong>Managed Since: </strong>2/05/2016</p>
+
+                                    <h5><strong>Note:</strong></h5>
+                                    <p>Some text about this property</p>
+
+                                </ng-container>
+
+                            </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </ng-container>
+
+
+            </div>
+        </div>
+    </div>
+</div>

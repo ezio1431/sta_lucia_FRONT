@@ -1,0 +1,100 @@
+<h5 mat-dialog-title *ngIf="mode==='add'">Add Task
+    <ng-container *ngIf="formError$ | async">
+        <mat-icon color="warn">error_outline</mat-icon>
+    </ng-container>
+</h5>
+<h5 mat-dialog-title *ngIf="mode==='edit'">Edit Task
+    <ng-container *ngIf="formError$ | async">
+        <mat-icon color="warn">error_outline</mat-icon>
+    </ng-container>
+</h5>
+
+
+<mat-dialog-content class="mat-dialog-data" [formGroup]="form"  (ngSubmit)="create()">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Lease</mat-label>
+                <input matInput formControlName="lease_id" placeholder="Lease">
+                <mat-error align="start" *ngIf="formErrors?.lease_id" class="form__error">{{ formErrors.lease_id }}</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Title</mat-label>
+                <input matInput formControlName="title" placeholder="Title">
+                <mat-error align="start" *ngIf="formErrors?.title" class="form__error">{{ formErrors.title }}</mat-error>
+            </mat-form-field>
+        </div>
+        <div class="col-sm-6">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Date</mat-label>
+                <input matInput formControlName="date" placeholder="Date">
+                <mat-error align="start" *ngIf="formErrors?.date" class="form__error">{{ formErrors.date }}</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-6">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Category</mat-label>
+                <input matInput formControlName="task_category" placeholder="Category">
+                <mat-error align="start" *ngIf="formErrors?.task_category" class="form__error">{{ formErrors.task_category }}</mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="col-sm-6">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Priority</mat-label>
+                <input matInput formControlName="priority" placeholder="Priority">
+                <mat-error align="start" *ngIf="formErrors?.priority" class="form__error">{{ formErrors.priority }}</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-12">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Description</mat-label>
+                <input matInput formControlName="description" placeholder="Description">
+                <mat-error align="start" *ngIf="formErrors?.description" class="form__error">{{ formErrors.description }}</mat-error>
+            </mat-form-field>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-12">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>Status</mat-label>
+                <input matInput formControlName="status" placeholder="Status">
+                <mat-error align="start" *ngIf="formErrors?.status" class="form__error">{{ formErrors.status }}</mat-error>
+            </mat-form-field>
+
+        </div>
+    </div>
+
+
+</mat-dialog-content>
+
+<div class="d-flex justify-content-center spinner-container" *ngIf="loader">
+    <mat-progress-bar
+            color="primary"
+            mode="query"
+            value=50
+            bufferValue=75>
+    </mat-progress-bar>
+</div>
+
+<mat-dialog-actions align="center">
+    <button [disabled]="loader" mat-button class="mr-2" color="primary" [mat-dialog-close]="true" (click)="close()">Close</button>
+    <button class="mat-raised-button mat-primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
+</mat-dialog-actions>

@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { PropertyModel } from '../models/property-model';
 import { BaseService } from '../../shared/base-service';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { UserProfileModel } from '../../user-profile/model/user-profile.model';
 
 @Injectable({ providedIn: 'root' })
 export class PropertyService extends BaseService<PropertyModel> {
@@ -49,15 +48,6 @@ export class PropertyService extends BaseService<PropertyModel> {
         const url =  `${super.getResourceUrl()}/${imageUrl}`;
 
         return this.localHttpClient.post<any>(url, {file_path}, {});
-    }
-
-    /**
-     *
-     * @param item
-     */
-    public updateMembershipForm(item: any): Observable<UserProfileModel> {
-        const itemUrl = 'membership_form_update';
-        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 
     /**

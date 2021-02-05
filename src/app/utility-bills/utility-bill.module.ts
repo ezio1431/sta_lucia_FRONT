@@ -12,6 +12,8 @@ import { UtilityBillDataService } from './data/utility-bill-data.service';
 import { ViewUtilityBillGeneralComponent } from './view/general/view-utility-bill-general.component';
 import { ViewUtilityBillComponent } from './view/view-utility-bill.component';
 import { UtilityBillUnitDetailsComponent } from './add/unit-details/utility-bill-unit-details.component';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 const entityMetaData: EntityMetadataMap = {
     Tenant: {
@@ -32,7 +34,8 @@ const entityMetaData: EntityMetadataMap = {
 @NgModule({
     imports: [
         SharedModule,
-        UtilityBillRoutingModule
+        UtilityBillRoutingModule,
+        NgxMatSelectSearchModule
     ],
     declarations: [
         UtilityBillComponent,

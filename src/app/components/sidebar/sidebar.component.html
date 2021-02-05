@@ -67,6 +67,13 @@
   </div>
     <ul class="nav">
         <ng-container *ngFor="let menuItem of menuItems">
+            <!--<li routerLinkActive="active" *robiPermission = menuItem?.permission class="{{menuItem.class}} nav-item">
+                <a class="nav-link" [routerLink]="[menuItem.path]">
+                    <i class="material-icons">{{menuItem.icon}}</i>
+                    <p> {{menuItem.title | translate}}</p>
+                </a>
+            </li>-->
+
             <li routerLinkActive="active" *robiPermission = menuItem?.permission class="{{menuItem.class}} nav-item">
                 <a class="nav-link" [routerLink]="[menuItem.path]">
                     <i class="material-icons">{{menuItem.icon}}</i>

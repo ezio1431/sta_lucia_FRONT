@@ -1,0 +1,30 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-info">
+                <h4 class="card-title ">Reports</h4>
+            </div>
+            <div class="card-body">
+                <nav mat-tab-nav-bar>
+
+                    <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
+                       routerLink="/reports">
+                        <span class="nav-text"> Accounts - General Ledger </span></a>
+
+                    <a mat-tab-link routerLinkActive #journal="routerLinkActive" [active]="journal.isActive" [routerLink]="['journal']">
+                        <span class="nav-text">  Journal </span></a>
+
+                    <a mat-tab-link routerLinkActive #finances="routerLinkActive" [active]="finances.isActive" [routerLink]="['other_reports']">
+                        <span class="nav-text">   Other Reports </span></a>
+
+                </nav>
+
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+</div>

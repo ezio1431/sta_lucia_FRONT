@@ -1,9 +1,9 @@
 import { Routes, RouterModule } from '@angular/router';
 import { LeaseComponent } from './lease.component';
 import { AddLeaseComponent } from './add/add-lease.component';
-import { LeaseResolverService } from './data/lease-resolver.service';
 import { ViewLeaseComponent } from './view/view-lease.component';
 import { ViewLeaseGeneralComponent } from './view/general/view-lease-general.component';
+import { CreateLeaseResolverService } from './data/create-lease-resolver.service';
 
 export const ROUTES: Routes = [
     {
@@ -13,7 +13,13 @@ export const ROUTES: Routes = [
             landlords: PropertyResolverService
         }*/
     },
-    { path: 'create', component: AddLeaseComponent },
+    {
+        path: 'create',
+        component: AddLeaseComponent,
+        resolve: {
+            properties: CreateLeaseResolverService
+        }
+    },
     {
         path: ':id',
         component: ViewLeaseComponent,

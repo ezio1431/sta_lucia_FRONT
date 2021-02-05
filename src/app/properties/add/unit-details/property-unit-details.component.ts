@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PropertyService } from '../../data/property.service';
 import { CheckboxItem } from '../../../settings/property/roles/edit/check-box-item';
+import { RentPeriods } from '../../../shared/enums/rent-period';
 
 @Component({
     selector: 'robi-add-member',
@@ -60,6 +61,8 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
 
     fromDialog: string;
 
+    rentPeriods: any;
+
     utilities$: any;
     amenities$: any;
     unitTypes$: any;
@@ -86,7 +89,8 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
             this.optionsAmenity = row.amenityOptions;
             this.optionsUtility = row.utilityOptions;
 
-      //  this.selectedValues = this.role.permissions.map(x => x['id']);
+        this.rentPeriods = RentPeriods;
+        //  this.selectedValues = this.role.permissions.map(x => x['id']);
     }
 
     ngOnInit() {
@@ -94,13 +98,15 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
         this.selectedValuesAmenity = this.unitValue?.selected_amenities ? this.unitValue?.selected_amenities : [];
         this.selectedValuesUtility = this.unitValue?.selected_utilities ? this.unitValue?.selected_utilities : [];
 
-        this.selectedUnitType = this.unitValue ? this.unitValue?.unit_type : 'residential';
+        this.selectedUnitType = this.unitValue ? this.unitValue?.unit_mode : 'residential';
 
             this.form = this.fb.group({
-                unit_type: [this.selectedUnitType],
+                unit_mode: [this.selectedUnitType],
                 unit_type_id: [this.unitValue?.unit_type_id],
                 unit_name: [this.unitValue?.unit_name, [Validators.required,
                     Validators.minLength(1)]],
+                rent_amount: [this.unitValue?.rent_amount],
+                rent_period: [this.unitValue?.rent_period],
                 bed_rooms: [this.unitValue?.bed_rooms],
                 bath_rooms: [this.unitValue?.bath_rooms],
                 square_foot: [this.unitValue?.square_foot, [Validators.required,
@@ -223,7 +229,7 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
      * @param data
      */
     closeDialog(data) {
-        console.log(data);
+        console.log('xxxxDATxxxx', data);
         data.selected_amenities = this.selectedAmenities();
         data.selected_utilities = this.selectedUtilities();
         console.log('Data with selected amenities', data);

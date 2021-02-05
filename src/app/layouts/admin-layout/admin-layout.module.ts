@@ -13,7 +13,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MaterialModule } from '../../shared/material.module';
 import { SharedModule } from '../../shared/shared.module';
-import { UserProfileComponent } from '../../user-profile/user-profile.component';
 @NgModule({
   imports: [
     /*  CommonModule,
@@ -30,8 +29,7 @@ import { UserProfileComponent } from '../../user-profile/user-profile.component'
 
   ],
   declarations: [
-    DashboardComponent,
-      UserProfileComponent
+    DashboardComponent
   ]
 })
 

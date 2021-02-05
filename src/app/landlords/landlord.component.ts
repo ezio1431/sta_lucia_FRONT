@@ -32,7 +32,9 @@ export class LandlordComponent implements OnInit, AfterViewInit {
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
     dataSource: LandlordDataSource;
+
     // Pagination
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
@@ -40,6 +42,7 @@ export class LandlordComponent implements OnInit, AfterViewInit {
 
     // Search field
     @ViewChild('search') search: ElementRef;
+    @ViewChild(MatSort, {static: true}) sort: MatSort;
 
     // Data for the list table display
     selectedRowIndex = '';
@@ -60,49 +63,12 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
         this.dataSource = new LandlordDataSource(this.landlordService);
-
         // Load pagination data
         this.dataSource.meta$.subscribe((res) => this.meta = res);
-
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
         this.dataSource.load('', 0, 0, 'first_name', 'desc');
-
-        this.landlords$ = this.landlordEntityService.entities$
-            .pipe(
-                map(landlords => {
-                    this.nextPage++;
-                    return landlords;
-                })
-            );
-
-        this.meta$ = this.landlordEntityService.meta$;
-
-        // this.initialLoad();
-
-        // Loading indicator
-        this.loading$ = this.landlordEntityService.loading$.pipe(
-            delay(0)
-        );
-
-        // Load pagination data
-    //    this.dataSource.meta$.subscribe((res) => this.meta = res);
-
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-       // this.dataSource.load('', 0, 0, 'updated_at', 'desc');
     }
-
-    initialLoad() {
-        this.landlords$ = this.landlordEntityService.entities$
-            .pipe(
-                map(landlords => {
-                   // this.nextPage++;
-                    return landlords;
-                })
-            );
-    }
-
 
     load(currentPage) {
         const page = currentPage + 1;
@@ -132,19 +98,17 @@ export class LandlordComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Load data from Api
+     * Fetch data from data lead
      */
-   loadData() {
-        this.landlordEntityService.getWithQuery({
-           'filter': this.search.nativeElement.value,
-           'page': this.nextPage.toString(),
-           'limit': '3',
-           'sortField': 'updated_at',
-           'sortDirection': 'desc'
-       });
-
-       this.nextPage++;
-   }
+    loadData() {
+        this.dataSource.load(
+            this.search.nativeElement.value,
+            (this.paginator.pageIndex + 1),
+            (this.paginator.pageSize),
+            this.sort.active,
+            this.sort.direction
+        );
+    }
 
     /**
      * Show or hide the load more button bar
@@ -159,30 +123,28 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
                 distinctUntilChanged(),
                 tap(() => {
-                   // this.nextPage = 0;
-                    this.filter(0);
-                   // this.load(0);
+                    this.paginator.pageIndex = 0;
+                    this.loadData();
                 })
             ).subscribe();
 
-        /* this.paginator.page.pipe(
-             tap(() => this.loadData() )
-         ).subscribe();*/
+        this.paginator.page.pipe(
+            tap(() => this.loadData() )
+        ).subscribe();
 
         // reset the paginator after sorting
-        //  this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-        /*  merge(this.sort.sortChange, this.paginator.page)
-              .pipe(
-                  tap(() => this.loadData())
-              )
-              .subscribe();*/
+        merge(this.sort.sortChange, this.paginator.page)
+            .pipe(
+                tap(() => this.loadData())
+            )
+            .subscribe();
     }
 
     /**
@@ -190,10 +152,7 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      */
     clearSearch() {
         this.search.nativeElement.value = '';
-        // this.loadData()
-        // this.initialLoad();
-        this.filter(0);
-      //  this.load(0);
+        this.loadData()
     }
 
     /**
@@ -212,7 +171,7 @@ export class LandlordComponent implements OnInit, AfterViewInit {
         dialogRef.afterClosed().subscribe(
             (val) => {
                 if ((val)) {
-                   // this.loadData();
+                    this.loadData();
                 }
             }
         );
@@ -224,20 +183,14 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      */
     onSelected(landlord: LandlordModel): void {
         this.selectedRowIndex = landlord.id;
+        this.landlordService.changeSelectedLandlord(landlord);
         this.landlordEntityService.changeSelectedLandlord(landlord);
     }
 
-    /**
-     * Fetch data from data lead
-     */
-   /* loadData() {
-        this.dataSource.load(
-            this.search.nativeElement.value,
-            (this.paginator.pageIndex + 1),
-            (this.paginator.pageSize),
-            this.sort.active,
-            this.sort.direction
-        );
+
+  /*  onSelected(loan: LoanModel): void {
+        this.selectedRowIndex = loan.id;
+        this.service.changeSelectedLoan(loan);
     }*/
 
 
@@ -285,13 +238,12 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      * @param landlord
      */
    delete(landlord: LandlordModel) {
-       // this.loader = true;
-        this.landlordEntityService.delete(landlord);
-     /*   this.service.delete(lead)
+        this.loader = true;
+        this.landlordService.delete(landlord)
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Lead has been deleted.');
+                    this.notification.showNotification('success', 'Success !! Landlord has been deleted.');
                 },
                 (error) => {
                     this.loader = false;
@@ -301,6 +253,6 @@ export class LandlordComponent implements OnInit, AfterViewInit {
                     } else {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }
-                });*/
+                });
     }
 }

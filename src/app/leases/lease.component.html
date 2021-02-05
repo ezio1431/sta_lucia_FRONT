@@ -76,7 +76,22 @@
                             </div>
                             <div class="table-responsive">
 
-                                <mat-table #table [dataSource]="dataSource$ | async" matSort matSortActive="rent_amount" matSortDirection="asc" matSortDisableClear>
+                                <mat-table #table [dataSource]="dataSource" matSort matSortActive="lease_number" matSortDirection="asc" matSortDisableClear>
+                                  <!--  <ng-container matColumnDef="lease_number">
+                                        <mat-header-cell *matHeaderCellDef> Lease Number </mat-header-cell>
+                                        <mat-cell *matCellDef="let row"> {{ row.lease_number}} </mat-cell>
+                                    </ng-container>-->
+
+                                    <ng-container matColumnDef="lease_number">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header> Lease Number </mat-header-cell>
+                                        <mat-cell *matCellDef="let row">
+                                            <button mat-stroked-button color="primary"
+                                                    (click)="accountBalance(row)" type="button" matTooltip="View Account Statement" [matTooltipPosition]="'above'" class="">
+                                                {{row.lease_number}}
+                                            </button>
+                                        </mat-cell>
+                                    </ng-container>
+
                                     <ng-container matColumnDef="rent_amount">
                                         <mat-header-cell *matHeaderCellDef> Rent Amount </mat-header-cell>
                                         <mat-cell *matCellDef="let row"> {{ row.rent_amount}} </mat-cell>
@@ -129,9 +144,11 @@
                                     </ng-container>
 
                                     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                                    <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onSelected(row)"
+                                    <!--<mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onSelected(row)"
                                              [ngClass]="{'clickable highlight': selectedRowIndex == row.id}"
-                                    ></mat-row>
+                                    ></mat-row>-->
+
+                                    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 
 
                                 </mat-table>
@@ -146,15 +163,15 @@
                                     </mat-progress-bar>
                                 </div>
 
-                                <!--<mat-paginator *ngIf="meta$ | async as meta" #pagination
+                                <mat-paginator #pagination
                                                [length]="meta?.total"
                                                [pageIndex]="pageIndex"
                                                [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
-                                </mat-paginator>-->
+                                </mat-paginator>
 
                             </div>
                         </div>
-                        <ng-container *ngIf="meta$ | async as meta">
+                    <!--    <ng-container *ngIf="meta$ | async as meta">
                             <button *ngIf="showLoadMoreButton(meta.current_page, meta.last_page)" [disabled]="loading$ | async" mat-raised-button
                                     class="justify-content-center" color="accent" (click)="filter(meta.current_page)">
                                 <ng-container *ngIf="!(loading$ | async)">{{ 'robi.landlords.load_more' | translate }} {{meta.current_page}} of {{meta.last_page}}</ng-container>
@@ -169,7 +186,7 @@
                                     value=20
                                     bufferValue=150>
                             </mat-progress-bar>
-                        </div>
+                        </div>-->
                     </ng-container>
                 </div>
 

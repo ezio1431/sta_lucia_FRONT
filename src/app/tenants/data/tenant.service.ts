@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TenantModel } from '../models/tenant-model';
 import { BaseService } from '../../shared/base-service';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { UserProfileModel } from '../../user-profile/model/user-profile.model';
 
 @Injectable({ providedIn: 'root' })
 export class TenantService extends BaseService<TenantModel> {
@@ -49,15 +48,6 @@ export class TenantService extends BaseService<TenantModel> {
         const url =  `${super.getResourceUrl()}/${imageUrl}`;
 
         return this.localHttpClient.post<any>(url, {file_path}, {});
-    }
-
-    /**
-     *
-     * @param item
-     */
-    public updateTenantshipForm(item: any): Observable<UserProfileModel> {
-        const itemUrl = 'membership_form_update';
-        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 
     /**

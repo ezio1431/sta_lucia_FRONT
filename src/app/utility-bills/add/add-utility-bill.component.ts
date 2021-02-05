@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UtilityBillModel } from '../models/utility-bill-model';
 import { UtilityBillService } from '../data/utility-bill.service';
 
 import { NotificationService } from '../../shared/notification.service';
 import { UtilityBillEntityService } from '../data/utility-bill-entity.service';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { UtilityBillUnitDetailsComponent } from './unit-details/utility-bill-unit-details.component';
-import { tap } from 'rxjs/operators';
+import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { TypeEntityService } from '../../settings/property/type/data/type-entity.service';
 import { UtilityEntityService } from '../../settings/property/utility/data/utility-entity.service';
 import { AmenityEntityService } from '../../settings/property/amenity/data/amenity-entity.service';
@@ -20,6 +20,9 @@ import { LeaseModeEntityService } from '../../settings/lease/lease-mode/data/lea
 import { LeaseTypeEntityService } from '../../settings/lease/lease-type/data/lease-type-entity.service';
 import { PaymentFrequencyEntityService } from '../../settings/payment/payment-frequency/data/payment-frequency-entity.service';
 import { TenantEntityService } from '../../tenants/data/tenant-entity.service';
+import { PropertyService } from '../../properties/data/property.service';
+import { MatSelect } from '@angular/material/select';
+import * as moment from 'moment';
 
 @Component({
     selector: 'robi-add-tenant',
@@ -27,6 +30,8 @@ import { TenantEntityService } from '../../tenants/data/tenant-entity.service';
     templateUrl: './add-utility-bill.component.html'
 })
 export class AddUtilityBillComponent implements OnInit  {
+
+    properties: any = [];
 
     unitFields: FormArray;
     utilityDeposits: FormArray;
@@ -73,19 +78,21 @@ export class AddUtilityBillComponent implements OnInit  {
 
 
     isLinear = false;
-    utilitySummaryFormGroup: FormGroup;
     manualUtilityBillsFormGroup: FormGroup;
     entryChoiceFormGroup: FormGroup;
     autoDataEntryFormGroup: FormGroup;
 
-    depositsFormGroup: FormGroup;
-    tenantsFormGroup: FormGroup;
-    leaseDetailsFormGroup: FormGroup;
-    leaseSettingsFormGroup: FormGroup;
+    utilitySummaryFormGroup: FormGroup;
+    utilityBillsFormGroup: FormGroup;
+
+    utilityBillFields: FormArray;
+
 
     details = 'noooone';
 
     isLoaded: boolean;
+    isManualEntry = true;
+    isAutoImport = false;
 
     propertyTypes$: Observable<any>;
     tenantTypes$: Observable<any>;
@@ -114,11 +121,27 @@ export class AddUtilityBillComponent implements OnInit  {
 
     public entryType: string;
 
+    units: any = [];
+    units$ = of([]);
+    utilityCharges$ = of([]);
+
+    /** control for filter for server side. */
+    public propertyServerSideFilteringCtrl: FormControl = new FormControl();
+    /** list of tenants filtered after simulating server side search */
+    public  filteredServerSideProperties: ReplaySubject<any> = new ReplaySubject<any>(1);
+
+    /** indicate search operation is in progress */
+    public searching = false;
+
+    /** Subject that emits when the component has been destroyed. */
+    protected _onDestroy = new Subject<void>();
+
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
                 private _formBuilder: FormBuilder,
-                private propertyService: UtilityBillService,
+                private propertyService: PropertyService,
                 private utilityBillEntityService: UtilityBillEntityService,
+                private utilityBillService: UtilityBillService,
                 private notification: NotificationService,
                 private propertyTypeEntityService: TypeEntityService,
                 private tenantTypeEntityService: TenantTypeEntityService,
@@ -129,9 +152,46 @@ export class AddUtilityBillComponent implements OnInit  {
                 private tenantEntityService: TenantEntityService,
                 private amenityEntityService: AmenityEntityService) {
         this.entryType = 'manual';
+        // Load properties list
+        this.propertyService.list(['property_name', 'location'])
+            .subscribe((res) => this.properties = res,
+                () => this.properties = []
+            );
     }
 
     ngOnInit() {
+
+        // Property Search
+        this.propertyServerSideFilteringCtrl.valueChanges
+            .pipe(
+                filter(search => !!search),
+                tap(() => this.searching = true),
+                takeUntil(this._onDestroy),
+                debounceTime(200),
+                distinctUntilChanged(),
+                map(search => {
+                    if (!this.properties) {
+                        return [];
+                    }
+                    search = search.toLowerCase();
+                    console.log('search', search);
+
+                    // simulate server fetching and filtering data
+                    return this.properties.filter(property => {
+                        console.log('property', property);
+                        return property.property_name.toLowerCase().indexOf(search) > -1
+                            || property.location.toLowerCase().indexOf(search) > -1;
+                    });
+                }),
+                delay(500)
+            )
+            .subscribe(filteredProperties => {
+                    this.searching = false;
+                    this.filteredServerSideProperties.next(filteredProperties);
+                },
+                error => {
+                    this.searching = false;
+                });
 
         this.loadTenants();
         this.loadPropertyTypes();
@@ -184,54 +244,37 @@ export class AddUtilityBillComponent implements OnInit  {
         });
 
         this.utilitySummaryFormGroup = this._formBuilder.group({
-            property_id: [''],
-            utility_id: [''],
-
-            /*unit_id: [''],
-            reading_date: [''],
-            current_reading: [''],
-
-            base_charge: [''],
-            previous_reading: [''],
-
-            rate_per_unit: [''],
-            units: [''],
-            total: [''],*/
+            property_id: ['', [Validators.required]],
+            utility_id: ['', [Validators.required]],
         });
 
-        this.entryChoiceFormGroup = this._formBuilder.group({
+        /*this.entryChoiceFormGroup = this._formBuilder.group({
             entry_type: [this.entryType]
-        });
+        });*/
 
-        this.autoDataEntryFormGroup = this._formBuilder.group({
+        /*this.autoDataEntryFormGroup = this._formBuilder.group({
             entry_type: [this.entryType]
+        });*/
+
+        this.utilityBillsFormGroup = this._formBuilder.group({
+            unitBills: this.fb.array([ this.utilityBillFieldCreate() ]),
         });
+    }
 
-        this.manualUtilityBillsFormGroup = this._formBuilder.group({
-            entry_type: [this.entryType],
-            property_id: [''],
-           /* unit_id: [''],
-            utility_id: [''],
+    /**
+     * Update supporting fields when property drop down changes content
+     * @param value
+     */
+    onPropertyItemChange(value) {
+        this.units = this.properties.find((item: any) => item.id === value).units;
+        this.units$ = of(this.properties.find((item: any) => item.id === value).units);
+    }
 
-            reading_date: [''],
-            current_reading: [''],
-
-            base_charge: [''],
-            previous_reading: [''],
-
-            rate_per_unit: [''],
-            units: [''],
-            total: [''],*/
-            unitBills: this.fb.array([ this.createUnitUtilityBillField() ]),
-        });
-
-        this.tenantsFormGroup = this._formBuilder.group({
-            tenants: this.fb.array([ this.createTenantField() ]),
-        });
-
-        this.leaseSettingsFormGroup = this._formBuilder.group({
-            secondCtrl: ['', Validators.required]
-        });
+    /**
+     * Update supporting fields when unit drop down changes content
+     * @param value
+     */
+    onUnitItemChange(value) {
     }
 
     /**
@@ -378,23 +421,25 @@ export class AddUtilityBillComponent implements OnInit  {
         });
     }
 
+
+    /*Start Utility Bill section*/
+
     /**
-     * Generate fields for a data row
+     * Fetch all defined fields
      */
-    createUnitUtilityBillField(data?: any): FormGroup {
+    get utilityBillFieldsAll () {
+        return <FormArray>this.utilityBillsFormGroup.get('unitBills');
+    }
+
+    /**
+     * Initial field creation
+     * @param data
+     */
+    utilityBillFieldCreate(data?: any): FormGroup {
         return this.fb.group({
-            unit_id: [''],
-            reading_date: [''],
-            current_reading: [''],
-
-           /* utility_id: [''],
-            property_id: [''],
-            base_charge: [''],
-            previous_reading: [''],
-
-            rate_per_unit: [''],
-            units: [''],
-            total: [''],*/
+            unit_id: [data?.unit_id, [Validators.required]],
+            reading_date: [data ? data?.reading_date : (new Date()).toISOString().substring(0, 10), [Validators.required]],
+            current_reading: [data?.current_reading, [Validators.required]],
         });
     }
 
@@ -402,88 +447,32 @@ export class AddUtilityBillComponent implements OnInit  {
      * Add an extra data row
      * @param data Default data
      */
-    addUnitUtilityBillField(data?: any): void {
-        this.unitUtilityBills = this.manualUtilityBillsFormGroup.get('unitBills') as FormArray;
-        this.unitUtilityBills.push(this.createUnitUtilityBillField(data));
+    utilityBillFieldAdd(data?: any): void {
+        this.utilityBillFields = this.utilityBillsFormGroup.get('unitBills') as FormArray;
+        this.utilityBillFields.push(this.utilityBillFieldCreate(data));
     }
 
     /**
      * remove an existing data row
      */
-    removeUnitUtilityBillField(i): void {
-        this.unitUtilityBills = this.manualUtilityBillsFormGroup.get('unitBills') as FormArray;
-        this.unitUtilityBills.removeAt(i);
-        const item = this.unitUtilityBillValues.splice(i, 1);
+    utilityBillFieldRemove(i): void {
+        this.utilityBillFields = this.utilityBillsFormGroup.get('unitBills') as FormArray;
+        this.utilityBillFields.removeAt(i);
     }
 
     /**
-     * Generate fields for a data row
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
      */
-    createTenantField(data?: any): FormGroup {
-        return this.fb.group({
-            tenant_id: [''],
-            first_name: [{value: '', disabled: true}],
-            id_passport_number: [{value: '', disabled: true}],
-        });
+    utilityBillFieldCopy(i): void {
+        this.utilityBillFields = this.utilityBillsFormGroup.get('unitBills') as FormArray;
+        const holder = [];
+        holder.push(this.utilityBillFields.value[i])
+        this.utilityBillFieldAdd(...holder);
     }
 
-    /**
-     * Add an extra data row
-     * @param data Default data
-     */
-    addTenantField(data?: any): void {
-        this.utilityDeposits = this.tenantsFormGroup.get('tenants') as FormArray;
-        this.utilityDeposits.push(this.createTenantField(data));
-    }
-
-    /**
-     * remove an existing data row
-     */
-    removeTenantField(i): void {
-        this.tenantFields = this.tenantsFormGroup.get('tenants') as FormArray;
-        this.tenantFields.removeAt(i);
-        const item = this.tenantValues.splice(i, 1);
-    }
-
-    /**
-     * Generate fields for a data row
-     */
-    createUtilityDepositField(data?: any): FormGroup {
-        return this.fb.group({
-            utility_id: [''],
-            deposit_amount: [''],
-        });
-    }
-
-    /**
-     * Add an extra data row
-     * @param data Default data
-     */
-    addUtilityDepositField(data?: any): void {
-        this.utilityDeposits = this.depositsFormGroup.get('utilityDeposits') as FormArray;
-        this.utilityDeposits.push(this.createUtilityDepositField(data));
-    }
-
-    /**
-     * remove an existing data row
-     */
-    removeUtilityDepositField(i): void {
-        this.unitFields = this.depositsFormGroup.get('utilityDeposits') as FormArray;
-        this.unitFields.removeAt(i);
-        const item = this.unitValues.splice(i, 1);
-
-        console.log('Removed = ', item);
-        console.log('After remove: ', this.unitValues);
-    }
-
-    /**
-     * Generate fields for a data row
-     */
-    createUnitField(data?: any): FormGroup {
-        return this.fb.group({
-            unit_name: [data?.unit_name]
-        });
-    }
+    /* End Utility Bills section*/
 
     /**
      * Create member
@@ -491,13 +480,13 @@ export class AddUtilityBillComponent implements OnInit  {
     create() {
         this.errorInForm.next(false);
 
-        const unitBills = {...this.utilitySummaryFormGroup.value, ...this.manualUtilityBillsFormGroup.value};
+        const unitBills = {...this.utilitySummaryFormGroup.value, ...this.utilityBillsFormGroup.value};
 
         this.loader = true;
 
-        this.utilityBillEntityService.add(unitBills).subscribe((data) => {
+        this.utilityBillService.create(unitBills).subscribe((data) => {
                // this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Bills Generated.');
+                this.notification.showNotification('success', 'Success !! Utility Readings Added.');
             },
             (error) => {
                 this.errorInForm.next(true);
@@ -523,9 +512,9 @@ export class AddUtilityBillComponent implements OnInit  {
                                 this.utilitySummaryFormGroup.controls[prop]?.markAsTouched();
                                 this.utilitySummaryFormGroup.controls[prop].setErrors({incorrect: true});
                             }
-                            if (this.manualUtilityBillsFormGroup.controls[prop]) {
-                                this.manualUtilityBillsFormGroup.controls[prop]?.markAsTouched();
-                                this.manualUtilityBillsFormGroup.controls[prop].setErrors({incorrect: true});
+                            if (this.utilityBillsFormGroup.controls[prop]) {
+                                this.utilityBillsFormGroup.controls[prop]?.markAsTouched();
+                                this.utilityBillsFormGroup.controls[prop].setErrors({incorrect: true});
                             }
                         }
                     }

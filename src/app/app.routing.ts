@@ -41,11 +41,11 @@ const routes: Routes = [
         path: 'leases',
         // loadChildren: './settings/setting.module#SettingModule',
         loadChildren: () => import('./leases/lease.module').then(m => m.LeaseModule),
-        canActivate: [AuthGuard],
+       /* canActivate: [AuthGuard],
         canLoad: [PermGuard],
         data: {
           permissions: ['dashboard-view']
-        }
+        }*/
       },
       {
         path: 'utility_bills',
@@ -53,13 +53,31 @@ const routes: Routes = [
         loadChildren: () => import('./utility-bills/utility-bill.module').then(m => m.UtilityBillModule),
       },
       {
+        path: 'invoices',
+        // loadChildren: './settings/setting.module#SettingModule',
+        loadChildren: () => import('./invoices/invoice.module').then(m => m.InvoiceModule),
+      },
+      {
+        path: 'payments',
+        // loadChildren: './settings/setting.module#SettingModule',
+        loadChildren: () => import('./payments/payment.module').then(m => m.PaymentModule),
+      },
+      {
         path: 'settings',
         // loadChildren: './settings/setting.module#SettingModule',
         loadChildren: () => import('./settings/setting.module').then(m => m.SettingModule),
       },
       {
-        path: 'landlord',
+        path: 'profile',
         // loadChildren: './settings/setting.module#SettingModule',
+        loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule),
+      },
+      {
+        path: 'tasks',
+        loadChildren: () => import('./tasks/task.module').then(m => m.TaskModule),
+      },
+      {
+        path: 'landlord',
         loadChildren: () => import('./landlord-area/landlord-area.module').then(m => m.LandlordAreaModule),
         canActivate: [AuthGuard],
         canLoad: [PermGuard],

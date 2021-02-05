@@ -4,6 +4,7 @@ import { AddPropertyComponent } from './add/add-property.component';
 import { PropertyResolverService } from './data/property-resolver.service';
 import { ViewPropertyComponent } from './view/view-property.component';
 import { ViewPropertyGeneralComponent } from './view/general/view-property-general.component';
+import { CreatePropertyResolverService } from './data/create-property-resolver.service';
 
 export const ROUTES: Routes = [
     {
@@ -13,7 +14,13 @@ export const ROUTES: Routes = [
             landlords: PropertyResolverService
         }*/
     },
-    { path: 'create', component: AddPropertyComponent },
+    {
+        path: 'create',
+        component: AddPropertyComponent,
+        resolve: {
+            landlords: CreatePropertyResolverService
+        }
+    },
     {
         path: ':id',
         component: ViewPropertyComponent,

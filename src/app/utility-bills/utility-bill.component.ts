@@ -15,6 +15,7 @@ import { AmenityEntityService } from '../settings/property/amenity/data/amenity-
 import { UtilityModel } from '../settings/property/utility/model/utility-model';
 import { TypeEntityService } from '../settings/property/type/data/type-entity.service';
 import { UtilityBillService } from './data/utility-bill.service';
+import { LandlordDataSource } from '../landlords/data/landlord-data.source';
 
 @Component({
     selector: 'robi-utility-bills',
@@ -24,10 +25,11 @@ import { UtilityBillService } from './data/utility-bill.service';
 export class UtilityBillComponent implements OnInit, AfterViewInit {
 
     displayedColumns = [
-        'rent_amount',
-        'start_date',
-        'location',
-        'landlord_id',
+        'property_id',
+        'utility_id',
+        'unit_id',
+        'reading_date',
+        'current_reading',
         'actions'
     ];
     displayedColumnsReduced = [
@@ -73,8 +75,11 @@ export class UtilityBillComponent implements OnInit, AfterViewInit {
 
     selectedRow = -1;
 
+    dataSource: UtilityBillDataSource;
+
     constructor(private propertyService: UtilityBillService,
                 private propertyEntityService: UtilityBillEntityService,
+                private utilityBillService: UtilityBillService,
                 private propertyTypeEntityService: TypeEntityService,
                 private notification: NotificationService,
                 private dialog: MatDialog, private utilityEntityService: UtilityEntityService,
@@ -87,6 +92,12 @@ export class UtilityBillComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
+
+        this.dataSource = new UtilityBillDataSource(this.utilityBillService);
+        // Load pagination data
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
+        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
+        this.dataSource.load('', 0, 0);
 
        // this.getImageFromService('Quotefancy-1571909-3840x2160_1589749637.jpg');
 

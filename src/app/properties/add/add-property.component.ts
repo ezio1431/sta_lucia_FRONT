@@ -1,33 +1,48 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { PropertyModel } from '../models/property-model';
 import { PropertyService } from '../data/property.service';
 
 import { NotificationService } from '../../shared/notification.service';
 import { PropertyEntityService } from '../data/property-entity.service';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { PropertyUnitDetailsComponent } from './unit-details/property-unit-details.component';
-import { tap } from 'rxjs/operators';
+import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { TypeEntityService } from '../../settings/property/type/data/type-entity.service';
 import { UtilityEntityService } from '../../settings/property/utility/data/utility-entity.service';
 import { AmenityEntityService } from '../../settings/property/amenity/data/amenity-entity.service';
 import { CheckboxItem } from '../../settings/property/roles/edit/check-box-item';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { UnitTypeEntityService } from '../../settings/property/unit-type/data/unit-type-entity.service';
+import { LandlordService } from '../../landlords/data/landlord.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LATE_FEE_TYPES } from '../../shared/enums/late-fee-type.enums';
+import { RentPeriods } from '../../shared/enums/rent-period';
+import { EXTRA_CHARGE_TYPES } from '../../shared/enums/extra-charge-type-enum';
+import { EXTRA_CHARGE__FREQUENCIES } from '../../shared/enums/extra-charge-frequency-enum';
+import { ExtraChargeService } from '../../settings/property/extra-charges/data/extra-charge.service';
+import { AGENT_COMMISSION_TYPES } from '../../shared/enums/agent-commision-type-enum';
+import { UTILITY_TYPES } from '../../shared/enums/utility-types-enum';
+import { PaymentMethodService } from '../../settings/payment/payment-method/data/payment-method.service';
 
 @Component({
     selector: 'robi-add-member',
     styles: [],
     templateUrl: './add-property.component.html'
 })
-export class AddPropertyComponent implements OnInit  {
+export class AddPropertyComponent implements OnInit, OnDestroy  {
 
     form: FormGroup;
     unitFields: FormArray;
+    lateFeeFields: FormArray;
+    paymentMethodFields: FormArray;
+    extraChargeFields: FormArray;
+    utilityFields: FormArray;
 
     unitValues = [];
+    lateFeeValues = [];
 
     formErrors: any;
     // formError$: Observable<boolean>;
@@ -57,7 +72,7 @@ export class AddPropertyComponent implements OnInit  {
 
     urls = new Array<string>();
 
-    landlord: PropertyModel;
+    property: PropertyModel;
 
     @ViewChild('stepper', {static: true }) stepper: MatStepper;
 
@@ -65,6 +80,8 @@ export class AddPropertyComponent implements OnInit  {
     isLinear = false;
     firstFormGroup: FormGroup;
     secondFormGroup: FormGroup;
+    thirdFormGroup: FormGroup;
+    fourthFormGroup: FormGroup;
 
     details = 'noooone';
 
@@ -74,12 +91,18 @@ export class AddPropertyComponent implements OnInit  {
     utilities$: Observable<any>;
     amenities$: Observable<any>;
     unitTypes$: Observable<any>;
-    selectedUnitType$: Observable<any>;
 
     allAmenitiesOptions = new Array<CheckboxItem>();
     allUtilitiesOptions = new Array<CheckboxItem>();
     amenities: any;
     utilities: any;
+    utilityTypes: any;
+    lateFeeTypes: any;
+    agentCommissionTypes: any;
+    extraChargeTypes: any;
+    extraChargeFrequencies: any;
+    extraCharges: any;
+    paymentMethods: any;
 
     logoToUpload: File = null;
     logoUrl = '';
@@ -91,9 +114,28 @@ export class AddPropertyComponent implements OnInit  {
     showPhoto: any;
     progress = 0;
 
+    landlords: any = [];
+
+    /** control for filter for server side. */
+    public landlordServerSideFilteringCtrl: FormControl = new FormControl();
+
+    /** indicate search operation is in progress */
+    public searching = false;
+
+    /** list of banks filtered after simulating server side search */
+    public  filteredServerSideLandlords: ReplaySubject<any> = new ReplaySubject<any>(1);
+
+    /** Subject that emits when the component has been destroyed. */
+    protected _onDestroy = new Subject<void>();
+
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
                 private _formBuilder: FormBuilder,
+                private route: ActivatedRoute,
+                private landlordService: LandlordService,
+                private extraChargeService: ExtraChargeService,
+                private paymentMethodService: PaymentMethodService,
+                private router: Router,
                 private propertyService: PropertyService,
                 private landlordEntityService: PropertyEntityService,
                 private notification: NotificationService,
@@ -101,9 +143,77 @@ export class AddPropertyComponent implements OnInit  {
                 private unitTypeEntityService: UnitTypeEntityService,
                 private utilityEntityService: UtilityEntityService,
                 private amenityEntityService: AmenityEntityService) {
+
+      /*  this.landlordService.list(['first_name', 'middle_name', 'last_name'])
+            .subscribe((res) => this.landlords = res,
+                () => this.landlords = []
+            );*/
+
+        if (this.route.snapshot.data['landlords']) {
+            this.landlords = this.route.snapshot.data['landlords'];
+        }
+        this.lateFeeTypes = LATE_FEE_TYPES;
+        this.extraChargeTypes = EXTRA_CHARGE_TYPES;
+        this.extraChargeFrequencies = EXTRA_CHARGE__FREQUENCIES;
+        this.agentCommissionTypes = AGENT_COMMISSION_TYPES;
+        this.utilityTypes = UTILITY_TYPES;
     }
 
     ngOnInit() {
+
+        // Extra Charges list
+        this.extraChargeService.list(['extra_charge_name', 'extra_charge_display_name'])
+            .subscribe((res) => this.extraCharges = res,
+                () => this.extraCharges = []
+            );
+
+        // Payment Method list
+        this.paymentMethodService.list(['name', 'display_name'])
+            .subscribe((res) => this.paymentMethods = res,
+                () => this.paymentMethods = []
+            );
+
+
+        // listen for search field value changes
+        this.landlordServerSideFilteringCtrl.valueChanges
+            .pipe(
+                filter(search => !!search),
+                tap(() => this.searching = true),
+                takeUntil(this._onDestroy),
+                debounceTime(200),
+                distinctUntilChanged(),
+                map(search => {
+                    if (!this.landlords) {
+                        return [];
+                    }
+                    search = search.toLowerCase();
+                    console.log('search', search);
+
+                    // simulate server fetching and filtering data
+                    return this.landlords.filter(landlord => {
+                        return landlord.first_name.toLowerCase().indexOf(search) > -1
+                            || landlord.last_name.toLowerCase().indexOf(search) > -1;
+                    });
+                }),
+                delay(500)
+            )
+            .subscribe(filteredLandlords => {
+                    this.searching = false;
+                    this.filteredServerSideLandlords.next(filteredLandlords);
+                },
+                error => {
+                    this.searching = false;
+                });
+
+
+        /*
+                            || landlord.middle_name.toLowerCase().indexOf(search) > -1
+                            || landlord.last_name.toLowerCase().indexOf(search) > -1
+         || member.phone.toLowerCase().indexOf(search) > -1
+             || member.account?.account_number.toLowerCase().indexOf(search) > -1
+             || member.id_number.toLowerCase().indexOf(search) > -1*/
+
+
 
         this.loadPropertyTypes();
         this.loadUnitTypes();
@@ -147,26 +257,281 @@ export class AddPropertyComponent implements OnInit  {
             });
         });
 
-
-
-
         this.firstFormGroup = this._formBuilder.group({
-            firstCtrl: ['', Validators.required]
+            landlord_id: ['', [Validators.required,
+                Validators.minLength(2)]],
+            property_name: ['', [Validators.required,
+                Validators.minLength(2)]],
+            location: [''],
+            property_code: ['', [Validators.required,
+                Validators.minLength(2)]],
+            property_type_id: ['', [Validators.required,
+                Validators.minLength(2)]],
+            unitFields: this.fb.array([ this.createUnitField() ])
         });
         this.secondFormGroup = this._formBuilder.group({
-            secondCtrl: ['', Validators.required]
+            agent_commission_value: [''],
+            agent_commission_type: [''],
+          //  lateFeeFields: this.fb.array([ this.lateFeeFieldCreate() ]),
+            paymentMethodFields: this.fb.array([ this.paymentMethodFieldCreate() ])
         });
-            this.form = this.fb.group({
-                landlord_id: ['', [Validators.required,
-                    Validators.minLength(2)]],
-                property_name: ['', [Validators.required,
-                    Validators.minLength(2)]],
-                location: [''],
-                property_type_id: ['', [Validators.required,
-                    Validators.minLength(2)]],
-                unitFields: this.fb.array([ this.createUnitField() ])
-            });
+
+        this.thirdFormGroup = this._formBuilder.group({
+            extraChargeFields: this.fb.array([ this.extraChargeFieldCreate() ]),
+          //  utilityFields: this.fb.array([ this.utilityFieldCreate() ])
+        });
+
+        this.fourthFormGroup = this._formBuilder.group({
+            utilityFields: this.fb.array([ this.utilityFieldCreate() ])
+        });
     }
+
+
+    /**
+     * Fetch all defined fields
+     */
+    get utilityFieldsAll () {
+        return <FormArray>this.fourthFormGroup.get('utilityFields');
+    }
+
+    /**
+     * Generate fields for a data row
+     */
+    utilityFieldCreate(data?: any): FormGroup {
+        return this.fb.group({
+            utility_id: [data?.utility_id],
+            utility_type: [data?.utility_type],
+            unit_cost: [data?.unit_cost],
+            standard_fee: [data?.standard_fee],
+        });
+    }
+
+    /**
+     * Add an extra data row
+     * @param data Default data
+     */
+    utilityFieldAdd(data?: any): void {
+        this.utilityFields = this.fourthFormGroup.get('utilityFields') as FormArray;
+        this.utilityFields.push(this.utilityFieldCreate(data));
+    }
+
+    /**
+     * remove an existing data row
+     */
+    utilityFieldRemove(i): void {
+        this.utilityFields = this.fourthFormGroup.get('utilityFields') as FormArray;
+        this.utilityFields.removeAt(i);
+        //  this.lateFeeValues.splice(i, 1);
+    }
+
+    /**
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
+     */
+    utilityFieldCopy(i): void {
+        this.utilityFields = this.fourthFormGroup.get('utilityFields') as FormArray;
+        const holder = [];
+        holder.push(this.utilityFields.value[i])
+        this.utilityFieldAdd(...holder);
+    }
+
+    /**
+     * Fetch all defined fields
+     */
+    get extraChargeFieldsAll () {
+        return <FormArray>this.thirdFormGroup.get('extraChargeFields');
+    }
+
+    /**
+     * Generate fields for a data row
+     */
+    extraChargeFieldCreate(data?: any): FormGroup {
+        return this.fb.group({
+            extra_charge_id: [data?.extra_charge_id],
+            extra_charge_value: [data?.extra_charge_value],
+            extra_charge_type: [data?.extra_charge_type],
+            extra_charge_frequency: [data?.extra_charge_frequency]
+        });
+    }
+
+    /**
+     * Add an extra data row
+     * @param data Default data
+     */
+    extraChargeFieldAdd(data?: any): void {
+        this.extraChargeFields = this.thirdFormGroup.get('extraChargeFields') as FormArray;
+        this.extraChargeFields.push(this.extraChargeFieldCreate(data));
+    }
+
+    /**
+     * remove an existing data row
+     */
+    extraChargeFieldRemove(i): void {
+        this.extraChargeFields = this.thirdFormGroup.get('extraChargeFields') as FormArray;
+        this.extraChargeFields.removeAt(i);
+        //  this.lateFeeValues.splice(i, 1);
+    }
+
+    /**
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
+     */
+    extraChargeFieldCopy(i): void {
+        this.extraChargeFields = this.thirdFormGroup.get('extraChargeFields') as FormArray;
+        const holder = [];
+        holder.push(this.extraChargeFields.value[i])
+        this.extraChargeFieldAdd(...holder);
+    }
+
+
+    /**
+     * Fetch all defined fields
+     */
+    get paymentMethodFieldsAll () {
+        return <FormArray>this.secondFormGroup.get('paymentMethodFields');
+    }
+
+    /**
+     * Generate fields for a data row
+     */
+    paymentMethodFieldCreate(data?: any): FormGroup {
+        return this.fb.group({
+            payment_method_id: [data?.payment_method_id],
+            payment_method_description: [data?.payment_method_description]
+        });
+    }
+
+    /**
+     * Add an extra data row
+     * @param data Default data
+     */
+    paymentMethodFieldAdd(data?: any): void {
+        this.paymentMethodFields = this.secondFormGroup.get('paymentMethodFields') as FormArray;
+        this.paymentMethodFields.push(this.paymentMethodFieldCreate(data));
+    }
+
+    /**
+     * remove an existing data row
+     */
+    paymentMethodFieldRemove(i): void {
+        this.paymentMethodFields = this.secondFormGroup.get('paymentMethodFields') as FormArray;
+        this.paymentMethodFields.removeAt(i);
+      //  this.lateFeeValues.splice(i, 1);
+    }
+
+    /**
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
+     */
+    paymentMethodFieldCopy(i): void {
+        this.paymentMethodFields = this.secondFormGroup.get('paymentMethodFields') as FormArray;
+        const holder = [];
+        holder.push(this.paymentMethodFields.value[i])
+        this.paymentMethodFieldAdd(...holder);
+    }
+
+
+    /**
+     * Fetch all defined fields
+     */
+   /* get lateFeeFieldsAll () {
+        return <FormArray>this.secondFormGroup.get('lateFeeFields');
+    }*/
+
+    /**
+     * Generate fields for a data row
+     */
+   /* lateFeeFieldCreate(data?: any): FormGroup {
+        return this.fb.group({
+            late_fee_value: [data?.late_fee_value],
+            late_fee_type: [data?.late_fee_type]
+        });
+    }*/
+
+    /**
+     * Add an extra data row
+     * @param data Default data
+     */
+   /* lateFeeFieldAdd(data?: any): void {
+        this.lateFeeFields = this.secondFormGroup.get('lateFeeFields') as FormArray;
+        this.lateFeeFields.push(this.lateFeeFieldCreate(data));
+    }*/
+
+    /**
+     * remove an existing data row
+     */
+  /*  lateFeeFieldRemove(i): void {
+        this.lateFeeFields = this.secondFormGroup.get('lateFeeFields') as FormArray;
+        this.lateFeeFields.removeAt(i);
+        this.lateFeeValues.splice(i, 1);
+    }*/
+
+    /**
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
+     */
+    /*lateFeeFieldCopy(i): void {
+        this.lateFeeFields = this.secondFormGroup.get('lateFeeFields') as FormArray;
+        const holder = [];
+        holder.push(this.lateFeeFields.value[i])
+        this.lateFeeFieldAdd(...holder);
+    }*/
+
+    /**
+     * Generate fields for a data row
+     */
+    createUnitField(data?: any): FormGroup {
+        return this.fb.group({
+            unit_name: [data?.unit_name],
+            unit_type_name: [this.unitTypeName(data?.unit_type_id)]
+        });
+    }
+
+    /**
+     * Fetch all defined fields
+     */
+    get allUnitFields () {
+        return <FormArray>this.firstFormGroup.get('unitFields');
+    }
+
+    /**
+     * Add an extra data row
+     * @param data Default data
+     */
+    addUnitField(data?: any): void {
+        this.unitFields = this.firstFormGroup.get('unitFields') as FormArray;
+        this.unitFields.push(this.createUnitField(data));
+    }
+
+    /**
+     * remove an existing data row
+     */
+    removeUnitField(i): void {
+        this.unitFields = this.firstFormGroup.get('unitFields') as FormArray;
+        this.unitFields.removeAt(i);
+        const item = this.unitValues.splice(i, 1);
+    }
+
+    /**
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
+     */
+    copyUnitField(i): void {
+
+        const unitValue = this.unitValues[i];
+        const size = this.unitValues.length;
+
+        const newCopyUnit = {...unitValue};
+        newCopyUnit.id = size;
+        this.unitValues.push(newCopyUnit);
+        this.addUnitField(newCopyUnit);
+    }
+
 
     /**
      * Load property Types
@@ -186,11 +551,15 @@ export class AddPropertyComponent implements OnInit  {
     }
 
     /**
-     * Load single item
+     * Gets a unit type name give id
      * @param id
      */
-    loadUnitType(id: string) {
-        return this.unitTypeEntityService.selectEntityById(id);
+    unitTypeName(id) {
+        let result;
+        this.unitTypes$.subscribe(unitTypes => {
+            result = unitTypes.find((item: any) => item.id === id)?.unit_type_display_name;
+        })
+        return result;
     }
 
     /**
@@ -244,53 +613,6 @@ export class AddPropertyComponent implements OnInit  {
         });
     }
 
-    /**
-     * Generate fields for a data row
-     */
-    createUnitField(data?: any): FormGroup {
-        return this.fb.group({
-            unit_name: [data?.unit_name]
-        });
-    }
-
-    /**
-     * Add an extra data row
-     * @param data Default data
-     */
-    addUnitField(data?: any): void {
-        this.unitFields = this.form.get('unitFields') as FormArray;
-        this.unitFields.push(this.createUnitField(data));
-    }
-
-    /**
-     * remove an existing data row
-     */
-    removeUnitField(i): void {
-        this.unitFields = this.form.get('unitFields') as FormArray;
-        this.unitFields.removeAt(i);
-        const item = this.unitValues.splice(i, 1);
-
-        console.log('Removed = ', item);
-        console.log('After remove: ', this.unitValues);
-    }
-
-    /**
-     * Copy an existing data row to a new one
-     * Makes an extra data object with an id same as size of the previous data array
-     * @param i
-     */
-    copyUnitField(i): void {
-
-        const unitValue = this.unitValues[i];
-        const size = this.unitValues.length;
-
-        const newCopyUnit = {...unitValue};
-        newCopyUnit.id = size;
-
-        this.unitValues.push(newCopyUnit);
-        this.addUnitField(newCopyUnit);
-    }
-
 
     /**
      * Pop up dialog form to capture unit details. Also Edit existing data.
@@ -303,10 +625,10 @@ export class AddPropertyComponent implements OnInit  {
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
 
-        console.log(number);
+      //  console.log(number);
         const unitValue = this.unitValues[number];
 
-        console.log('unitValue', unitValue);
+     //   console.log('unitValue', unitValue);
 
         if (typeof unitValue !== 'undefined') {
             edit = true;
@@ -327,6 +649,8 @@ export class AddPropertyComponent implements OnInit  {
         dialogRef.afterClosed().subscribe(result => {
             if ((result)) {
 
+                console.log('giku ... result', result)
+
                 const resultData = result.data;
                 resultData.id = number;
 
@@ -341,26 +665,20 @@ export class AddPropertyComponent implements OnInit  {
 
                     this.unitValues = newArray.slice();
 
-                    this.unitFields = this.form.get('unitFields') as FormArray;
+                    this.unitFields = this.firstFormGroup.get('unitFields') as FormArray;
                     this.unitFields.at(number).patchValue({
                         unit_name: result.data.unit_name,
+                      //  unit_type_name: result.data.unit_type_id,
+                        unit_type_name: this.unitTypeName(result.data.unit_type_id),
                     });
-                    this.selectedUnitType$ = this.loadUnitType(this.unitValues[number]?.unit_type_id);
-
-                    console.log(' *****NEWWWW this.unitValues', this.unitValues);
-
                 } else {
-                    // this.unitValues.push(result.data);
                     this.unitValues.push(resultData);
 
-                    console.log('Added data: ', this.unitValues);
-
-                    this.unitFields = this.form.get('unitFields') as FormArray;
+                    this.unitFields = this.firstFormGroup.get('unitFields') as FormArray;
                     this.unitFields.at(number).patchValue({
                         unit_name: result.data.unit_name,
+                        unit_type_name: this.unitTypeName(result.data.unit_type_id),
                     });
-                  //  this.selectedUnitType$ = this.loadUnitType(result.data.unit_type_id);
-                    this.selectedUnitType$ = this.loadUnitType(this.unitValues[number]?.unit_type_id);
                 }
             }
         });
@@ -422,18 +740,6 @@ export class AddPropertyComponent implements OnInit  {
 
     /**
      *
-     */
-    getImageFromService() {
-       /* if (this.setting && this.setting.logo !== null) {
-            this.propertyService.fetchPhoto(this.settingId).subscribe(data => {
-                this.createImageFromBlob(data);
-            }, error => {
-            });
-        }*/
-    }
-
-    /**
-     *
      * @param image
      */
     createImageFromBlob(image: Blob) {
@@ -490,101 +796,8 @@ export class AddPropertyComponent implements OnInit  {
 
                     if (event.type === HttpEventType.UploadProgress) {
                         console.log('Progress', event.loaded);
-                      //  console.log('Progress', Math.round(event.loaded / event.total * 100));
-
                     }
-
-            /*    switch (event.type) {
-                    case HttpEventType.Sent:
-                        console.log('Request has been made!');
-                        break;
-                    case HttpEventType.ResponseHeader:
-                        console.log('Response header has been received!');
-                        break;
-                    case HttpEventType.UploadProgress:
-                        this.progress = Math.round(event.loaded / event.total * 100);
-                        console.log(`Uploaded! ${this.progress}%`);
-                        break;
-                    case HttpEventType.Response:
-                        console.log('User successfully created!', event.body);
-                        setTimeout(() => {
-                            this.progress = 0;
-                        }, 1500);
-                }*/
-
-
-            /*    console.log('file upload');
-                console.log(event);*/
-                 //   this.loader = false;
-                  //  this.getImageFromService();
-                    // notify success
-                    this.notification.showNotification('success', 'Success !! Logo has been updated.');
-                },
-                (error) => {
-                   /* this.loader = false;
-                    if (error.payment === 0) {
-                        return;
-                    }
-                    // An array of all form errors as returned by server
-                    this.formErrors = error;
-
-                    if (this.formErrors) {
-                        // loop through from fields, If has an error, mark as invalid so mat-error can show
-                        for (const prop in this.formErrors) {
-                            if (this.form) {
-                                this.form.controls[prop].setErrors({incorrect: true});
-                            }
-                        }
-                    }*/
                 });
-    }
-
-    /**
-     *
-     * @param file
-     */
-    onMembershipFormInputSelect(file: FileList) {
-
-        if (file.length > 0) {
-            this.membershipFormFileToUpload = file.item(0);
-
-            const reader = new FileReader();
-
-            reader.onload = (event: any) => {
-                this.membershipFormUrl = event.target.result;
-            };
-
-            reader.readAsDataURL(this.membershipFormFileToUpload);
-        }
-    }
-
-    /**
-     *
-     * @param event
-     */
-    onFileSelect(event) {
-        if (event.target.files.length > 0) {
-            const file = event.target.files[0];
-            this.form.get('passport_photo').setValue(file);
-        }
-    }
-
-    /**
-     *
-     * @param file
-     */
-    membershipFormUpload(file: FileList) {
-
-        if (file.length > 0) {
-            this.membershipFormToUpload = file.item(0);
-
-            const reader = new FileReader();
-
-            reader.onload = (event: any) => {
-                this.membershipFormUrl = event.target.result;
-            };
-            reader.readAsDataURL(this.membershipFormToUpload);
-        }
     }
 
     /**
@@ -593,10 +806,13 @@ export class AddPropertyComponent implements OnInit  {
     create() {
         this.errorInForm.next(false);
 
-        const body = Object.assign({}, this.landlord, this.form.value);
+        const data = {...this.firstFormGroup.value, ...this.secondFormGroup.value,
+            ...this.thirdFormGroup.value, ...this.fourthFormGroup.value};
+
+        const body = Object.assign({}, this.property, data);
         body.units = this.unitValues;
 
-        const formData = new FormData();
+       /* const formData = new FormData();
         if (this.profilePicFileToUpload != null) {
             formData.append('property_photo', this.profilePicFileToUpload);
         }
@@ -604,16 +820,59 @@ export class AddPropertyComponent implements OnInit  {
             formData.append('membership_form', this.membershipFormToUpload);
         }
 
-       /* for (const key in body) {
+        for (const key in body) {
             if (body.hasOwnProperty(key)) {
                 formData.append(key, body[key]);
             }
         }*/
         this.loader = true;
 
-        this.landlordEntityService.add(body).subscribe((data) => {
+        this.propertyService.create(body)
+            .subscribe((res) => {
+                console.log('formData');
+                console.log(body);
+                    this.notification.showNotification('success', 'Success !! New Property created.');
+                },
+                (error) => {
+                    this.loader = false;
+                    if (error.lead === 0) {
+                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
+                            ' Check your connection and retry.');
+                        return;
+                    }
+                    // An array of all form errors as returned by server
+                    this.formErrors = error;
+
+                    if (this.formErrors) {
+                        // loop through from fields, If has an error, mark as invalid so mat-error can show
+                        for (const prop in this.formErrors) {
+                            this.stepper.selectedIndex = 0;
+
+                            if (this.fourthFormGroup.controls[prop]) {
+                                this.fourthFormGroup.controls[prop]?.markAsTouched();
+                                this.fourthFormGroup.controls[prop].setErrors({incorrect: true});
+                            }
+                            if (this.thirdFormGroup.controls[prop]) {
+                                this.thirdFormGroup.controls[prop]?.markAsTouched();
+                                this.thirdFormGroup.controls[prop].setErrors({incorrect: true});
+                            }
+                            if (this.secondFormGroup.controls[prop]) {
+                                this.secondFormGroup.controls[prop]?.markAsTouched();
+                                this.secondFormGroup.controls[prop].setErrors({incorrect: true});
+                            }
+                            if (this.firstFormGroup.controls[prop]) {
+                                this.firstFormGroup.controls[prop]?.markAsTouched();
+                                this.firstFormGroup.controls[prop].setErrors({incorrect: true});
+                            }
+                        }
+                    }
+
+                });
+
+      /*  this.landlordEntityService.add(body).subscribe((data) => {
                // this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Landlord created.');
+                this.notification.showNotification('success', 'Success !! Property created.');
+                this.router.navigateByUrl('/properties');
 
                 // Upload image
                 formData.append('property_id', data.id);
@@ -645,14 +904,14 @@ export class AddPropertyComponent implements OnInit  {
                     }
                 }
 
-            });
+            });*/
     }
 
     /**
      *
      */
 /*    update() {
-        const body = Object.assign({}, this.landlord, this.form.value);
+        const body = Object.assign({}, this.property, this.form.value);
         delete body.membership_form;
 
         this.loader = true;
@@ -672,7 +931,7 @@ export class AddPropertyComponent implements OnInit  {
                 this.errorInForm.next(true);
                // this.formError$.subscribe(subscriber => {subscriber.next(true)});
 
-                if (error.landlord === 0) {
+                if (error.property === 0) {
                     // notify error
                     return;
                 }
@@ -704,6 +963,9 @@ export class AddPropertyComponent implements OnInit  {
         this.form.reset();
         this.dialogRef.close(this.form.value);
     }*/
-
+    ngOnDestroy() {
+        this._onDestroy.next();
+        this._onDestroy.complete();
+    }
 }
 

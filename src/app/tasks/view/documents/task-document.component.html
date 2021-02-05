@@ -1,0 +1,66 @@
+<div class="row search-form-section">
+    <div class="col-12">
+        <mat-form-field class="search-form-field">
+            <input matInput #search placeholder="Filter" autocomplete="off" [disabled]="meta?.total===0">
+            <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
+                <mat-icon>close</mat-icon></button>
+        </mat-form-field>
+    </div>
+</div>
+
+<div class="table-responsive">
+
+    <mat-table #table [dataSource]="guarantorDataSource" matSort matSortActive="created_at" matSortDirection="desc" matSortDisableClear>
+
+        <ng-container matColumnDef="loan_application_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Loan </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.loanApplication?.loan?.loan_reference_number}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="loan_type">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.loanApplication?.loanType?.name}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="guarantee_amount">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Amount </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.loanApplication?.amount_applied}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="member_id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Member </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.loanApplication?.member?.first_name}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="reviewed_on">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Reviewed On </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.loanApplication?.reviewed_on}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="loan_status">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.loanApplication?.status}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="guarantorColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: guarantorColumns;"> </mat-row>
+
+    </mat-table>
+    <span *ngIf="meta?.total===0">Member hasn't guaranteed a loan.</span>
+
+    <div class="d-flex justify-content-center spinner-container" *ngIf="(guarantorDataSource?.loading$ | async) || loader">
+        <mat-progress-bar
+                color="green"
+                mode="query"
+                value=50
+                bufferValue=75>
+        </mat-progress-bar>
+    </div>
+
+    <mat-paginator #pagination
+                   [length]="meta?.total"
+                   [pageIndex]="pageIndex"
+                   [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
+    </mat-paginator>
+
+</div>
