@@ -4,7 +4,4 @@ export class PaymentMethodModel extends BaseModel {
     payment_method_name: string;
     payment_method_display_name: string;
     payment_method_description: string;
-
-    created_by: string;
-    updated_by: string;
 }

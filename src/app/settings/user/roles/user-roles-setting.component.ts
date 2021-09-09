@@ -16,7 +16,7 @@ import { NotificationService } from '../../../shared/notification.service';
 import { PermissionSettingService } from '../data/permission-setting.service';
 
 @Component({
-    selector: 'app-user-role-setting',
+    selector: 'robi-user-role-setting',
     templateUrl: './user-roles-setting.component.html',
     styleUrls: ['./user-roles-setting.component.css']
 })
@@ -91,6 +91,9 @@ export class UserRolesSettingComponent implements OnInit, AfterViewInit {
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
 
+        dialogConfig.width = '550px';
+        dialogConfig.height = '450px';
+
         const dialogRef = this.dialog.open(AddRoleComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(
             (val) => {
@@ -118,6 +121,9 @@ export class UserRolesSettingComponent implements OnInit, AfterViewInit {
         dialogConfig.autoFocus = true;
         dialogConfig.data = {role,
             permOptions: this.allPermissionsOptions};
+
+        dialogConfig.width = '550px';
+        dialogConfig.height = '450px';
 
         const dialogRef = this.dialog.open(EditRoleComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(

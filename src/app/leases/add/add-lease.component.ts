@@ -1,38 +1,33 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { LeaseModel } from '../models/lease-model';
-import { LeaseService } from '../data/lease.service';
-
 import { NotificationService } from '../../shared/notification.service';
-import { LeaseEntityService } from '../data/lease-entity.service';
 import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
-import { LeaseUnitDetailsComponent } from './unit-details/lease-unit-details.component';
 import { debounceTime, delay, distinctUntilChanged, filter, map, take, takeUntil, tap } from 'rxjs/operators';
-import { TypeEntityService } from '../../settings/property/type/data/type-entity.service';
-import { UtilityEntityService } from '../../settings/property/utility/data/utility-entity.service';
-import { AmenityEntityService } from '../../settings/property/amenity/data/amenity-entity.service';
-import { CheckboxItem } from '../../settings/property/roles/edit/check-box-item';
-import { HttpEvent, HttpEventType } from '@angular/common/http';
-import { TenantTypeEntityService } from '../../settings/lease/tenant-type/data/tenant-type-entity.service';
-import { LeaseModeEntityService } from '../../settings/lease/lease-mode/data/lease-mode-entity.service';
-import { LeaseTypeEntityService } from '../../settings/lease/lease-type/data/lease-type-entity.service';
-import { PaymentFrequencyEntityService } from '../../settings/payment/payment-frequency/data/payment-frequency-entity.service';
-import { TenantEntityService } from '../../tenants/data/tenant-entity.service';
-import { switchMap } from 'rxjs-compat/operator/switchMap';
 import { MatSelect } from '@angular/material/select';
 import { PropertyService } from '../../properties/data/property.service';
-import { ExtraChargeService } from '../../settings/property/extra-charges/data/extra-charge.service';
 import { EXTRA_CHARGE_TYPES } from '../../shared/enums/extra-charge-type-enum';
 import { EXTRA_CHARGE__FREQUENCIES } from '../../shared/enums/extra-charge-frequency-enum';
 import { PaymentMethodService } from '../../settings/payment/payment-method/data/payment-method.service';
-import { UTILITY_TYPES } from '../../shared/enums/utility-types-enum';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BILLING_FREQUENCIES } from '../../shared/enums/billing-frequency-enum';
+import { LeaseService } from '../data/lease.service';
+import { LeaseTypeService } from '../../settings/lease/lease-type/data/lease-type.service';
+import { UtilityService } from '../../settings/property/utility/data/utility.service';
+import { TenantService } from '../../tenants/data/tenant.service';
+import { LeaseSettingService } from '../../settings/lease/general/data/lease-setting.service';
+import { LeaseGeneralSettingModel } from '../../settings/lease/general/model/lease-general-setting.model';
+import { LATE_FEE_FREQUENCIES } from '../../shared/enums/late-fee-frequencies.enum';
+import { LATE_FEE_TYPES } from '../../shared/enums/late-fee-types.enum';
+import { LeaseExtraDataService } from '../data/lease-extra-data.service';
+import { PropertyModel } from '../../properties/models/property-model';
+import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AuthenticationService } from '../../authentication/authentication.service';
 
 @Component({
-    selector: 'robi-add-tenant',
+    selector: 'robi-add-lease',
     styles: [],
     templateUrl: './add-lease.component.html'
 })
@@ -43,37 +38,13 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
     unitValues = [];
 
-    tenantFields: FormArray;
-    tenantValues = [];
-
     formErrors: any;
-    // formError$: Observable<boolean>;
 
     private errorInForm = new BehaviorSubject<boolean>(false);
     formError$ = this.errorInForm.asObservable();
 
-    member: LeaseModel;
-
     loader = false;
-
-    memberMethods: any = [];
-    groups: any = [];
-
     formGroup: FormGroup;
-
-    memberStatuses: any = [];
-    memberSources: any = [];
-    memberTypes: any = [];
-
-    profilePicFileToUpload: File = null;
-    membershipFormFileToUpload: File = null;
-    profilePicUrl = '';
-
-    membershipFormToUpload: File = null;
-    membershipFormUrl = '';
-
-    urls = new Array<string>();
-
     tenant: LeaseModel;
 
     @ViewChild('stepper', {static: true }) stepper: MatStepper;
@@ -84,65 +55,54 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     depositsFormGroup: FormGroup;
     tenantsFormGroup: FormGroup;
     extraChargesFormGroup: FormGroup;
+    lateFeesFormGroup: FormGroup;
     utilityChargesFormGroup: FormGroup;
     paymentMethodsFormGroup: FormGroup;
+    leaseSettingsFormGroup: FormGroup;
 
     extraChargeTypes: any;
+    lateFeeTypes: any;
     extraChargeFrequencies: any;
-    extraChargesData: any;
+    extraCharges$: Observable<any>;
 
-    utilityTypes: any;
     billingFrequencies: any;
-    paymentMethods: any;
-
-    filteredTenant$: any;
-
     details = 'noooone';
 
-    isLoaded: boolean;
-
-    propertyTypes$: Observable<any>;
-    tenantTypes$: Observable<any>;
-    leaseModes$: Observable<any>;
+  //  leaseModes$: Observable<any>;
     leaseTypes$: Observable<any>;
-    paymentFrequencies$: Observable<any>;
 
-    tenants$: Observable<any>;
+    leaseSettings$: Observable<any>;
+    leaseSetting: any;
     utilities$: Observable<any>;
     amenities$: Observable<any>;
-
-    allAmenitiesOptions = new Array<CheckboxItem>();
-    allUtilitiesOptions = new Array<CheckboxItem>();
     amenities: any;
     utilities: any;
-
-    logoToUpload: File = null;
-    logoUrl = '';
-    showLogo: any;
-
-    photoToUpload: File = null;
-    photoName: any;
-    photoUrl = '';
-    showPhoto: any;
     progress = 0;
 
     public newTenant: string;
 
     properties: any = [];
-    propertyUnits: any = [];
     tenants: any = [];
     units: any = [];
+    lateFeeFrequencies: any;
+    selectedProperty: any;
+    propertyID: string;
+    landlordID: string;
 
     extraCharges: FormArray;
+    lateFeeFields: FormArray;
 
     paymentMethodFields: FormArray;
     utilityCharges: FormArray;
 
-    properties$: Observable<any>;
-
-    extraCharges$ = of([]);
+    lateFees$: any;
     utilityCharges$ = of([]);
-    paymentMethods$ = of([]);
+    paymentMethods$: Observable<any>;
+    utilityDeposits$: Observable<any>;
+
+    isAdd = true;
+    lease: LeaseModel;
+    leaseID: string;
 
     dueON = Array.from({length: (29 - 1)}, (v, k) => k + 1);
 
@@ -176,7 +136,10 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
     /** list of units filtered by search keyword */
     public filteredUnitsMulti: ReplaySubject<any> = new ReplaySubject<any>(1);
+    deleteDialogRef: MatDialogRef<ConfirmationDialogComponent>;
+    isAdmin$: Observable<boolean>;
 
+    propertiesFiltered$: Observable<any>;
     @ViewChild('unitSelect', { static: true }) unitSelect: MatSelect;
 
     /**
@@ -192,33 +155,69 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     get unitsCtrl() {
         return <FormControl>this.leaseDetailsFormGroup.get('units');
     }
-
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
+                private leaseExtraDataService: LeaseExtraDataService,
                 private route: ActivatedRoute,
+                private router: Router,
                 private _formBuilder: FormBuilder,
                 private propertyService: PropertyService,
+                private tenantService: TenantService,
                 private paymentMethodService: PaymentMethodService,
-                private leaseEntityService: LeaseEntityService,
-                private notification: NotificationService,
-                private extraChargeService: ExtraChargeService,
-                private propertyTypeEntityService: TypeEntityService,
-                private tenantTypeEntityService: TenantTypeEntityService,
-                private leaseModeEntityService: LeaseModeEntityService,
-                private leaseTypeEntityService: LeaseTypeEntityService,
-                private utilityEntityService: UtilityEntityService,
-                private paymentFrequencyEntityService: PaymentFrequencyEntityService,
-                private tenantEntityService: TenantEntityService,
-                private amenityEntityService: AmenityEntityService) {
-
-        if (this.route.snapshot.data['properties']) {
-            this.properties = this.route.snapshot.data['properties'];
-        }
+                private leaseService: LeaseService,
+                private leaseTypeService: LeaseTypeService,
+                private utilityService: UtilityService,
+                private leaseSettingService: LeaseSettingService,
+                private authenticationService: AuthenticationService,
+                private notification: NotificationService) {
+        this.lateFeeFrequencies = LATE_FEE_FREQUENCIES;
         this.newTenant = 'new';
         this.extraChargeTypes = EXTRA_CHARGE_TYPES;
+        this.lateFeeTypes = LATE_FEE_TYPES;
         this.extraChargeFrequencies = EXTRA_CHARGE__FREQUENCIES;
-        this.utilityTypes = UTILITY_TYPES;
         this.billingFrequencies = BILLING_FREQUENCIES;
+        this.isAdmin$ = this.authenticationService.isAdmin();
+        this.leaseDetailsFormGroup = this._formBuilder.group({
+            lease_type_id: [''],
+            property: [''],
+            units: [[]],
+            start_date: [(new Date()).toISOString().substring(0, 10), [Validators.required]],
+            due_date: [''],
+            rent_amount: [''],
+            due_on: [5]
+        });
+
+        this.depositsFormGroup = this._formBuilder.group({
+            rent_deposit: [''],
+            utilityDeposits: this.fb.array([ this.utilityDepositFieldCreate() ]),
+        });
+
+        this.tenantsFormGroup = this._formBuilder.group({
+            tenants: [[], Validators.required],
+        });
+
+        this.extraChargesFormGroup = this._formBuilder.group({
+            extraCharges: this.fb.array([ this.extraChargeFieldCreate() ])
+        });
+
+        this.lateFeesFormGroup = this._formBuilder.group({
+            lateFeeFields: this.fb.array([ this.lateFeeFieldCreate() ])
+        });
+
+        this.utilityChargesFormGroup = this._formBuilder.group({
+            utilityCharges: this.fb.array([ this.utilityChargeCreate() ])
+        });
+
+        this.paymentMethodsFormGroup = this._formBuilder.group({
+            paymentMethodFields: this.fb.array([ this.paymentMethodFieldCreate() ])
+        });
+
+        this.leaseSettingsFormGroup = this._formBuilder.group({
+            generate_invoice_on: [''],
+            next_period_billing: [''],
+            skip_starting_period: [''],
+            waive_penalty: [''],
+        });
     }
 
     /**
@@ -228,12 +227,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.filteredTenantsMulti
             .pipe(take(1), takeUntil(this._onDestroy))
             .subscribe(() => {
-                // setting the compareWith property to a comparison function
-                // triggers initializing the selection according to the initial value of
-                // the form control (i.e. _initializeSelection())
-                // this needs to be done after the filteredTenants are loaded initially
-                // and after the mat-option elements are available
-              //  this.tenantSelect.compareWith = (a: Tenant, b: Tenant) => a && b && a.id === b.id;
             });
     }
 
@@ -262,12 +255,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.filteredUnitsMulti
             .pipe(take(1), takeUntil(this._onDestroy))
             .subscribe(() => {
-                // setting the compareWith property to a comparison function
-                // triggers initializing the selection according to the initial value of
-                // the form control (i.e. _initializeSelection())
-                // this needs to be done after the filteredUnits are loaded initially
-                // and after the mat-option elements are available
-                //  this.unitSelect.compareWith = (a: Unit, b: Unit) => a && b && a.id === b.id;
             });
     }
 
@@ -285,22 +272,83 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         }
         // filter the units
         this.filteredUnitsMulti.next(
-            this.units.filter(unit => unit.unit_name.toLowerCase().indexOf(search) > -1)
+            this.units.filter(unit => unit?.unit_name?.toLowerCase().indexOf(search) > -1)
         );
     }
 
+    private populateForm(lease: LeaseModel) {
+        this.leaseDetailsFormGroup.get('property').disable();
+        this.leaseDetailsFormGroup.get('units').disable();
+        this.leaseDetailsFormGroup.get('start_date').disable();
+
+        this.leaseDetailsFormGroup.patchValue({
+            property: lease?.property?.property_name + ' (' + lease?.property?.property_code + ')',
+            units: lease?.unit_names,
+            lease_type_id: lease?.lease_type_id,
+            start_date: lease?.start_date,
+            rent_amount: lease?.rent_amount,
+            due_on: lease?.due_on,
+        });
+
+        this.depositsFormGroup.get('rent_deposit').disable();
+        this.depositsFormGroup.patchValue({
+            rent_deposit: lease?.rent_deposit
+        });
+
+        this.tenantsFormGroup.get('tenants').disable();
+        this.tenantsFormGroup.patchValue({
+            tenants: [lease?.tenant_names]
+        });
+
+        this.populateUtilityDeposits(lease);
+        this.populateExtraCharges(lease);
+        this.populateLateFees(lease);
+        this.populateUtilityCharges(lease);
+        this.populatePaymentMethods(lease);
+
+        this.leaseSettingsFormGroup.get('skip_starting_period').disable();
+        this.leaseSettingsFormGroup.patchValue({
+            generate_invoice_on: lease?.generate_invoice_on,
+            next_period_billing: lease?.next_period_billing,
+            skip_starting_period: lease?.skip_starting_period,
+            waive_penalty: lease?.waive_penalty,
+        });
+    }
     ngOnInit() {
+        this.leaseID = this.route.snapshot.paramMap.get('id');
+        if (this.leaseID) {
+            this.isAdd = false;
+            this.leaseService.selectedLeaseChanges$.subscribe(lease => {
+                if (lease) {
+                    this.lease = lease;
+                    this.populateForm(lease);
+                }
+                if (!lease) {
+                    this.leaseService.getById(this.leaseID).subscribe(data => {
+                        this.lease = data;
+                        this.leaseService.changeSelectedLease(data);
+                        this.populateForm(data);
+                    });
+                }
+            });
+        }
 
-        // Payment Method list
-        this.paymentMethodService.list(['name', 'display_name'])
-            .subscribe((res) => this.paymentMethods = res,
-                () => this.paymentMethods = []
-            );
+        this.leaseExtraDataService.fetch().subscribe(res => {
+            this.leaseSetting = res?.lease_settings;
+            if (this.isAdd) {
+                this.prePopulateLeaseSettingForm(this.leaseSetting);
+            }
+            this.leaseTypes$ = of(res?.lease_types);
+            this.lateFees$ = of(res?.late_fees);
+            this.paymentMethods$ = of(res?.payment_methods);
+            this.utilities$ = of(res?.utilities);
+            this.extraCharges$ = of(res?.extra_charges);
+        });
 
-        // Extra Charges list
-        this.extraChargeService.list(['extra_charge_name', 'extra_charge_display_name'])
-            .subscribe((res) => this.extraChargesData = res,
-                () => this.extraChargesData = []
+        // Tenants list
+        this.tenantService.list(['first_name', 'middle_name', 'last_name'])
+            .subscribe((res) => this.tenants = res,
+                () => this.tenants = []
             );
 
         // load the initial tenant list
@@ -313,119 +361,17 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                 this.filterTenantsMulti();
             });
 
-
-
-        // Load properties list
-       /* this.propertyService.list(['property_name', 'location'])
-            .subscribe((res) => this.properties = res,
-                () => this.properties = []
-            );*/
-
-        this.loadTenants();
-        this.loadPropertyTypes();
-
-      //  this.loadPropertyTypes();
-        this.loadLeaseTypes();
-        this.loadLeaseModes();
-        this.loadUtilities();
-        this.loadTenantTypes();
-        this.loadPaymentFrequencies();
-
-       // this.loadUtilities ();
-      //  this.loadAmenities();
-
-
-        // load amenities
-        this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.amenities$ = this.amenityEntityService.entities$;
-            this.amenityEntityService.entities$.subscribe(amenities => {
-                this.amenities = amenities;
-
-                this.allAmenitiesOptions = this.amenities.map(
-                    x => new CheckboxItem(x.id, x.amenity_display_name));
-            });
-        });
-
-        // load utilities
-        this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilityEntityService.entities$.subscribe(utilities => {
-                this.utilities = utilities;
-                this.allUtilitiesOptions = this.utilities.map(
-                    x => new CheckboxItem(x.id, x.utility_display_name));
-            });
-        });
-
-        this.leaseDetailsFormGroup = this._formBuilder.group({
-            lease_type_id: [''],
-            lease_mode_id: [''],
-            property_id: [''],
-          //  unit_id: [''],
-            units: [[]],
-            start_date: [(new Date()).toISOString().substring(0, 10), [Validators.required]],
-            end_date: [''],
-            due_date: [''],
-            rent_amount: [''],
-            billing_frequency: ['monthly'],
-            due_on: ['']
-        });
-
-        this.depositsFormGroup = this._formBuilder.group({
-            rent_deposit: [''],
-            utilityDeposits: this.fb.array([ this.utilityDepositFieldCreate() ]),
-        });
-
-        this.tenantsFormGroup = this._formBuilder.group({
-            tenants: [[], Validators.required],
-        });
-
-        this.extraChargesFormGroup = this._formBuilder.group({
-            extraCharges: this.fb.array([ this.extraChargeFieldCreate() ])
-        });
-
-        this.utilityChargesFormGroup = this._formBuilder.group({
-            utilityCharges: this.fb.array([ this.utilityChargeCreate() ])
-        });
-
-        this.paymentMethodsFormGroup = this._formBuilder.group({
-            paymentMethodFields: this.fb.array([ this.paymentMethodFieldCreate() ])
-        });
-
-        // Property Search
+        // listen for search field value changes
         this.propertyServerSideFilteringCtrl.valueChanges
             .pipe(
                 filter(search => !!search),
                 tap(() => this.searching = true),
                 takeUntil(this._onDestroy),
-                debounceTime(200),
+                debounceTime(2000),
                 distinctUntilChanged(),
                 map(search => {
-                    if (!this.properties) {
-                        return [];
-                    }
                     search = search.toLowerCase();
-                    console.log('search', search);
-
-                    // simulate server fetching and filtering data
-                    return this.properties.filter(property => {
-                        return property.property_name.toLowerCase().indexOf(search) > -1
-                            || property.location.toLowerCase().indexOf(search) > -1;
-                    });
+                    this.propertiesFiltered$ =  this.propertyService.search(search);
                 }),
                 delay(500)
             )
@@ -436,9 +382,20 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                 error => {
                     this.searching = false;
                 });
-
     }
 
+    /**
+     *
+     * @param setting
+     */
+    prePopulateLeaseSettingForm(setting: LeaseGeneralSettingModel) {
+        this.leaseSettingsFormGroup.patchValue({
+            generate_invoice_on: setting?.generate_invoice_on,
+            next_period_billing: setting?.next_period_billing,
+            skip_starting_period: setting?.skip_starting_period,
+            waive_penalty: setting?.waive_penalty
+        });
+    }
 
     ngAfterViewInit() {
         this.setTenantInitialValue();
@@ -449,15 +406,54 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this._onDestroy.complete();
     }
 
+    populateUtilityDeposits(lease) {
+        this.utilityDeposits$ = of(lease?.utility_deposits);
+        this.depositsFormGroup.setControl('utilityDeposits', this.utilityDepositFieldReplaceAll());
+        this.depositsFormGroup.get('utilityDeposits')['controls']
+            .forEach(control => {
+                control.disable();
+            });
+    }
+    populateExtraCharges(lease) {
+        this.extraCharges$ = of(lease?.extra_charges);
+        this.extraCharges$.subscribe(res => {
+            this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
+        });
+    }
+    populateLateFees(lease) {
+        this.lateFees$ = of(lease?.late_fees);
+        this.lateFees$.subscribe(res => {
+            this.lateFeesFormGroup.setControl('lateFeeFields', this.lateFeeFieldReplaceAll());
+        });
+    }
+
+    populateUtilityCharges(lease) {
+        this.utilityCharges$ = of(lease?.utility_charges);
+        this.utilityCharges$.subscribe(res => {
+            this.utilityChargesFormGroup.setControl('utilityCharges', this.utilityChargeReplaceAll());
+        });
+    }
+
+    populatePaymentMethods(lease) {
+        this.paymentMethods$ = of(lease?.payment_methods);
+        this.paymentMethods$.subscribe(res => {
+            this.paymentMethodsFormGroup.setControl('paymentMethodFields', this.paymentMethodFieldReplaceAll());
+        });
+    }
+
     /**
      * Update supporting fields when property drop down changes content
-     * @param value
+     * @param property
      */
-    onPropertyItemChange(value) {
-        this.units = this.properties.find((item: any) => item.id === value).units;
-        this.extraCharges$ = of(this.properties.find((item: any) => item.id === value)?.extra_charges);
-        this.utilityCharges$ = of(this.properties.find((item: any) => item.id === value)?.utility_costs);
-        this.paymentMethods$ = of(this.properties.find((item: any) => item.id === value)?.payment_methods);
+    onPropertyItemChange(property: PropertyModel) {
+        this.selectedProperty = property;
+        this.propertyID = property?.id;
+        this.landlordID = property?.landlord_id;
+        this.units = property?.vacant_units;
+        this.extraCharges$ = of(property?.extra_charges);
+        this.lateFees$ = of(property?.late_fees);
+        this.utilityCharges$ = of(property?.utility_costs);
+        this.paymentMethods$ = of(property?.payment_methods);
 
         // load the initial tenant list
         this.filteredUnitsMulti.next(this.units.slice());
@@ -473,6 +469,10 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
         });
 
+        this.lateFees$.subscribe(fees => {
+            this.lateFeesFormGroup.setControl('lateFeeFields', this.lateFeeFieldReplaceAll());
+        });
+
         this.utilityCharges$.subscribe(utilities => {
                 this.utilityChargesFormGroup.setControl('utilityCharges', this.utilityChargeReplaceAll());
         });
@@ -483,7 +483,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     }
 
     /*Start extra charge section*/
-
     /**
      * Fetch all defined fields
      */
@@ -550,8 +549,78 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         holder.push(this.extraCharges.value[i])
         this.extraChargeFieldAdd(...holder);
     }
-
     /* End extra charge section*/
+
+    /*Start late fee section*/
+    /**
+     * Fetch all defined fields
+     */
+    get lateFeeFieldAll () {
+        return <FormArray>this.lateFeesFormGroup.get('lateFeeFields');
+    }
+
+    /**
+     * Replace  fields for those filled with data from selected property
+     */
+    lateFeeFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.lateFees$.subscribe(fees => {
+            fees.forEach(fee => {
+                formArray.push(this.fb.group({
+                    late_fee_id: fee?.id,
+                    late_fee_value: fee?.pivot?.late_fee_value,
+                    late_fee_type: fee?.pivot?.late_fee_type,
+                    late_fee_frequency: fee?.pivot?.late_fee_frequency,
+                    grace_period: fee?.pivot?.grace_period,
+                }))
+            });
+        });
+        return formArray;
+    }
+
+    /**
+     * Initial field creation
+     * @param data
+     */
+    lateFeeFieldCreate(data?: any): FormGroup {
+        return this.fb.group({
+            late_fee_id: [data?.late_fee_id],
+            late_fee_value: [data?.late_fee_value],
+            late_fee_type: [data?.late_fee_type],
+            grace_period: [data?.grace_period],
+            late_fee_frequency: [data?.late_fee_frequency]
+        });
+    }
+
+    /**
+     * Add an extra data row
+     * @param data Default data
+     */
+    lateFeeFieldAdd(data?: any): void {
+        this.lateFeeFields = this.lateFeesFormGroup.get('lateFeeFields') as FormArray;
+        this.lateFeeFields.push(this.lateFeeFieldCreate(data));
+    }
+
+    /**
+     * remove an existing data row
+     */
+    lateFeeFieldRemove(i): void {
+        this.lateFeeFields = this.lateFeesFormGroup.get('lateFeeFields') as FormArray;
+        this.lateFeeFields.removeAt(i);
+    }
+
+    /**
+     * Copy an existing data row to a new one
+     * Makes an extra data object with an id same as size of the previous data array
+     * @param i
+     */
+    lateFeeFieldCopy(i): void {
+        this.lateFeeFields = this.lateFeesFormGroup.get('lateFeeFields') as FormArray;
+        const holder = [];
+        holder.push(this.lateFeeFields.value[i])
+        this.lateFeeFieldAdd(...holder);
+    }
+    /* End late fee section*/
 
     /* Start utility charge section*/
     /**
@@ -567,9 +636,8 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     utilityChargeCreate(data?: any): FormGroup {
         return this.fb.group({
             utility_id: [data?.utility_id],
-            utility_type: [data?.utility_type],
-            unit_cost: [data?.unit_cost],
-            fixed_fee: [data?.fixed_fee],
+            utility_unit_cost: [data?.utility_unit_cost],
+            utility_base_fee: [data?.utility_base_fee],
         });
     }
 
@@ -582,9 +650,8 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             charges.forEach(charge => {
                 formArray.push(this.fb.group({
                     utility_id: charge?.id,
-                    utility_type: charge?.pivot?.utility_type,
-                    unit_cost: charge?.pivot?.utility_unit_cost,
-                    standard_fee: charge?.pivot?.utility_standard_fee,
+                    utility_unit_cost: charge?.pivot?.utility_unit_cost,
+                    utility_base_fee: charge?.pivot?.utility_base_fee,
                 }))
             });
         });
@@ -645,16 +712,11 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
      */
     paymentMethodFieldReplaceAll(): FormArray {
         const formArray =  new FormArray([]);
-        this.paymentMethods$.subscribe(charges => {
-            charges.forEach(charge => {
+        this.paymentMethods$.subscribe(paymentMethods => {
+            paymentMethods.forEach(paymentMethod => {
                 formArray.push(this.fb.group({
-                    /*extra_charge_id: charge?.id,
-                    extra_charge_value: charge?.pivot?.extra_charge_value,
-                    extra_charge_type: charge?.pivot?.extra_charge_type,
-                    extra_charge_frequency: charge?.pivot?.extra_charge_frequency,*/
-
-                    payment_method_id: charge?.id,
-                    payment_method_description: charge?.pivot?.payment_method_description,
+                    payment_method_id: paymentMethod?.id,
+                    payment_method_description: paymentMethod?.payment_method_description,
                 }))
             });
         });
@@ -690,7 +752,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         holder.push(this.paymentMethodFields.value[i])
         this.paymentMethodFieldAdd(...holder);
     }
-
     /* End payment methods section*/
 
     /* Start utility deposit section*/
@@ -706,6 +767,19 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             utility_id: [data?.utility_id],
             deposit_amount: [data?.deposit_amount]
         });
+    }
+
+    utilityDepositFieldReplaceAll(): FormArray {
+        const formArray =  new FormArray([]);
+        this.utilityDeposits$.subscribe(deposits => {
+            deposits.forEach(deposit => {
+                formArray.push(this.fb.group({
+                    utility_id: deposit?.id,
+                    deposit_amount: deposit?.pivot?.deposit_amount,
+                }))
+            });
+        });
+        return formArray;
     }
 
     /**
@@ -751,146 +825,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
     }
 
     /**
-     * Load loadPaymentFrequencies
-     */
-    loadPaymentFrequencies() {
-        this.paymentFrequencyEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.paymentFrequencyEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.paymentFrequencies$ = this.paymentFrequencyEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Utility entities either from API or store
-     */
-    loadTenants () {
-        this.tenantEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.tenantEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.tenants$ = this.tenantEntityService.entities$;
-                this.tenantEntityService.entities$.subscribe( (tenantsData) => {
-              //  console.log('data', tenantsData);
-                this.tenants = tenantsData;
-            });
-        });
-    }
-
-    /**
-     * Load property Types
-     */
-    loadTenantTypes() {
-        this.tenantTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.tenantTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.tenantTypes$ = this.tenantTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Lease Modes
-     */
-    loadLeaseModes() {
-        this.leaseModeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.leaseModeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.leaseModes$ = this.leaseModeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Lease Types
-     */
-    loadLeaseTypes() {
-        this.leaseTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.leaseTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.leaseTypes$ = this.leaseTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load property Types
-     */
-    loadPropertyTypes() {
-        this.propertyTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.propertyTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.propertyTypes$ = this.propertyTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Utility entities either from API or store
-     */
-    loadUtilities () {
-        this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.utilityEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Amenity entities either from store or API
-     */
-    loadAmenities() {
-        this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.amenities$ = this.amenityEntityService.entities$;
-        });
-    }
-
-    /**
      * Generate fields for a data row
      */
     createUnitField(data?: any): FormGroup {
@@ -899,44 +833,47 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         });
     }
 
+    createOrUpdate() {
+        this.isAdd ? this.create() : this.update();
+    }
+
     /**
      * Create member
      */
     create() {
         this.errorInForm.next(false);
-
         const lease = {
             ...this.leaseDetailsFormGroup.value,
             ...this.depositsFormGroup.value,
             ...this.tenantsFormGroup.value,
             ...this.extraChargesFormGroup.value,
+            ...this.lateFeesFormGroup.value,
             ...this.utilityChargesFormGroup.value,
-            ...this.paymentMethodsFormGroup.value
+            ...this.paymentMethodsFormGroup.value,
+            ...this.leaseSettingsFormGroup.value
         };
-
+        const body = Object.assign({}, this.lease, lease);
+        body.property_id = this.propertyID;
+        body.landlord_id = this.landlordID;
         this.loader = true;
-
-        this.leaseEntityService.add(lease).subscribe((data) => {
-               // this.onSaveComplete();
+        this.leaseService.create(body).subscribe((data) => {
+                this.loader = false;
                 this.notification.showNotification('success', 'Success !! Lease created.');
+                this.onSaveComplete();
             },
             (error) => {
                 this.errorInForm.next(true);
 
                 this.loader = false;
-                if (error.member === 0) {
+                if (error.lease === 0) {
                     this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
                         ' Check your connection and retry.');
                     return;
                 }
-                // An array of all form errors as returned by server
                 this.formErrors = error?.error;
 
                 if (this.formErrors) {
-
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
                     if (this.formErrors) {
-                        // loop through from fields, If has an error, mark as invalid so mat-error can show
                         for (const prop in this.formErrors) {
                             if (this.formErrors.hasOwnProperty(prop)) {
                                 this.stepper.selectedIndex = 0;
@@ -957,6 +894,10 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                                     this.extraChargesFormGroup.controls[prop]?.markAsTouched();
                                     this.extraChargesFormGroup.controls[prop].setErrors({incorrect: true});
                                 }
+                                if (this.lateFeesFormGroup.controls[prop]) {
+                                    this.lateFeesFormGroup.controls[prop]?.markAsTouched();
+                                    this.lateFeesFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
                                 if (this.utilityChargesFormGroup.controls[prop]) {
                                     this.utilityChargesFormGroup.controls[prop]?.markAsTouched();
                                     this.utilityChargesFormGroup.controls[prop].setErrors({incorrect: true});
@@ -973,62 +914,117 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             });
     }
 
-    /**
-     *
-     */
-/*    update() {
-        const body = Object.assign({}, this.tenant, this.form.value);
-        delete body.membership_form;
+    update() {
+        const lease = {
+            ...this.leaseDetailsFormGroup.value,
+            ...this.depositsFormGroup.value,
+            ...this.tenantsFormGroup.value,
+            ...this.extraChargesFormGroup.value,
+            ...this.lateFeesFormGroup.value,
+            ...this.utilityChargesFormGroup.value,
+            ...this.paymentMethodsFormGroup.value,
+            ...this.leaseSettingsFormGroup.value
+        };
+        const body = Object.assign({}, this.lease, lease);
+        body.property_id = this.propertyID;
+        body.landlord_id = this.landlordID;
+       /* delete body.property;
+        delete body.units;
+        delete body.utility_deposits;
+        delete body.late_fees;
+        delete body.extra_charges;
+        delete body.payment_methods;
+        delete body.utility_charges;
+        delete body.status;
+        delete body.utilityDeposits;
+        delete body.tenants;*/
 
         this.loader = true;
         this.errorInForm.next(false);
 
-        this.leaseEntityService.update(body).subscribe((data) => {
-                this.loader = false;
+        this.leaseService.update(body)
+            .subscribe((res) => {
+                    this.loader = false;
+                    this.notification.showNotification('success', 'Success !! Lease has been updated.');
+                    this.onSaveComplete();
+                },
+                (error) => {
+                    this.loader = false;
+                    if (error.landlord === 0) {
+                        return;
+                    }
+                    this.formErrors = error;
 
-                this.dialogRef.close(this.form.value);
-
-                // notify success
-                this.notification.showNotification('success', 'Success !! Tenant has been updated.');
-
-            },
-            (error) => {
-                this.loader = false;
-                this.errorInForm.next(true);
-               // this.formError$.subscribe(subscriber => {subscriber.next(true)});
-
-                if (error.tenant === 0) {
-                    // notify error
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-              //  this.formErrors = error.error.error.errors;
-
-                if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
-                    for (const prop in this.formErrors) {
-                        if (this.form) {
-                            this.form.controls[prop]?.markAsTouched();
-                            this.form.controls[prop]?.setErrors({incorrect: true});
+                    if (this.formErrors) {
+                        for (const prop in this.formErrors) {
+                            if (this.formErrors.hasOwnProperty(prop)) {
+                                this.stepper.selectedIndex = 0;
+                                if (this.leaseDetailsFormGroup.controls[prop]) {
+                                    this.leaseDetailsFormGroup.controls[prop]?.markAsTouched();
+                                    this.leaseDetailsFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                                if (this.depositsFormGroup.controls[prop]) {
+                                    this.depositsFormGroup.controls[prop]?.markAsTouched();
+                                    this.depositsFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                                if (this.tenantsFormGroup.controls[prop]) {
+                                    this.tenantsFormGroup.controls[prop]?.markAsTouched();
+                                    this.tenantsFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                                if (this.extraChargesFormGroup.controls[prop]) {
+                                    this.extraChargesFormGroup.controls[prop]?.markAsTouched();
+                                    this.extraChargesFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                                if (this.lateFeesFormGroup.controls[prop]) {
+                                    this.lateFeesFormGroup.controls[prop]?.markAsTouched();
+                                    this.lateFeesFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                                if (this.utilityChargesFormGroup.controls[prop]) {
+                                    this.utilityChargesFormGroup.controls[prop]?.markAsTouched();
+                                    this.utilityChargesFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                                if (this.paymentMethodsFormGroup.controls[prop]) {
+                                    this.paymentMethodsFormGroup.controls[prop]?.markAsTouched();
+                                    this.paymentMethodsFormGroup.controls[prop].setErrors({incorrect: true});
+                                }
+                            }
                         }
                     }
-                }
-            });
+                });
     }
 
-    close() {
-        this.dialogRef.close();
-    }
-
-    /!**
-     *
-     *!/
     public onSaveComplete(): void {
         this.loader = false;
-        this.form.reset();
-        this.dialogRef.close(this.form.value);
-    }*/
+        this.router.navigate(['/leases']);
+    }
 
+    openConfirmationDialog(lease: LeaseModel) {
+        this.deleteDialogRef = this.dialog.open(ConfirmationDialogComponent, {
+            disableClose: true
+        });
+        this.deleteDialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.delete(lease);
+            }
+            this.deleteDialogRef = null;
+        });
+    }
+
+    private delete(lease: LeaseModel) {
+        this.loader = true;
+        this.leaseService.delete(lease)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.onSaveComplete();
+                    this.notification.showNotification('success', 'Success !! Lease has been deleted.');
+                },
+                (error) => {
+                    this.loader = false;
+                    if (error.error['message']) {
+                        this.notification.showNotification('danger', error.error['message']);
+                    } else {
+                        this.notification.showNotification('danger', 'Delete Error !! ');
+                    }
+                });
+    }
 }
-

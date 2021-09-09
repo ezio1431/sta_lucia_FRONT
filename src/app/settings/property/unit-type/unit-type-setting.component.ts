@@ -7,9 +7,10 @@ import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
-import { UnitTypeEntityService } from './data/unit-type-entity.service';
 import { UnitTypeModel } from './model/unit-type-model';
 import { AddUnitTypeComponent } from './add/add-unit-type.component';
+import { UnitTypeDataSource } from './data/unit-type-data.source';
+import { UnitTypeService } from './data/unit-type.service';
 
 @Component({
     selector: 'robi-unit-type-setting',
@@ -28,24 +29,23 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
+    dataSource: UnitTypeDataSource;
+
     // Search field
-    @ViewChild('search', {static: true}) search: ElementRef;
+    @ViewChild('search') search: ElementRef;
+
     // pagination
-    @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
     // Pagination
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
-
+    meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-    utilities$: any;
-    isLoaded: boolean;
-    dataSource$: any;
-    meta: any;
-    metax: any;
-
-    constructor(private unitTypeEntityService: UnitTypeEntityService, private notification: NotificationService,
+    constructor(private unitTypeService: UnitTypeService,
+                private notification: NotificationService,
                 private dialog: MatDialog) {
     }
 
@@ -55,47 +55,17 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
-        // load Utilities
-        this.loadUnitTypes();
-
-        this.dataSource$ = this.unitTypeEntityService.entities$;
-
-        /*this.unitTypeEntityService.selectors$.collection$.subscribe(xxx => {
-            this.meta = xxx;
-        });
-        this.metax = this.meta.meta;*/
-
-    }
-
-    /**
-     * Load Property entities either from store or API
-     */
-    loadUnitTypes() {
-        this.unitTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.unitTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.unitTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Fetch data from data source
-     */
-    loadData() {
+        this.dataSource = new UnitTypeDataSource(this.unitTypeService);
+        // Load pagination data
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
+        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
+        this.dataSource.load('', 0, 0, 'unit_type_name', 'desc');
     }
 
     /**
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
@@ -121,22 +91,42 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Add dialog launch
+     * Fetch data from data lead
      */
-    addDialog(mode: string, unitType?: UnitTypeModel) {
+    loadData() {
+        this.dataSource.load(
+            this.search.nativeElement.value,
+            (this.paginator.pageIndex + 1),
+            (this.paginator.pageSize),
+            this.sort.active,
+            this.sort.direction
+        );
+    }
+
+    /**
+     * Empty search box
+     */
+    clearSearch() {
+        this.search.nativeElement.value = '';
+        this.loadData()
+    }
+
+    /**
+     * @param isAdd
+     * @param unitType
+     */
+    addDialog(isAdd = true, unitType?: UnitTypeModel) {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
 
-        dialogConfig.data = {unitType,
-            mode: mode
-        };
+        dialogConfig.data = {unitType, isAdd};
 
         const dialogRef = this.dialog.open(AddUnitTypeComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(
             (val) => {
                 if ((val)) {
-                    // this.loadData();
+                    this.loadData();
                 }
             }
         );
@@ -147,7 +137,6 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
      * @param unitType
      */
     openConfirmationDialog(unitType: UnitTypeModel) {
-
         this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true
         });
@@ -164,13 +153,21 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
      * @param unitType
      */
     delete(unitType: UnitTypeModel) {
-    }
-
-    /**
-     * Empty search box
-     */
-    clearSearch() {
-        this.search.nativeElement.value = '';
-        this.loadData()
+        this.loader = true;
+        this.unitTypeService.delete(unitType)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.loadData();
+                    this.notification.showNotification('success', 'Success !! UnitType has been deleted.');
+                },
+                (error) => {
+                    this.loader = false;
+                    if (!error.error['error']) {
+                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
+                            ' Check Connection and retry. ');
+                    } else {
+                        this.notification.showNotification('danger', 'Delete Error !! ');
+                    }
+                });
     }
 }

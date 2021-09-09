@@ -4,7 +4,7 @@ import { select, Store } from '@ngrx/store';
 import { AppState } from '../reducers';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { selectorIsLoggedIn } from './auth.selectors';
+import { selectorIsUserLoggedIn } from './authentication.selectors';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
 
         return this.store
             .pipe(
-                select(selectorIsLoggedIn),
+                select(selectorIsUserLoggedIn),
                 tap(loggedIn => {
                     if (!loggedIn) {
                       //  this.router.navigate(['/login'], { queryParams: { returnUrl: state.url }});

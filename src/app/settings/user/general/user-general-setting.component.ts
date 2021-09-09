@@ -8,7 +8,6 @@ import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 
 import { AddUserComponent } from './add/add-user.component';
-import { EditUserComponent } from './edit/edit-user.component';
 import { UserSettingModel } from '../model/user-setting.model';
 import { UserSettingDataSource } from '../data/user-setting-data.source';
 import { UserSettingService } from '../data/user-setting.service';
@@ -22,7 +21,6 @@ import { RoleSettingService } from '../data/role-setting.service';
 })
 export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
     displayedColumns = [
-        'branch_id',
         'role_id',
         'first_name',
         'last_name',
@@ -49,11 +47,9 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
     dataSource: UserSettingDataSource;
 
     roles: any = [];
-    employees: any = [];
-    branches: any = [];
 
     constructor(private service: UserSettingService, private notification: NotificationService,
-                private roleService: RoleSettingService) {
+                private roleService: RoleSettingService, private dialog: MatDialog) {
     }
 
     /**
@@ -62,15 +58,11 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
         this.dataSource = new UserSettingDataSource(this.service);
-
         // Load pagination data
         this.dataSource.meta$.subscribe((res) => this.meta = res);
-
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
         this.dataSource.load('', 0, 0, 'updated_at', 'desc');
-
         this.roleService.list('name')
             .subscribe((res) => this.roles = res,
                 () => this.roles = []
@@ -78,52 +70,34 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Add dialog launch
+     * @param isAdd
+     * @param user
      */
-    addDialog() {
+    addDialog(isAdd = true, user?: UserSettingModel) {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
-        dialogConfig.data = {
-            roles: this.roles,
-            employees: this.employees,
-            branches: this.branches
-        };
 
-     /*   const dialogRef = this.dialog.open(AddUserComponent, dialogConfig);
+        dialogConfig.data = {user, isAdd,
+            roles: this.roles,
+        };
+        dialogConfig.width = '550px';
+        dialogConfig.minHeight = '500px';
+
+        const dialogRef = this.dialog.open(AddUserComponent, dialogConfig);
+
+       /* const dialogRef = this.dialog.open(AddUserComponent, {
+            width: '550px',
+            height: '500px',
+        });*/
+
         dialogRef.afterClosed().subscribe(
             (val) => {
                 if ((val)) {
                     this.loadData();
                 }
             }
-        );*/
-    }
-
-    /**
-     * Edit dialog launch
-     */
-    editDialog(user: UserSettingModel) {
-
-        const id = user.id;
-
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.data = {user,
-            roles: this.roles,
-            employees: this.employees,
-            branches: this.branches
-        };
-
-       /* const dialogRef = this.dialog.open(EditUserComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    this.loadData();
-                }
-            }
-        );*/
+        );
     }
 
     /**
@@ -143,7 +117,6 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
@@ -174,10 +147,10 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
      */
     openConfirmationDialog(user: UserSettingModel) {
 
-       /* this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true
         });
-*/
+
         this.dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.delete(user);

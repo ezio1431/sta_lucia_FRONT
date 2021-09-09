@@ -1,16 +1,14 @@
 import { NgModule } from '@angular/core';
-
 import { GeneralSettingRoutingModule } from './general-setting-routing.module';
 import { GeneralSettingComponent } from './general-setting.component';
-import { MaterialModule } from '../../shared/material.module';
 import { SharedModule } from '../../shared/shared.module';
-import { CoreModule } from '../../core/core.module';
-
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 @NgModule({
     imports: [
         SharedModule,
         GeneralSettingRoutingModule,
+        ImageCropperModule
     ],
     declarations: [
         GeneralSettingComponent,

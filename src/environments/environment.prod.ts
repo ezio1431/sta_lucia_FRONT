@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  appName: 'Angular Ngrx Material Starter',
+  appName: 'Signal Rentals - Property management, rentals, booking',
   envName: 'PROD',
   test: false,
-  i18nPrefix: '/angular-ngrx-material-starter',
+  i18nPrefix: '',
 };

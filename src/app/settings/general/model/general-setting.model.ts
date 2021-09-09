@@ -1,8 +1,9 @@
 import { BaseModel } from '../../../shared/models/base-model';
 
 export class GeneralSettingModel extends BaseModel {
-    business_name: string;
-    business_type: string;
+    theme: string;
+    language: string;
+    company_name: string;
     email: string;
     phone: string;
     currency: string;
@@ -12,6 +13,7 @@ export class GeneralSettingModel extends BaseModel {
     physical_address: string;
     postal_address: string;
     postal_code: string;
+    website_url: string;
     logo: File | null;
 
     favicon: string;

@@ -3,18 +3,15 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { fromEvent, merge, Observable } from 'rxjs';
-import { debounceTime, delay, distinctUntilChanged, filter, first, map, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialog-component';
 import { AddTenantComponent } from './add/add-tenant.component';
 import { TenantModel } from './models/tenant-model';
 import { TenantDataSource } from './data/tenant-data.source';
 import { NotificationService } from '../shared/notification.service';
-import { TenantEntityService } from './data/tenant-entity.service';
-import { UtilityEntityService } from '../settings/property/utility/data/utility-entity.service';
-import { AmenityEntityService } from '../settings/property/amenity/data/amenity-entity.service';
-import { UtilityModel } from '../settings/property/utility/model/utility-model';
-import { TypeEntityService } from '../settings/property/type/data/type-entity.service';
 import { TenantService } from './data/tenant.service';
+import { PropertyModel } from '../properties/models/property-model';
+import { AuthenticationService } from '../authentication/authentication.service';
 
 @Component({
     selector: 'robi-properties',
@@ -27,58 +24,35 @@ export class TenantComponent implements OnInit, AfterViewInit {
         'first_name',
         'last_name',
         'gender',
-        'contact_phone',
+        'phone',
+        'status',
         'actions'
     ];
-    displayedColumnsReduced = [
-        'first_name',
-        'last_name',
-        'actions'
-    ];
+
+    loader = false;
+
+    dialogRef: MatDialogRef<ConfirmationDialogComponent>;
+
+    dataSource: TenantDataSource;
+
+    // Search field
+    @ViewChild('search') search: ElementRef;
+
+    // pagination
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
     // Pagination
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
-    dataSource$: any;
-    // pagination
-    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
-
-    dialogRef: MatDialogRef<ConfirmationDialogComponent>;
-
-    // Search field
-    @ViewChild('search') search: ElementRef;
-
-    // Data for the list table display
-    selectedRowIndex = '';
-
-    loading$: Observable<boolean>;
-    meta$: Observable<any>;
-    landlords$: Observable<any>;
-    nextPage = 1;
-    loaded: boolean;
-
-   // utilities$: Observable<UtilityModel>;
-    utilities$: any;
-    isLoaded: boolean;
-    amenities$: Observable<any>;
-    properties$: Observable<any>;
-    propertyTypes$: Observable<any>;
-
-    imageToShow: any;
-
-    showMaster = false;
-    selectedProperty$: any;
-
-    selectedRow = -1;
-
-    constructor(private propertyService: TenantService,
-                private tenantEntityService: TenantEntityService,
-                private propertyTypeEntityService: TypeEntityService,
+    isAdmin$: Observable<boolean>;
+    constructor(private tenantService: TenantService,
                 private notification: NotificationService,
-                private dialog: MatDialog, private utilityEntityService: UtilityEntityService,
-                private amenityEntityService: AmenityEntityService) {
+                private authenticationService: AuthenticationService,
+                private dialog: MatDialog) {
+        this.isAdmin$ = this.authenticationService.isAdmin();
     }
 
     /**
@@ -87,367 +61,52 @@ export class TenantComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
-       // this.getImageFromService('Quotefancy-1571909-3840x2160_1589749637.jpg');
-
-        // load properties
-        this.loadProperties();
-
-        this.dataSource$ = this.tenantEntityService.entities$;
-
-
-        this.loadPropertyTypes();
-
-        // fetch utilities
-        this.loadUtilities ();
-       /*this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-               this.utilities$ = this.utilityEntityService.entities$;
-           });*/
-
-        // fetch amenities
-        this.loadAmenities();
-       /* this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.amenities$ = this.amenityEntityService.entities$;
-        });*/
-
-    /*    this.amenities$ = this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-                filter(loaded => !!loaded),
-                first()
-            );*/
-
-
-
-        const loadedx = this.tenantEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                         this.tenantEntityService.getAll();
-                    }
-                }),
-                  filter(loaded => !!loaded),
-                  first()
-            );
-
-     /*   this.landlords$ = this.tenantEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                        return this.tenantEntityService.getAll();
-                    }
-                })
-              //  filter(loaded => !!loaded),
-              //  first()
-            );*/
-
-     if (loadedx) {
-         this.landlords$ = this.tenantEntityService.entities$
-             .pipe(
-                 map(landlords => {
-                     this.nextPage++;
-                     return landlords;
-                 })
-             );
-
-         this.meta$ = this.tenantEntityService.meta$;
-
-         // this.initialLoad();
-
-         // Loading indicator
-         this.loading$ = this.tenantEntityService.loading$.pipe(
-             delay(0)
-         );
-     }
-
+        this.dataSource = new TenantDataSource(this.tenantService);
         // Load pagination data
-    //    this.dataSource.meta$.subscribe((res) => this.meta = res);
-
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-       // this.dataSource.load('', 0, 0, 'updated_at', 'desc');
-
-        // Master detail select data
-        this.tenantEntityService.selectedOption$.subscribe(property =>
-            this.selectedProperty$ = this.tenantEntityService.entities$
-                .pipe(
-                    map(entities => entities.find(entity => entity.id === property.id))
-                )
-        );
+        this.dataSource.load('', 0, 0, 'first_name', 'desc');
     }
-
-    highlight(row) {
-        console.log('highlight', row);
-        this.selectedRow = row.id;
-    }
-
-    toggleShowMaster() {
-        this.showMaster = !this.showMaster;
-    }
-
-    /**
-     * When a property is selected for view
-     * @param property
-     */
-    onSelected(property: TenantModel): void {
-        console.log('onSelected', property);
-        this.showMaster = true;
-        this.selectedRowIndex = property.id;
-        this.tenantEntityService.changeSelectedProperty(property);
-    }
-
-    initialLoad() {
-        this.landlords$ = this.tenantEntityService.entities$
-            .pipe(
-                map(landlords => {
-                   // this.nextPage++;
-                    return landlords;
-                })
-            );
-    }
-
-    /**
-     * Load Property entities either from store or API
-     */
-    loadProperties() {
-        this.tenantEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.tenantEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.properties$ = this.tenantEntityService.entities$;
-        });
-    }
-
-    /**
-     * Search
-     */
-    filter(currentPage) {
-        const page = currentPage + 1;
-
-        console.log('currentPage', currentPage);
-
-        this.tenantEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': page.toString(),
-            'limit': '',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-    }
-
-    /**
-     * Load data from Api
-     */
-    loadData() {
-        this.tenantEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': this.nextPage.toString(),
-            'limit': '3',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-
-        this.nextPage++;
-    }
-
-    /**
-     * Load property Types
-     */
-    loadPropertyTypes() {
-        this.propertyTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.propertyTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.propertyTypes$ = this.propertyTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Amenity entities either from store or API
-     */
-    loadAmenities() {
-        this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.amenities$ = this.amenityEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Utility entities either from API or store
-     */
-    loadUtilities () {
-        this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.utilityEntityService.entities$;
-        });
-    }
-
-    getImageFromService(imageName: string) {
-        console.log('called');
-
-  /*      const clicks = fromEvent(document, 'click');
-    * const result = clicks.pipe(first());
-    * result.subscribe(x => console.log(x));*/
-
-        /*const imageUrl = this.propertyService.getImage(imageName)
-            .pipe(first());
-
-        imageUrl.subscribe(url => {
-            return url;
-        });*/
-
-            this.propertyService.getImagePath(imageName).subscribe(data => {
-               // console.log('my image data');
-               /// console.log(data);
-               // return data;
-                this.createImageFromBlob(data);
-            }, error => {
-                console.log(error);
-            });
-    }
-
-    createImageFromBlob(image: Blob) {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-            this.imageToShow = reader.result;
-            console.log('reader.result');
-            console.log(reader.result);
-          //  return reader.result;
-        }, false);
-
-        if (image) {
-            reader.readAsDataURL(image);
-        }
-    }
-
-    load(currentPage) {
-        const page = currentPage + 1;
-
-        this.tenantEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': page.toString(),
-            'limit': '',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-    }
-
-
-
-    /**
-     * Show or hide the load more button bar
-     * @param presentPage
-     * @param lastPage
-     */
-   showLoadMoreButton(presentPage, lastPage) {
-       return (presentPage + 1) <= lastPage;
-   }
-
-    /**
-     * Handle search and pagination
-     */
-/*    ngAfterViewInit() {
-
-        fromEvent(this.search.nativeElement, 'keyup')
-            .pipe(
-                debounceTime(1000),
-                distinctUntilChanged(),
-                tap(() => {
-                   // this.nextPage = 0;
-                    this.filter(0);
-                   // this.load(0);
-                })
-            ).subscribe();
-
-        /!* this.paginator.page.pipe(
-             tap(() => this.loadData() )
-         ).subscribe();*!/
-
-        // reset the paginator after sorting
-        //  this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
-        /!*  merge(this.sort.sortChange, this.paginator.page)
-              .pipe(
-                  tap(() => this.loadData())
-              )
-              .subscribe();*!/
-    }*/
-
 
     /**
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
-        console.log('ngAfterViewInit');
-        console.log(this.paginator);
-
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
                 distinctUntilChanged(),
                 tap(() => {
                     this.paginator.pageIndex = 0;
-                   // this.loadData();
-                   // this.filter();
+                    this.loadData();
                 })
             ).subscribe();
 
-     /*   this.paginator.page.pipe(
-            tap(() => this.filter(this.paginator.page) )
-        ).subscribe();*/
+        this.paginator.page.pipe(
+            tap(() => this.loadData() )
+        ).subscribe();
 
         // reset the paginator after sorting
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-        /*merge(this.sort.sortChange, this.paginator.page)
+        merge(this.sort.sortChange, this.paginator.page)
             .pipe(
                 tap(() => this.loadData())
             )
-            .subscribe();*/
+            .subscribe();
+    }
+
+    /**
+     * Fetch data from data lead
+     */
+    loadData() {
+        this.dataSource.load(
+            this.search.nativeElement.value,
+            (this.paginator.pageIndex + 1),
+            (this.paginator.pageSize),
+            this.sort.active,
+            this.sort.direction
+        );
     }
 
     /**
@@ -455,10 +114,7 @@ export class TenantComponent implements OnInit, AfterViewInit {
      */
     clearSearch() {
         this.search.nativeElement.value = '';
-        // this.loadData()
-        // this.initialLoad();
-        this.filter(0);
-      //  this.load(0);
+        this.loadData()
     }
 
     /**
@@ -481,41 +137,6 @@ export class TenantComponent implements OnInit, AfterViewInit {
                 }
             }
         );
-    }
-
-    /**
-     * Fetch data from data lead
-     */
-   /* loadData() {
-        this.dataSource.load(
-            this.search.nativeElement.value,
-            (this.paginator.pageIndex + 1),
-            (this.paginator.pageSize),
-            this.sort.active,
-            this.sort.direction
-        );
-    }*/
-
-
-    /**
-     *
-     * @param blob
-     */
-    showFile(blob) {
-        const newBlob = new Blob([blob], {type: 'application/pdf'});
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(newBlob);
-            return;
-        }
-        const data = window.URL.createObjectURL(newBlob);
-        const link = document.createElement('a');
-        link.href = data;
-        link.download = 'statement.pdf';
-        link.click();
-        setTimeout(function() {
-            window.URL.revokeObjectURL(data);
-        }, 100);
     }
 
     /**
@@ -542,7 +163,6 @@ export class TenantComponent implements OnInit, AfterViewInit {
      */
    delete(landlord: TenantModel) {
        // this.loader = true;
-        this.tenantEntityService.delete(landlord);
      /*   this.service.delete(lead)
             .subscribe((data) => {
                     this.loader = false;
@@ -558,5 +178,12 @@ export class TenantComponent implements OnInit, AfterViewInit {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }
                 });*/
+    }
+
+    /**
+     * @param tenant
+     */
+    onSelected(tenant: TenantModel): void {
+        this.tenantService.changeSelectedTenant(tenant);
     }
 }

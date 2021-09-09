@@ -8,19 +8,20 @@
             </div>
             <div class="card-body">
                 <nav mat-tab-nav-bar>
-
                     <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
                        routerLink="/reports">
-                        <span class="nav-text"> Accounts - General Ledger </span></a>
+                        <span class="nav-text"> Property Report </span>
+                    </a>
+
+                    <a mat-tab-link routerLinkActive #ledger="routerLinkActive" [active]="ledger.isActive" [routerLink]="['ledger']"
+                       routerLink="/ledger">
+                        <span class="nav-text"> General Ledger </span>
+                    </a>
 
                     <a mat-tab-link routerLinkActive #journal="routerLinkActive" [active]="journal.isActive" [routerLink]="['journal']">
-                        <span class="nav-text">  Journal </span></a>
-
-                    <a mat-tab-link routerLinkActive #finances="routerLinkActive" [active]="finances.isActive" [routerLink]="['other_reports']">
-                        <span class="nav-text">   Other Reports </span></a>
-
+                        <span class="nav-text">  Journal </span>
+                    </a>
                 </nav>
-
                 <router-outlet></router-outlet>
             </div>
         </div>

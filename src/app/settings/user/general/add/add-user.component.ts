@@ -4,9 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserSettingModel } from '../../model/user-setting.model';
 import { UserSettingService } from '../../data/user-setting.service';
 import { NotificationService } from '../../../../shared/notification.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
-    selector: 'app-add-user',
+    selector: 'robi-add-user',
     styles: [],
     templateUrl: './add-user.component.html'
 })
@@ -16,6 +17,8 @@ export class AddUserComponent implements OnInit  {
     form: FormGroup;
 
     formErrors: any;
+    private errorInForm = new BehaviorSubject<boolean>(false);
+    formError$ = this.errorInForm.asObservable();
 
     user: UserSettingModel;
 
@@ -24,6 +27,8 @@ export class AddUserComponent implements OnInit  {
     roles: any = [];
     employees: any = [];
     branches: any = [];
+    isAdd: boolean;
+
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
@@ -33,24 +38,125 @@ export class AddUserComponent implements OnInit  {
         this.roles = row.roles;
         this.employees = row.employees;
         this.branches = row.branches;
+        this.isAdd = row.isAdd;
+        this.user = row.user;
     }
 
     ngOnInit() {
 
-        this.form = this.fb.group({
-            branch_id: ['', [Validators.required,
-                Validators.minLength(3)]],
-            first_name: ['', [Validators.required,
-                Validators.minLength(3)]],
-            middle_name: [''],
-            last_name: ['', [Validators.required,
-                Validators.minLength(3)]],
-            role_id: [''],
-           /* employee_id: [''],*/
-            email: [''],
-            password: [''],
-            password_confirmation: [''],
-        });
+        if (this.isAdd) {
+            this.form = this.fb.group({
+                first_name: ['', [Validators.required,
+                    Validators.minLength(3)]],
+                middle_name: [''],
+                last_name: ['', [Validators.required,
+                    Validators.minLength(3)]],
+                role_id: [''],
+                email: [''],
+                password: [''],
+                password_confirmation: [''],
+            });
+        }
+
+        if (!this.isAdd) {
+            this.form = this.fb.group({
+                first_name: [this.user?.first_name, [Validators.required,
+                    Validators.minLength(3)]],
+                middle_name: [this.user?.middle_name],
+                last_name: [this.user?.last_name, [Validators.required,
+                    Validators.minLength(3)]],
+                role_id: [this.user?.role_id],
+                email: [this.user?.email],
+                current_password: [''],
+                password: [''],
+                password_confirmation: [''],
+            });
+        }
+    }
+
+    /**
+     * Create member
+     */
+    create() {
+        this.errorInForm.next(false);
+
+        const body = Object.assign({}, this.user, this.form.value);
+
+        this.loader = true;
+
+        this.userService.create(body).subscribe((data) => {
+                this.onSaveComplete();
+                this.notification.showNotification('success', 'Success !! User created.');
+            },
+            (error) => {
+                this.errorInForm.next(true);
+
+                this.loader = false;
+                if (error.member === 0) {
+                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
+                        ' Check your connection and retry.');
+                    return;
+                }
+                // An array of all form errors as returned by server
+                // this.formErrors = error?.error;
+                this.formErrors = error;
+
+                if (this.formErrors) {
+                    // loop through from fields, If has an error, mark as invalid so mat-error can show
+                    for (const prop in this.formErrors) {
+                        if (this.form) {
+                            this.form.controls[prop]?.markAsTouched();
+                            this.form.controls[prop]?.setErrors({incorrect: true});
+                        }
+                    }
+                }
+
+            });
+    }
+
+    /**
+     *
+     */
+    update() {
+        const body = Object.assign({}, this.user, this.form.value);
+
+        this.loader = true;
+        this.errorInForm.next(false);
+
+        this.userService.update(body).subscribe((data) => {
+                this.loader = false;
+                this.dialogRef.close(this.form.value);
+                // notify success
+                this.notification.showNotification('success', 'Success !! User has been updated.');
+            },
+            (error) => {
+                this.loader = false;
+                this.errorInForm.next(true);
+                // this.formError$.subscribe(subscriber => {subscriber.next(true)});
+                if (error.utility === 0) {
+                    return;
+                }
+                // An array of all form errors as returned by server
+                this.formErrors = error?.error;
+                //  this.formErrors = error.error.error.errors;
+
+                if (this.formErrors) {
+                    // loop through from fields, If has an error, mark as invalid so mat-error can show
+                    for (const prop in this.formErrors) {
+                        if (this.form) {
+                            this.form.controls[prop]?.markAsTouched();
+                            this.form.controls[prop]?.setErrors({incorrect: true});
+                        }
+                    }
+                }
+            });
+    }
+
+    /**
+     * Create or Update Data
+     */
+    createOrUpdate() {
+        this.isAdd ? this.create() : this.update();
     }
 
     save() {
@@ -59,44 +165,6 @@ export class AddUserComponent implements OnInit  {
 
     close() {
         this.dialogRef.close();
-    }
-
-    addDialog() {}
-
-    /**
-     * Create a resource
-     */
-    createUser() {
-
-        const body = Object.assign({}, this.user, this.form.value);
-
-        this.loader = true;
-
-        this.userService.create(body)
-            .subscribe((data) => {
-                    this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! New user created.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (error.user === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
-                        return;
-                    }
-                    // An array of all form errors as returned by server
-                    this.formErrors = error;
-
-                    if (this.formErrors) {
-                        // loop through from fields, If has an error, mark as invalid so mat-error can show
-                        for (const prop in this.formErrors) {
-                            if (this.form) {
-                                this.form.controls[prop].setErrors({incorrect: true});
-                            }
-                        }
-                    }
-
-                });
     }
 
     /**

@@ -4,11 +4,13 @@ import { MatStepper } from '@angular/material/stepper';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
-import { LeaseTypeEntityService } from '../data/lease-type-entity.service';
 import { LeaseTypeModel } from '../model/lease-type-model';
+import { LeaseTypeService } from '../data/lease-type.service';
+import { AmenityModel } from '../../../property/amenity/model/amenity-model';
+import { AmenityService } from '../../../property/amenity/data/amenity.service';
 
 @Component({
-    selector: 'robi-add-lease-ype',
+    selector: 'robi-add-lease-type',
     styles: [],
     templateUrl: './add-lease-type.component.html'
 })
@@ -17,7 +19,6 @@ export class AddLeaseTypeComponent implements OnInit  {
     form: FormGroup;
 
     formErrors: any;
-    // formError$: Observable<boolean>;
 
     private errorInForm = new BehaviorSubject<boolean>(false);
     formError$ = this.errorInForm.asObservable();
@@ -26,23 +27,20 @@ export class AddLeaseTypeComponent implements OnInit  {
 
     formGroup: FormGroup;
 
-    mode: 'add' | 'edit';
+    isAdd: boolean;
     leaseType: LeaseTypeModel;
-
-    @ViewChild('stepper', {static: true }) stepper: MatStepper;
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
-                private leaseTypeEntityService: LeaseTypeEntityService,
+                private leaseTypeService: LeaseTypeService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddLeaseTypeComponent>) {
-        this.mode = row.mode;
+        this.isAdd = row.isAdd;
         this.leaseType = row.leaseType;
     }
 
     ngOnInit() {
-
-        if (this.mode === 'add') {
+        if (this.isAdd) {
             this.form = this.fb.group({
                 lease_type_name: ['', [Validators.required,
                     Validators.minLength(2)]],
@@ -51,7 +49,7 @@ export class AddLeaseTypeComponent implements OnInit  {
             });
         }
 
-        if (this.mode === 'edit') {
+        if (!this.isAdd) {
             this.form = this.fb.group({
                 lease_type_name: [this.leaseType?.lease_type_name, [Validators.required,
                     Validators.minLength(3)]],
@@ -71,7 +69,7 @@ export class AddLeaseTypeComponent implements OnInit  {
 
         this.loader = true;
 
-        this.leaseTypeEntityService.add(body).subscribe((data) => {
+        this.leaseTypeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
                 this.notification.showNotification('success', 'Success !! LeaseType created.');
             },
@@ -106,11 +104,12 @@ export class AddLeaseTypeComponent implements OnInit  {
      */
     update() {
         const body = Object.assign({}, this.leaseType, this.form.value);
+        delete body.membership_form;
 
         this.loader = true;
         this.errorInForm.next(false);
 
-        this.leaseTypeEntityService.update(body).subscribe((data) => {
+        this.leaseTypeService.update(body).subscribe((data) => {
                 this.loader = false;
 
                 this.dialogRef.close(this.form.value);
@@ -122,15 +121,15 @@ export class AddLeaseTypeComponent implements OnInit  {
             (error) => {
                 this.loader = false;
                 this.errorInForm.next(true);
-               // this.formError$.subscribe(subscriber => {subscriber.next(true)});
+                // this.formError$.subscribe(subscriber => {subscriber.next(true)});
 
-                if (error.leaseType === 0) {
+                if (error.utility === 0) {
                     // notify error
                     return;
                 }
                 // An array of all form errors as returned by server
                 this.formErrors = error?.error;
-              //  this.formErrors = error.error.error.errors;
+                //  this.formErrors = error.error.error.errors;
 
                 if (this.formErrors) {
                     // loop through from fields, If has an error, mark as invalid so mat-error can show
@@ -148,19 +147,7 @@ export class AddLeaseTypeComponent implements OnInit  {
      * Create or Update Data
      */
     createOrUpdate() {
-        switch (this.mode) {
-            case 'edit' : {
-                this.update();
-            }
-                break;
-            case 'add' : {
-                this.create();
-            }
-                break;
-            default :
-                break;
-        }
-       // this.dialogRef.close(this.form.value);
+        this.isAdd ? this.create() : this.update();
     }
 
     close() {
@@ -175,6 +162,5 @@ export class AddLeaseTypeComponent implements OnInit  {
         this.form.reset();
         this.dialogRef.close(this.form.value);
     }
-
 }
 

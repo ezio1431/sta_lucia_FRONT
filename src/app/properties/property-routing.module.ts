@@ -1,33 +1,40 @@
 import { Routes, RouterModule } from '@angular/router';
 import { PropertyComponent } from './property.component';
 import { AddPropertyComponent } from './add/add-property.component';
-import { PropertyResolverService } from './data/property-resolver.service';
 import { ViewPropertyComponent } from './view/view-property.component';
 import { ViewPropertyGeneralComponent } from './view/general/view-property-general.component';
-import { CreatePropertyResolverService } from './data/create-property-resolver.service';
+import { PropertyLeaseComponent } from './view/lease/property-lease.component';
+import { PropertyInvoiceComponent } from './view/invoice/property-invoice.component';
+import { PropertyNoticeComponent } from './view/notice/property-notice.component';
+import { PropertyUnitComponent } from './view/unit/property-unit.component';
 
 export const ROUTES: Routes = [
     {
         path: '',
-        component: PropertyComponent,
-       /* resolve: {
-            landlords: PropertyResolverService
-        }*/
+        component: PropertyComponent
     },
     {
         path: 'create',
-        component: AddPropertyComponent,
-        resolve: {
-            landlords: CreatePropertyResolverService
-        }
+        component: AddPropertyComponent
     },
     {
         path: ':id',
         component: ViewPropertyComponent,
-        /*resolve : { member: LandlordResolverService},*/
         children: [
-            { path: '', component: ViewPropertyGeneralComponent }
+            { path: '', component: ViewPropertyGeneralComponent },
+            { path: 'units', component: PropertyUnitComponent },
+            { path: 'leases', component: PropertyLeaseComponent },
+            { path: 'invoices', component: PropertyInvoiceComponent },
+            { path: 'notices', component: PropertyNoticeComponent },
         ]
+    },
+    {
+        path: ':id/edit',
+        component: AddPropertyComponent
+    },
+    {
+        path: ':id/edit/units',
+        loadChildren: () => import('../units/unit.module').then(m => m.UnitModule),
     },
 ];
 

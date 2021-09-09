@@ -1,81 +1,46 @@
 <div class="main-content">
-    <div class="container-fluid" *ngIf="landlord$ | async as landlord">
+    <ng-template #no_data>
+        <div class="not-found">
+            <mat-icon>error</mat-icon> Not Found
+        </div>
+    </ng-template>
+    <div class="container-fluid" *ngIf="landlordData$ | async as landlord; else no_data">
         <div class="row">
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header card-header-info">
-                            <h4 class="card-title">Landlord Profile</h4>
-                            <p class="card-category"></p>
+                            <div class="row">
+                                <div class="col-8">
+                                    <h4 class="card-title">Landlord Details</h4>
+                                    <p class="card-category">{{landlord?.first_name}} {{landlord?.last_name}}</p>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                                        <mat-icon>more_vert</mat-icon>
+                                    </button>
+                                    <mat-menu #menu="matMenu">
+                                        <button mat-menu-item matTooltip="Edit Landlord." [matTooltipPosition]="'above'"
+                                                routerLink="edit" (click)="onSelected(landlord)">
+                                            <mat-icon>edit</mat-icon>
+                                            <span>Edit Landlord</span>
+                                        </button>
+                                    </mat-menu>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
-
                             <nav mat-tab-nav-bar>
-
                                 <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
-                                   routerLink="/landlords/{{id}}">
+                                   routerLink="/landlords/{{landlordID}}">
                                     <span class="nav-text">  Info </span></a>
-
                                 <a mat-tab-link routerLinkActive #properties="routerLinkActive" [active]="properties.isActive" [routerLink]="['properties']">
                                     <span class="nav-text">   Properties </span></a>
-
-                                <a mat-tab-link routerLinkActive #documents="routerLinkActive" [active]="documents.isActive" [routerLink]="['documents']">
-                                    <span class="nav-text">  Documents </span></a>
                             </nav>
-
                             <router-outlet></router-outlet>
-
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card card-lift--hover shadow border-0 card-profile">
-                        <div class="front">
-                            <div class="cover">
-                                <img class="img" src="../../assets/img/images/rotating_card_thumb3.png"/>
-                            </div>
-                            <div class="card-avatar">
-                                <img [src]="landlord.profile_pic"/>
-                                <!--<img class="img" src="../../../assets/img/images/2.jpg"/>-->
-
-                            </div>
-
-
-                            <div class="content">
-                                <div class="main">
-                                    <h3 class="name">
-                                        {{landlord.first_name}} {{landlord.last_name}}
-                                    </h3>
-                                    <p class="profession">
-                                        <button mat-stroked-button disabled>
-                                            <mat-icon color="accent">phone</mat-icon>
-                                            <span>{{landlord?.phone}}</span>
-                                        </button>
-                                    </p>
-                                    <div class="stats-container">
-                                        <div class="property-stats">
-                                            <p>
-                                                <button mat-icon-button (click)="logoFileInput.click()">
-                                                    <i class="material-icons">attachment</i>photo
-                                                </button>
-                                            </p>
-                                        </div>
-                                        <div class="property-stats">
-                                            <p>
-                                                <button mat-icon-button (click)="addDialog('edit', landlord)">
-                                                    <i class="material-icons">edit</i>edit
-                                                </button>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                </div>
-                            </div>
-                        </div> <!-- end front panel -->
-                    </div>
-
-
-
                         <div class="card">
                             <div class="card-header card-header-info">
                                 <h4 class="card-title">Summary</h4>
@@ -87,26 +52,6 @@
                                 <div class="card-category text-gray"> Charge rate: 10%</div>
                             </div>
                         </div>
-
-
-
-                 <!--   <div class="card card-profile">
-                        <div class="card-profile">
-                            <div class="card-avatar" *ngIf="imageToShow">
-                                <img [src]="imageToShow" alt="Profile Picture">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="card-category text-gray">{{memberData?.first_name}} {{memberData?.middle_name}} {{memberData?.last_name}}</h6>
-                            <h4 class="card-title"> A/C #. {{memberData?.account?.account_number}}</h4>
-                            <div class="card-description">
-                                <div>Phone: {{memberData?.phone}}</div>
-                                <div>Email: {{memberData?.email}}</div>
-                                Branch: {{memberData?.branch?.name}}
-                            </div>
-                            Joined: {{memberData?.date_became_member_display}}
-                        </div>
-                    </div>-->
                 </div>
         </div>
     </div>

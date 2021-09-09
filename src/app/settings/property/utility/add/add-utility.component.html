@@ -1,9 +1,9 @@
-<h5 mat-dialog-title *ngIf="mode==='add'">Add Utility
+<h5 mat-dialog-title *ngIf="isAdd">Add Utility
     <ng-container *ngIf="formError$ | async">
         <mat-icon color="warn">error_outline</mat-icon>
     </ng-container>
 </h5>
-<h5 mat-dialog-title *ngIf="mode==='edit'">Edit Utility
+<h5 mat-dialog-title *ngIf="!isAdd">Edit Utility
     <ng-container *ngIf="formError$ | async">
         <mat-icon color="warn">error_outline</mat-icon>
     </ng-container>
@@ -51,6 +51,6 @@
 </div>
 
 <mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mat-raised-button mr-2" [mat-dialog-close]="true" (click)="close()">Close</button>
-    <button class="mat-raised-button mat-primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">Cancel</button>
+    <button mat-raised-button  color="primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
 </mat-dialog-actions>

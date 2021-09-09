@@ -9,20 +9,23 @@
     "username": "Enter your user name",
     "password": "Password here"
   },
+  "robi.filter": "Filter",
   "robi.sidebar.dashboard": "Dashboard",
   "robi.sidebar.setting": "Setting",
   "robi.sidebar.landlords": "Landlords",
   "robi.sidebar.properties": "Properties",
   "robi.sidebar.tenants": "Tenants",
   "robi.sidebar.leases": "Leases",
-  "robi.sidebar.utility-bills": "Utility Readings",
+  "robi.sidebar.utilities": "Utilities",
   "robi.sidebar.units": "Units",
 
   "robi.properties.title": "Properties",
+  "robi.utilities.title": "Utility Readings",
+  "robi.payments.title": "Payments",
+  "robi.tasks.title": "Tasks",
 
   "robi.tenants.title": "Tenants",
   "robi.tenants.new": "New Tenant",
-
 
   "robi.leases.title": "Leases",
   "robi.leases.title.new": "New Lease",
@@ -38,6 +41,7 @@
 
 
 
+  "robi.vacate.title": "Vacate Notices",
   "robi.landlords.title": "Landlords",
   "robi.landlords.total": "Total",
   "robi.landlords.active": "Active",
@@ -55,9 +59,6 @@
 
   "robi.landlords.load_more": "Load More",
   "robi.landlords.loading": "loading",
-
-  "robi.tasks.title": "Tasks",
-
 
 
 

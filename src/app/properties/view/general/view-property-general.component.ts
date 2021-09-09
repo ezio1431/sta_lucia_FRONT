@@ -1,9 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NotificationService } from '../../../shared/notification.service';
-import { MatDialog } from '@angular/material/dialog';
-import { PropertyEntityService } from '../../data/property-entity.service';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { PropertyService } from '../../data/property.service';
+import { PropertyModel } from '../../models/property-model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'robi-view-property-general',
@@ -24,23 +23,25 @@ export class ViewPropertyGeneralComponent implements OnInit {
     loader = false;
     memberShipForm = false;
 
-    landlord$: Observable<any>;
+    property$: Observable<PropertyModel>;
 
-    constructor(private propertyEntityService: PropertyEntityService, private notification: NotificationService) {}
+    id: string;
+    propertyData: any;
+
+    constructor(private propertyService: PropertyService, private route: ActivatedRoute) {
+    }
 
     ngOnInit() {
-      //  this.landlord$ = this.propertyEntityService.selectedLandlordChanges$;
+        this.property$ = this.propertyService.selectedPropertyChanges$;
 
-        this.propertyEntityService.selectedOption$.subscribe(property =>
-            this.landlord$ = this.propertyEntityService.entities$
-                .pipe(
-                    map(entities => entities.find(entity => entity.id === property.id))
-                )
-        );
+        this.id = this.route.snapshot.paramMap.get('id');
 
-      /*  this.landlord$ = this.propertyEntityService.entities$
-            .pipe(
-                map(entities => entities.find(property => property.id === this.id))
-            );*/
+        this.propertyService.selectedPropertyChanges$.subscribe(data => {
+            this.propertyData = data;
+        });
+
+        if (this.propertyData == null) {
+            this.property$ = this.propertyService.getById(this.id);
+        }
     }
 }

@@ -5,10 +5,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
 import { tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { selectEffectiveTheme } from '../../core/settings/settings.selectors';
-import { AuthActions } from '../action-types';
+import { AuthenticationActions } from '../action-types';
 import { selectorIsLoggedIn, selectorScopes } from '../auth.selectors';
+import { selectorUserScopes } from '../authentication.selectors';
 
 @Component({templateUrl: 'login.component.html'})
 export class LoginComponent implements OnInit {
@@ -34,8 +35,7 @@ export class LoginComponent implements OnInit {
     ngOnInit() {
         this.theme$ = this.store.pipe(select(selectEffectiveTheme));
 
-        this.store.dispatch(AuthActions.actionLogout());
-       // this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/' || 'landlord';
+        this.store.dispatch(AuthenticationActions.actionLogout());
         this.returnUrl = '/';
     }
 
@@ -64,20 +64,20 @@ export class LoginComponent implements OnInit {
             .pipe(tap(
                 user => {
                     this.loader = false;
-                    this.store.dispatch(AuthActions.actionLogin({user}));
-                  //  this.token$ = this.store.pipe(select(selectorScopes));
+                    console.log('AuthActions.actionLogin({user}');
+                    console.log(user);
 
-                    this.store.pipe(select(selectorScopes)).subscribe(scopes => {
+                    this.store.dispatch(AuthenticationActions.actionLogin({user}));
+
+                    this.store.pipe(select(selectorUserScopes)).subscribe(scopes => {
                         this.loginScopes = scopes;
-                       // const landlord = scopes.find(x => x === 'landlord');
-
                         // We have a landlord
-                        if (scopes?.find(x => x === 'landlord')) {
-                            this.returnUrl = '/landlord';
+                        if (scopes?.find(x => x === 'am-landlord')) {
+                            this.returnUrl = '/landlord/dashboard';
                         }
                         // We have a tenant
-                        if (scopes?.find(x => x === 'tenant')) {
-                            this.returnUrl = '/tenant';
+                        if (scopes?.find(x => x === 'am-tenant')) {
+                            this.returnUrl = '/tenant/dashboard';
                         } else {
                             //
                         }

@@ -1,14 +1,12 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, OnInit, Output, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Inject, OnInit, Output, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatStepper } from '@angular/material/stepper';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import * as moment from 'moment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { PropertyService } from '../../data/property.service';
-import { CheckboxItem } from '../../../settings/property/roles/edit/check-box-item';
-import { RentPeriods } from '../../../shared/enums/rent-period';
+import { CheckboxItem } from './check-box-item';
+import { BILLING_FREQUENCIES } from '../../../shared/enums/billing-frequency-enum';
 
 @Component({
     selector: 'robi-add-member',
@@ -20,7 +18,6 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
     form: FormGroup;
 
     formErrors: any;
-    // formError$: Observable<boolean>;
 
     private errorInForm = new BehaviorSubject<boolean>(false);
     formError$ = this.errorInForm.asObservable();
@@ -59,15 +56,12 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
     panelOpenState = false;
     disableAnimation = true;
 
-    fromDialog: string;
-
-    rentPeriods: any;
+    billingFrequencies: any;
 
     utilities$: any;
     amenities$: any;
     unitTypes$: any;
 
-  //  amenities: any;
     amenities = Array<CheckboxItem>();
     optionsAmenity = Array<CheckboxItem>();
     optionsUtility = Array<CheckboxItem>();
@@ -83,13 +77,13 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
                 private dialogRef: MatDialogRef<PropertyUnitDetailsComponent>) {
             this.unitValue = row.unitValue;
             this.utilities$ = row.utilities;
-            this.amenities$ = row.amenities;
-            this.unitTypes$ = row.unitTypes;
+            this.amenities$ = row.amenities$;
+            this.unitTypes$ = row.unitTypes$;
             this.amenities = row.amenitiesData;
             this.optionsAmenity = row.amenityOptions;
             this.optionsUtility = row.utilityOptions;
 
-        this.rentPeriods = RentPeriods;
+        this.billingFrequencies = BILLING_FREQUENCIES;
         //  this.selectedValues = this.role.permissions.map(x => x['id']);
     }
 
@@ -105,12 +99,12 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
                 unit_type_id: [this.unitValue?.unit_type_id],
                 unit_name: [this.unitValue?.unit_name, [Validators.required,
                     Validators.minLength(1)]],
+                unit_floor: [this.unitValue?.unit_floor],
                 rent_amount: [this.unitValue?.rent_amount],
-                rent_period: [this.unitValue?.rent_period],
+               // billing_frequency: [this.unitValue?.billing_frequency],
                 bed_rooms: [this.unitValue?.bed_rooms],
                 bath_rooms: [this.unitValue?.bath_rooms],
-                square_foot: [this.unitValue?.square_foot, [Validators.required,
-                    Validators.minLength(1)]],
+                square_foot: [this.unitValue?.square_foot],
                 total_rooms: [this.unitValue?.total_rooms],
                 utilityFields: new FormArray([]),
                 amenityFields: new FormArray([]),

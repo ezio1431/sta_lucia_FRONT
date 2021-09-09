@@ -5,7 +5,7 @@
 
 export const environment = {
   production: false,
-  appName: 'Angular Ngrx Material Starter',
+  appName: 'Signal Rentals - Property management, rentals, booking',
   envName: 'DEV',
   test: false,
   i18nPrefix: '',

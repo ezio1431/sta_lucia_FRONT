@@ -90,6 +90,20 @@ export class BaseService<T extends BaseModel> {
         });
     }
 
+    getNested(url: string, filter: string, page: number, limit: number, sortField: string = '', sortDirection: string = '',
+           whereField: string = '', whereValue: string = ''): Observable<{}> {
+        return this.httpClient.get(url, {
+            params: new HttpParams()
+                .set('filter', filter)
+                .set('page', page.toString())
+                .set('limit', limit.toString())
+                .set('sortField', sortField)
+                .set('sortDirection', sortDirection)
+                .set('whereField', whereField)
+                .set('whereValue', whereValue)
+        });
+    }
+
     fetchBranches(page = 0, limit = 4, sortField: string = '', sortDirection: string = ''): Observable<{}> {
         return this.httpClient.get(this.getResourceUrl(), {
             params: new HttpParams()
@@ -108,6 +122,14 @@ export class BaseService<T extends BaseModel> {
     getById(uuid: string): Observable<T> {
         return this.httpClient
             .get<T>(this.getItemUrl(uuid));
+    }
+
+    /**
+     * @param url
+     */
+    getNestedById(url: string): Observable<any> {
+        return this.httpClient
+            .get<T>(url);
     }
 
     /**
@@ -132,5 +154,93 @@ export class BaseService<T extends BaseModel> {
      */
     public delete(item: T) {
         return this.httpClient.delete(this.getItemUrl(item.id));
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedLeasesUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/leases`;
+    }
+
+    public nestedLeaseUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/leases/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedTenantsUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/tenants`;
+    }
+
+    public nestedTenantUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/tenants/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedInvoicesUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/invoices`;
+    }
+
+    public nestedInvoiceUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/invoices/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedNoticesUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/notices`;
+    }
+
+    public nestedNoticeUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/notices/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedPaymentsUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/payments`;
+    }
+
+    public nestedPaymentUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/payments/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedDocumentsUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/documents`;
+    }
+
+    public nestedDocumentUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/documents/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedPropertiesUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/properties`;
+    }
+
+    public nestedPropertyUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/properties/${itemID}`;
+    }
+
+    /**
+     * @param baseEntityID
+     */
+    public nestedUnitsUrl(baseEntityID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/units`;
+    }
+
+    public nestedUnitUrl(baseEntityID: string, itemID: string) {
+        return `${this.getResourceUrl()}/${baseEntityID}/units/${itemID}`;
     }
 }

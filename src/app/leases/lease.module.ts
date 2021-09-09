@@ -3,34 +3,15 @@ import { LeaseRoutingModule } from './lease-routing.module';
 import { LeaseComponent } from './lease.component';
 import { AddLeaseComponent } from './add/add-lease.component';
 import { SharedModule } from '../shared/shared.module';
-import {
-    EntityDataService,
-    EntityDefinitionService,
-    EntityMetadataMap,
-} from '@ngrx/data';
-import { LeaseDataService } from './data/lease-data.service';
 import { ViewLeaseGeneralComponent } from './view/general/view-lease-general.component';
 import { ViewLeaseComponent } from './view/view-lease.component';
-import { LeaseUnitDetailsComponent } from './add/unit-details/lease-unit-details.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
-import { StatementComponent } from '../accounting/statement/statement.component';
-
-const entityMetaData: EntityMetadataMap = {
-    Tenant: {
-        additionalCollectionState: {
-            meta: {
-                current_page: 1,
-                from: 1,
-                last_page: '',
-                path: '',
-                per_page: '',
-                to: '',
-                total: ''
-            }
-        }
-    }
-};
+import { LeaseInvoiceComponent } from './view/invoice/lease-invoice.component';
+import { LeaseDocumentComponent } from './view/document/lease-document.component';
+import { TerminateLeaseComponent } from './view/terminate/terminate-lease.component';
+import { LeaseStatementComponent } from './statement/lease-statement.component';
+import { PdfInvoiceComponent } from '../accounting/pdf-invoice/pdf-invoice.component';
 
 @NgModule({
     imports: [
@@ -44,16 +25,14 @@ const entityMetaData: EntityMetadataMap = {
         AddLeaseComponent,
         ViewLeaseGeneralComponent,
         ViewLeaseComponent,
-        LeaseUnitDetailsComponent,
-        StatementComponent
+        LeaseInvoiceComponent,
+        LeaseDocumentComponent,
+        TerminateLeaseComponent,
+        LeaseStatementComponent,
+        PdfInvoiceComponent
     ]
 })
-
 export class LeaseModule {
-
-    constructor (private eds: EntityDefinitionService, private entityDataService: EntityDataService,
-                 private tenantDataService: LeaseDataService) {
-       // eds.registerMetadataMap(entityMetaData);
-      //  entityDataService.registerService('Tenant', tenantDataService)
+    constructor () {
     }
 }

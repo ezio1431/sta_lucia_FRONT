@@ -1,8 +1,5 @@
 import { Routes, RouterModule } from '@angular/router';
 import { PropertySettingComponent } from './property-setting.component';
-import { UtilityResolverService } from './utility/data/utility-resolver.service';
-import { AmenityResolverService } from './amenity/data/amenity-resolver.service';
-import { UnitTypeResolverService } from './unit-type/data/unit-type-resolver.service';
 
 export const ROUTES: Routes = [
     {
@@ -11,57 +8,31 @@ export const ROUTES: Routes = [
         children: [
             {
                 path: '',
-              //  loadChildren: 'app/settings/user/general/user-general-setting.module#UserGeneralSettingModule'
-                loadChildren: () => import('app/settings/property/general/property-general-setting.module')
-                    .then(m => m.PropertyGeneralSettingModule)
+          /*      loadChildren: () => import('app/settings/property/general/property-general-setting.module')
+                    .then(m => m.PropertyGeneralSettingModule)*/
+
+                loadChildren: () => import('app/settings/property/type/property-type-setting.module')
+                    .then(m => m.PropertyTypeSettingModule)
             },
-            {
-                path: 'roles',
-              //  loadChildren: 'app/settings/user/roles/user-roles-setting.module#UserRolesSettingModule'
-                loadChildren: () => import('app/settings/user/roles/user-roles-setting.module')
-                    .then(m => m.UserRolesSettingModule)
-            },
-            {
-                path: 'permissions',
-              //  loadChildren: 'app/settings/user/permissions/user-permissions-setting.module#UserPermissionsSettingModule'
-                loadChildren: () => import('app/settings/user/permissions/user-permissions-setting.module')
-                    .then(m => m.UserPermissionsSettingModule)
-            },
-            {
+            /*{
                 path: 'property_types',
-                //  loadChildren: 'app/settings/user/permissions/user-permissions-setting.module#UserPermissionsSettingModule'
-                loadChildren: () => import('app/settings/property/type/type-setting.module')
-                    .then(m => m.TypeSettingModule),
-                resolve: {
-                    property_types: AmenityResolverService
-                }
-            },
+                loadChildren: () => import('app/settings/property/type/property-type-setting.module')
+                    .then(m => m.PropertyTypeSettingModule)
+            },*/
             {
                 path: 'amenities',
-                //  loadChildren: 'app/settings/user/permissions/user-permissions-setting.module#UserPermissionsSettingModule'
                 loadChildren: () => import('app/settings/property/amenity/amenity-setting.module')
-                    .then(m => m.AmenitySettingModule),
-                resolve: {
-                    amenities: AmenityResolverService
-                }
+                    .then(m => m.AmenitySettingModule)
             },
             {
                 path: 'utilities',
-                //  loadChildren: 'app/settings/user/permissions/user-permissions-setting.module#UserPermissionsSettingModule'
                 loadChildren: () => import('app/settings/property/utility/utility-setting.module')
-                    .then(m => m.UtilitySettingModule),
-                resolve: {
-                    utilities: UtilityResolverService
-                }
+                    .then(m => m.UtilitySettingModule)
             },
             {
                 path: 'unit_types',
-                //  loadChildren: 'app/settings/user/permissions/user-permissions-setting.module#UserPermissionsSettingModule'
                 loadChildren: () => import('app/settings/property/unit-type/unit-type-setting.module')
                     .then(m => m.UnitTypeSettingModule),
-               /* resolve: {
-                    utilities: UnitTypeResolverService
-                }*/
             }
         ]
     }

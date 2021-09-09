@@ -1,223 +1,112 @@
-import { Component, ElementRef, Inject, OnInit, ViewChild, ViewChildren } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandlordModel } from '../models/landlord-model';
 import { LandlordService } from '../data/landlord.service';
-
 import { NotificationService } from '../../shared/notification.service';
-import * as moment from 'moment';
-import { LandlordEntityService } from '../data/landlord-entity.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LeaseModel } from '../../leases/models/lease-model';
+import { AuthenticationService } from '../../authentication/authentication.service';
 
 @Component({
-    selector: 'robi-add-member',
+    selector: 'robi-add-landlord',
     styles: [],
     templateUrl: './add-landlord.component.html'
 })
 export class AddLandlordComponent implements OnInit  {
 
     form: FormGroup;
-
     formErrors: any;
-    // formError$: Observable<boolean>;
-
     private errorInForm = new BehaviorSubject<boolean>(false);
     formError$ = this.errorInForm.asObservable();
-
-    member: LandlordModel;
-
     loader = false;
-
-    memberMethods: any = [];
-    groups: any = [];
-
     formGroup: FormGroup;
 
-    memberStatuses: any = [];
-    memberSources: any = [];
-    memberTypes: any = [];
-
-    profilePicFileToUpload: File = null;
-    membershipFormFileToUpload: File = null;
-    profilePicUrl = '';
-
-    membershipFormToUpload: File = null;
-    membershipFormUrl = '';
-
-    urls = new Array<string>();
-
-    mode: 'add' | 'edit';
+    isAdd = true;
     landlord: LandlordModel;
+    landlordID: string;
 
     @ViewChild('stepper', {static: true }) stepper: MatStepper;
-
-    constructor(@Inject(MAT_DIALOG_DATA) row: any,
-                private fb: FormBuilder,
-                private memberService: LandlordService,
-                private landlordEntityService: LandlordEntityService,
+    deleteDialogRef: MatDialogRef<ConfirmationDialogComponent>;
+    isAdmin$: Observable<boolean>;
+    constructor(private fb: FormBuilder,
+                private dialog: MatDialog,
+                private landlordService: LandlordService,
                 private notification: NotificationService,
-                private dialogRef: MatDialogRef<AddLandlordComponent>) {
-        this.mode = row.mode;
-        this.landlord = row.landlord;
+                private authenticationService: AuthenticationService,
+                private router: Router, private route: ActivatedRoute) {
+        this.isAdmin$ = this.authenticationService.isAdmin();
+        this.form = this.fb.group({
+            first_name: ['', [Validators.required,
+                Validators.minLength(2)]],
+            middle_name: [''],
+            last_name: ['', [Validators.required,
+                Validators.minLength(2)]],
+            nationality: [''],
+            id_number: [''],
+            passport_number: [''],
+            phone: [''],
+            email: [''],
+            registration_date: [''],
+            postal_address: [''],
+            physical_address: [''],
+            residential_address: [''],
+            county: [''],
+            city: [''],
+            state: [''],
+            status_id: [''],
+            password: [''],
+            password_confirmation: ['']
+        });
     }
 
     ngOnInit() {
+        this.landlordID = this.route.snapshot.paramMap.get('id');
+        if (this.landlordID) {
+            this.isAdd = false;
 
-        if (this.mode === 'add') {
-            this.form = this.fb.group({
-                first_name: ['', [Validators.required,
-                    Validators.minLength(2)]],
-                middle_name: [''],
-                last_name: ['', [Validators.required,
-                    Validators.minLength(2)]],
-                nationality: [''],
-                id_number: [''],
-                passport_number: [''],
-                phone: [''],
-                email: [''],
-                postal_address: [''],
-                residential_address: [''],
-                group_id: [''],
-                county: [''],
-                city: [''],
-                status_id: [''],
-                /*date_of_birth: ['', [Validators.required,
-                    Validators.minLength(2)]],
-                date_became_member: [moment(), Validators.required]*/
-            });
-        }
-
-        if (this.mode === 'edit') {
-            this.form = this.fb.group({
-                first_name: [this.landlord.first_name, [Validators.required,
-                    Validators.minLength(3)]],
-                middle_name: [this.landlord.middle_name],
-                last_name: [this.landlord.last_name],
-                nationality: [this.landlord.nationality],
-                id_number: [this.landlord.id_number],
-                passport_number: [this.landlord.passport_number],
-                phone: [this.landlord.phone],
-                email: [this.landlord.email],
-                group_id: [this.landlord.group_id],
-                postal_address: [this.landlord.postal_address],
-                residential_address: [this.landlord.residential_address],
-                date_of_birth: [this.landlord.date_of_birth],
-                date_became_member: [this.landlord.date_became_member],
-                county: [this.landlord.county],
-                city: [this.landlord.city],
-                status_id: [this.landlord.status_id],
-                membership_form: [{value: this.landlord.membership_form, disabled: true}],
-                document: [null, null],
+            this.landlordService.selectedLandlordChanges$.subscribe(landlord => {
+                if (landlord) {
+                    this.landlord = landlord;
+                    this.populateForm(landlord);
+                }
+                if (!landlord) {
+                    this.landlordService.getById(this.landlordID).subscribe(data => {
+                        this.landlord = data;
+                        this.landlordService.changeSelectedLandlord(data);
+                        this.populateForm(data);
+                    });
+                }
             });
         }
     }
 
-
-
-    /**
-     *
-     * @param event
-     */
-    detectFiles(event) {
-        this.urls = [];
-        const files = event.target.files;
-        if (files) {
-            for (const file of files) {
-                const reader = new FileReader();
-                reader.onload = (e: any) => {
-                    this.urls.push(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+    populateForm(landlord: LandlordModel) {
+        this.form.patchValue({
+            first_name: landlord?.first_name,
+            middle_name: landlord?.middle_name,
+            last_name: landlord?.last_name,
+            nationality: landlord?.nationality,
+            id_number: landlord?.id_number,
+            passport_number: landlord?.passport_number,
+            phone: landlord?.phone,
+            email: landlord?.email,
+            registration_date: landlord?.registration_date,
+            postal_address: landlord?.postal_address,
+            residential_address: landlord?.residential_address,
+            physical_address: landlord?.physical_address,
+            county: landlord?.county,
+            city: landlord?.city,
+            state: landlord?.state,
+            status_id: landlord?.status_id
+        });
     }
 
     /**
-     *
-     * @param file
-     */
-    handleFileInput(file: FileList) {
-        this.profilePicFileToUpload = file.item(0);
-
-        const reader = new FileReader();
-
-        reader.onload = (event: any) => {
-            this.profilePicUrl = event.target.result;
-        };
-
-        reader.readAsDataURL(this.profilePicFileToUpload);
-    }
-
-    /**
-     *
-     * @param file
-     */
-    onProfilePicSelect(file: FileList) {
-
-        if (file.length > 0) {
-            this.profilePicFileToUpload = file.item(0);
-
-            const reader = new FileReader();
-
-            reader.onload = (event: any) => {
-                this.profilePicUrl = event.target.result;
-            };
-            reader.readAsDataURL(this.profilePicFileToUpload);
-        }
-    }
-
-    /**
-     *
-     * @param file
-     */
-    onMembershipFormInputSelect(file: FileList) {
-
-        if (file.length > 0) {
-            this.membershipFormFileToUpload = file.item(0);
-
-            const reader = new FileReader();
-
-            reader.onload = (event: any) => {
-                this.membershipFormUrl = event.target.result;
-            };
-
-            reader.readAsDataURL(this.membershipFormFileToUpload);
-        }
-    }
-
-    /**
-     *
-     * @param event
-     */
-    onFileSelect(event) {
-        if (event.target.files.length > 0) {
-            const file = event.target.files[0];
-            this.form.get('passport_photo').setValue(file);
-        }
-    }
-
-    /**
-     *
-     * @param file
-     */
-    membershipFormUpload(file: FileList) {
-
-        if (file.length > 0) {
-            this.membershipFormToUpload = file.item(0);
-
-            const reader = new FileReader();
-
-            reader.onload = (event: any) => {
-                this.membershipFormUrl = event.target.result;
-            };
-            reader.readAsDataURL(this.membershipFormToUpload);
-        }
-    }
-
-    /**
-     * Create member
+     * Create landlord
      */
     create() {
         this.errorInForm.next(false);
@@ -225,12 +114,6 @@ export class AddLandlordComponent implements OnInit  {
         const body = Object.assign({}, this.landlord, this.form.value);
 
         const formData = new FormData();
-        if (this.profilePicFileToUpload != null) {
-            formData.append('passport_photo', this.profilePicFileToUpload);
-        }
-        if (this.membershipFormToUpload != null) {
-            formData.append('membership_form', this.membershipFormToUpload);
-        }
 
         for (const key in body) {
             if (body.hasOwnProperty(key)) {
@@ -239,34 +122,30 @@ export class AddLandlordComponent implements OnInit  {
         }
         this.loader = true;
 
-        this.landlordEntityService.add(body).subscribe((data) => {
-                this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Landlord created.');
-            },
-            (error) => {
-                this.errorInForm.next(true);
+        this.landlordService.create(formData)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.notification.showNotification('success', 'Success !! New Landlord created.');
+                    this.onSaveComplete();
+                },
+                (error) => {
+                    this.loader = false;
+                    if (error.landlord === 0) {
+                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
+                            ' Check your connection and retry.');
+                        return;
+                    }
+                    this.formErrors = error;
 
-                this.loader = false;
-                if (error.member === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-
-                if (this.formErrors) {
-
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
-                    for (const prop in this.formErrors) {
-                        if (this.form) {
-                            this.form.controls[prop]?.markAsTouched();
-                            this.form.controls[prop]?.setErrors({incorrect: true});
+                    if (this.formErrors) {
+                        for (const prop in this.formErrors) {
+                            if (this.form) {
+                                this.form.controls[prop]?.markAsTouched();
+                                this.form.controls[prop].setErrors({incorrect: true});
+                            }
                         }
                     }
-                }
-
-            });
+                });
     }
 
     /**
@@ -274,66 +153,69 @@ export class AddLandlordComponent implements OnInit  {
      */
     update() {
         const body = Object.assign({}, this.landlord, this.form.value);
-        delete body.membership_form;
-
         this.loader = true;
         this.errorInForm.next(false);
 
-        this.landlordEntityService.update(body).subscribe((data) => {
-                this.loader = false;
+        this.landlordService.update(body)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.notification.showNotification('success', 'Success !! Landlord has been updated.');
+                    this.onSaveComplete();
+                },
+                (error) => {
+                    this.loader = false;
+                    if (error.landlord === 0) {
+                        return;
+                    }
+                    this.formErrors = error;
 
-                this.dialogRef.close(this.form.value);
-
-                // notify success
-                this.notification.showNotification('success', 'Success !! Landlord has been updated.');
-
-            },
-            (error) => {
-                this.loader = false;
-                this.errorInForm.next(true);
-               // this.formError$.subscribe(subscriber => {subscriber.next(true)});
-
-                if (error.landlord === 0) {
-                    // notify error
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-              //  this.formErrors = error.error.error.errors;
-
-                if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
-                    for (const prop in this.formErrors) {
-                        if (this.form) {
-                            this.form.controls[prop]?.markAsTouched();
-                            this.form.controls[prop]?.setErrors({incorrect: true});
+                    if (this.formErrors) {
+                        for (const prop in this.formErrors) {
+                            if (this.form) {
+                                this.form.controls[prop]?.markAsTouched();
+                                this.form.controls[prop].setErrors({incorrect: true});
+                            }
                         }
                     }
-                }
-            });
+                });
     }
 
-    /**
-     * Create or Update Data
-     */
-    createOrUpdate() {
-        switch (this.mode) {
-            case 'edit' : {
-                this.update();
+    openConfirmationDialog(landlord: LandlordModel) {
+        this.deleteDialogRef = this.dialog.open(ConfirmationDialogComponent, {
+            disableClose: true
+        });
+        this.deleteDialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.delete(landlord);
             }
-                break;
-            case 'add' : {
-                this.create();
-            }
-                break;
-            default :
-                break;
-        }
-       // this.dialogRef.close(this.form.value);
+            this.deleteDialogRef = null;
+        });
+    }
+
+    private delete(landlord: LandlordModel) {
+        this.loader = true;
+        this.landlordService.delete(landlord)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.onSaveComplete();
+                    this.notification.showNotification('success', 'Success !! Landlord has been deleted.');
+                },
+                (error) => {
+                    this.loader = false;
+                    if (error.error['message']) {
+                        this.notification.showNotification('danger', error.error['message']);
+                    } else {
+                        this.notification.showNotification('danger', 'Delete Error !! ');
+                    }
+                });
+    }
+
+   createOrUpdate() {
+        this.isAdd ? this.create() : this.update();
     }
 
     close() {
-        this.dialogRef.close();
+      //  this.dialogRef.close();
     }
 
     /**
@@ -342,7 +224,7 @@ export class AddLandlordComponent implements OnInit  {
     public onSaveComplete(): void {
         this.loader = false;
         this.form.reset();
-        this.dialogRef.close(this.form.value);
+        this.router.navigate(['/landlords']);
     }
 
 }

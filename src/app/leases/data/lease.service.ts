@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { LeaseModel } from '../models/lease-model';
 import { BaseService } from '../../shared/base-service';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class LeaseService extends BaseService<LeaseModel> {
-    private selectedTenantSource = new BehaviorSubject<LeaseModel | null>(null);
-    selectedTenantChanges$ = this.selectedTenantSource.asObservable();
+    private selectedLeaseSource = new BehaviorSubject<LeaseModel | null>(null);
+    selectedLeaseChanges$ = this.selectedLeaseSource.asObservable();
 
     private  localHttpClient: HttpClient;
     constructor(httpClient: HttpClient) {
@@ -15,10 +15,19 @@ export class LeaseService extends BaseService<LeaseModel> {
         this.localHttpClient = httpClient;
     }
 
-    changeSelectedTenant(selectedTenant: LeaseModel | null ): void {
-        this.selectedTenantSource.next(selectedTenant);
+    changeSelectedLease(selectedLease: LeaseModel | null ): void {
+        this.selectedLeaseSource.next(selectedLease);
     }
 
+    /**
+     * Create a new resource
+     * @param item
+     */
+    public terminate(item: any): Observable<LeaseModel> {
+        const endPoint = 'terminate';
+        const url =  `${super.getResourceUrl()}/${endPoint}`;
+        return this.localHttpClient.post<any>(url, item);
+    }
 
     /**
      * Create a new resource

@@ -8,9 +8,10 @@
                     <div class="row">
                         <div class="col-5">
                             <mat-form-field class="search-form-field" color="primary">
-                                <mat-select placeholder="Branch" formControlName="branch_id" #branchSelect (selectionChange)="onBranchChange(branchSelect.value)">
-                                    <mat-option *ngFor="let branch of branches" [value]="branch.id">
-                                        {{branch.name}}
+                                <mat-select placeholder="Property" formControlName="property_id"
+                                            #propertySelect (selectionChange)="onPropertyChange(propertySelect.value)">
+                                    <mat-option *ngFor="let property of properties$ | async" [value]="property.id">
+                                        {{property.property_name}}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>

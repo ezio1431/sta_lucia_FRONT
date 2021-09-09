@@ -3,19 +3,21 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { fromEvent, merge, Observable } from 'rxjs';
-import { debounceTime, delay, distinctUntilChanged, filter, first, map, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialog-component';
 import { AddInvoiceComponent } from './add/add-invoice.component';
 import { InvoiceModel } from './models/invoice-model';
 import { InvoiceDataSource } from './data/invoice-data.source';
 import { NotificationService } from '../shared/notification.service';
-import { InvoiceEntityService } from './data/invoice-entity.service';
-import { UtilityEntityService } from '../settings/property/utility/data/utility-entity.service';
-import { AmenityEntityService } from '../settings/property/amenity/data/amenity-entity.service';
-import { UtilityModel } from '../settings/property/utility/model/utility-model';
-import { TypeEntityService } from '../settings/property/type/data/type-entity.service';
 import { InvoiceService } from './data/invoice.service';
-import { LandlordDataSource } from '../landlords/data/landlord-data.source';
+import { select, Store } from '@ngrx/store';
+import { AppState } from '../reducers';
+import { LandlordService } from '../landlords/data/landlord.service';
+import { selectorIsAgent, selectorIsLandlord, selectorUserID } from '../authentication/authentication.selectors';
+import { UserSettingService } from '../settings/user/data/user-setting.service';
+import { TenantService } from '../tenants/data/tenant.service';
+import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
+import { AuthenticationService } from '../authentication/authentication.service';
 
 @Component({
     selector: 'robi-utility-bills',
@@ -25,66 +27,59 @@ import { LandlordDataSource } from '../landlords/data/landlord-data.source';
 export class InvoiceComponent implements OnInit, AfterViewInit {
 
     displayedColumns = [
-        'property_id',
         'invoice_number',
-        'total_items',
-        'invoice_amount',
         'invoice_date',
+        'lease_id',
+        'period',
+        'invoice_amount',
+        'amount_paid',
+        'amount_due',
         'due_date',
+        'status',
         'actions'
     ];
-    displayedColumnsReduced = [
-        'rent_amount',
-        'start_date',
-        'actions'
-    ];
+
+    loader = false;
+
+    dialogRef: MatDialogRef<ConfirmationDialogComponent>;
+
+    dataSource: InvoiceDataSource;
+
+    // Search field
+    @ViewChild('search') search: ElementRef;
+
+    // pagination
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
     // Pagination
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
-    dataSource$: any;
-    // pagination
-    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
-
-    dialogRef: MatDialogRef<ConfirmationDialogComponent>;
-
-    // Search field
-    @ViewChild('search') search: ElementRef;
-
-    // Data for the list table display
-    selectedRowIndex = '';
-
-    loading$: Observable<boolean>;
-    meta$: Observable<any>;
-    landlords$: Observable<any>;
-    nextPage = 1;
-    loaded: boolean;
-
-   // utilities$: Observable<UtilityModel>;
-    utilities$: any;
-    isLoaded: boolean;
-    amenities$: Observable<any>;
-    properties$: Observable<any>;
-    propertyTypes$: Observable<any>;
-
-    imageToShow: any;
-
-    showMaster = false;
-    selectedProperty$: any;
-
-    selectedRow = -1;
-
-    dataSource: InvoiceDataSource;
-
-    constructor(private propertyService: InvoiceService,
-                private propertyEntityService: InvoiceEntityService,
+    isAgent$: Observable<any>;
+    isLandlord = false;
+    landlordID: string;
+    activeUser: any;
+    isAdmin$: Observable<boolean>;
+    constructor(private store: Store<AppState>,
+                private userService: UserSettingService,
+                private landlordService: LandlordService,
+                private tenantService: TenantService,
+                private invoiceService: InvoiceService,
                 private utilityBillService: InvoiceService,
-                private propertyTypeEntityService: TypeEntityService,
                 private notification: NotificationService,
-                private dialog: MatDialog, private utilityEntityService: UtilityEntityService,
-                private amenityEntityService: AmenityEntityService) {
+                private authenticationService: AuthenticationService,
+                private dialog: MatDialog) {
+        this.activeUser = this.userService.getActiveUser();
+        this.isAgent$ = this.store.pipe(select(selectorIsAgent));
+        this.isAdmin$ = this.authenticationService.isAdmin();
+        this.store.pipe(select(selectorIsLandlord)).subscribe(isLandlord => {
+            if (isLandlord) {
+                this.isLandlord = true;
+                this.store.pipe(select(selectorUserID)).subscribe(userID => this.landlordID = userID);
+            }
+        });
     }
 
     /**
@@ -93,373 +88,96 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
-        this.dataSource = new InvoiceDataSource(this.utilityBillService);
-        // Load pagination data
+        this.dataSource = new InvoiceDataSource(this.invoiceService);
         this.dataSource.meta$.subscribe((res) => this.meta = res);
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.dataSource.load('', 0, 0);
 
-       // this.getImageFromService('Quotefancy-1571909-3840x2160_1589749637.jpg');
-
-        // load properties
-        this.loadProperties();
-
-        this.dataSource$ = this.propertyEntityService.entities$;
-
-
-        this.loadPropertyTypes();
-
-        // fetch utilities
-        this.loadUtilities ();
-       /*this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-               this.utilities$ = this.utilityEntityService.entities$;
-           });*/
-
-        // fetch amenities
-        this.loadAmenities();
-       /* this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.amenities$ = this.amenityEntityService.entities$;
-        });*/
-
-    /*    this.amenities$ = this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-                filter(loaded => !!loaded),
-                first()
-            );*/
-
-
-
-        const loadedx = this.propertyEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                         this.propertyEntityService.getAll();
-                    }
-                }),
-                  filter(loaded => !!loaded),
-                  first()
-            );
-
-     /*   this.landlords$ = this.propertyEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    if (!loaded) {
-                        return this.propertyEntityService.getAll();
-                    }
-                })
-              //  filter(loaded => !!loaded),
-              //  first()
-            );*/
-
-     if (loadedx) {
-         this.landlords$ = this.propertyEntityService.entities$
-             .pipe(
-                 map(landlords => {
-                     this.nextPage++;
-                     return landlords;
-                 })
-             );
-
-         this.meta$ = this.propertyEntityService.meta$;
-
-         // this.initialLoad();
-
-         // Loading indicator
-         this.loading$ = this.propertyEntityService.loading$.pipe(
-             delay(0)
-         );
-     }
-
-        // Load pagination data
-    //    this.dataSource.meta$.subscribe((res) => this.meta = res);
-
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-       // this.dataSource.load('', 0, 0, 'updated_at', 'desc');
-
-        // Master detail select data
-        this.propertyEntityService.selectedOption$.subscribe(property =>
-            this.selectedProperty$ = this.propertyEntityService.entities$
-                .pipe(
-                    map(entities => entities.find(entity => entity.id === property.id))
-                )
-        );
-    }
-
-    highlight(row) {
-        console.log('highlight', row);
-        this.selectedRow = row.id;
-    }
-
-    toggleShowMaster() {
-        this.showMaster = !this.showMaster;
-    }
-
-    /**
-     * When a property is selected for view
-     * @param property
-     */
-    onSelected(property: InvoiceModel): void {
-        console.log('onSelected', property);
-        this.showMaster = true;
-        this.selectedRowIndex = property.id;
-        this.propertyEntityService.changeSelectedProperty(property);
-    }
-
-    initialLoad() {
-        this.landlords$ = this.propertyEntityService.entities$
-            .pipe(
-                map(landlords => {
-                   // this.nextPage++;
-                    return landlords;
-                })
-            );
-    }
-
-    /**
-     * Load Property entities either from store or API
-     */
-    loadProperties() {
-        this.propertyEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.propertyEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.properties$ = this.propertyEntityService.entities$;
-        });
-    }
-
-    /**
-     * Search
-     */
-    filter(currentPage) {
-        const page = currentPage + 1;
-
-        console.log('currentPage', currentPage);
-
-        this.propertyEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': page.toString(),
-            'limit': '',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-    }
-
-    /**
-     * Load data from Api
-     */
-    loadData() {
-        this.propertyEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': this.nextPage.toString(),
-            'limit': '3',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-
-        this.nextPage++;
-    }
-
-    /**
-     * Load property Types
-     */
-    loadPropertyTypes() {
-        this.propertyTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.propertyTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.propertyTypes$ = this.propertyTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Amenity entities either from store or API
-     */
-    loadAmenities() {
-        this.amenityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.amenityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.amenities$ = this.amenityEntityService.entities$;
-        });
-    }
-
-    /**
-     * Load Utility entities either from API or store
-     */
-    loadUtilities () {
-        this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.utilityEntityService.entities$;
-        });
-    }
-
-    getImageFromService(imageName: string) {
-        console.log('called');
-
-  /*      const clicks = fromEvent(document, 'click');
-    * const result = clicks.pipe(first());
-    * result.subscribe(x => console.log(x));*/
-
-        /*const imageUrl = this.propertyService.getImage(imageName)
-            .pipe(first());
-
-        imageUrl.subscribe(url => {
-            return url;
-        });*/
-
-            this.propertyService.getImagePath(imageName).subscribe(data => {
-               // console.log('my image data');
-               /// console.log(data);
-               // return data;
-                this.createImageFromBlob(data);
-            }, error => {
-                console.log(error);
-            });
-    }
-
-    createImageFromBlob(image: Blob) {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-            this.imageToShow = reader.result;
-            console.log('reader.result');
-            console.log(reader.result);
-          //  return reader.result;
-        }, false);
-
-        if (image) {
-            reader.readAsDataURL(image);
+        // load invoices
+        switch (this.activeUser?.userType) {
+            case USER_SCOPES.ADMIN: {
+                this.dataSource.load('', 0, 0, 'updated_at', 'desc');
+                break;
+            }
+            case USER_SCOPES.LANDLORD: {
+                this.dataSource.loadNested(
+                    this.landlordService.nestedInvoicesUrl(this.activeUser?.userID),
+                    '', 0, 0);
+                break;
+            }
+            case USER_SCOPES.TENANT: {
+                this.dataSource.loadNested(
+                    this.tenantService.nestedInvoicesUrl(this.activeUser?.userID),
+                    '', 0, 0);
+                break;
+            }
         }
     }
-
-    load(currentPage) {
-        const page = currentPage + 1;
-
-        this.propertyEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': page.toString(),
-            'limit': '',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-    }
-
-
-
-    /**
-     * Show or hide the load more button bar
-     * @param presentPage
-     * @param lastPage
-     */
-   showLoadMoreButton(presentPage, lastPage) {
-       return (presentPage + 1) <= lastPage;
-   }
-
-    /**
-     * Handle search and pagination
-     */
-/*    ngAfterViewInit() {
-
-        fromEvent(this.search.nativeElement, 'keyup')
-            .pipe(
-                debounceTime(1000),
-                distinctUntilChanged(),
-                tap(() => {
-                   // this.nextPage = 0;
-                    this.filter(0);
-                   // this.load(0);
-                })
-            ).subscribe();
-
-        /!* this.paginator.page.pipe(
-             tap(() => this.loadData() )
-         ).subscribe();*!/
-
-        // reset the paginator after sorting
-        //  this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
-        /!*  merge(this.sort.sortChange, this.paginator.page)
-              .pipe(
-                  tap(() => this.loadData())
-              )
-              .subscribe();*!/
-    }*/
-
 
     /**
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
-        console.log('ngAfterViewInit');
-        console.log(this.paginator);
-
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
                 distinctUntilChanged(),
                 tap(() => {
                     this.paginator.pageIndex = 0;
-                   // this.loadData();
-                   // this.filter();
+                    this.loadData();
                 })
             ).subscribe();
 
-     /*   this.paginator.page.pipe(
-            tap(() => this.filter(this.paginator.page) )
-        ).subscribe();*/
+        this.paginator.page.pipe(
+            tap(() => this.loadData() )
+        ).subscribe();
 
         // reset the paginator after sorting
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-        /*merge(this.sort.sortChange, this.paginator.page)
+        merge(this.sort.sortChange, this.paginator.page)
             .pipe(
                 tap(() => this.loadData())
             )
-            .subscribe();*/
+            .subscribe();
+    }
+
+    /**
+     * Fetch data from data lead
+     */
+    loadData() {
+        switch (this.activeUser?.userType) {
+            case USER_SCOPES.ADMIN: {
+                this.dataSource.load(
+                    this.search.nativeElement.value,
+                    (this.paginator.pageIndex + 1),
+                    (this.paginator.pageSize),
+                    this.sort.active,
+                    this.sort.direction
+                );
+                break;
+            }
+            case USER_SCOPES.LANDLORD: {
+                this.dataSource.loadNested(
+                    this.landlordService.nestedInvoicesUrl(this.activeUser?.userID),
+                    this.search.nativeElement.value,
+                    (this.paginator.pageIndex + 1),
+                    (this.paginator.pageSize),
+                    this.sort.active,
+                    this.sort.direction
+                );
+                break;
+            }
+            case USER_SCOPES.TENANT: {
+                this.dataSource.loadNested(
+                    this.tenantService.nestedInvoicesUrl(this.activeUser?.userID),
+                    this.search.nativeElement.value,
+                    (this.paginator.pageIndex + 1),
+                    (this.paginator.pageSize),
+                    this.sort.active,
+                    this.sort.direction
+                );
+                break;
+            }
+        }
     }
 
     /**
@@ -467,10 +185,7 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
      */
     clearSearch() {
         this.search.nativeElement.value = '';
-        // this.loadData()
-        // this.initialLoad();
-        this.filter(0);
-      //  this.load(0);
+        this.loadData()
     }
 
     /**
@@ -495,39 +210,9 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
         );
     }
 
-    /**
-     * Fetch data from data lead
-     */
-   /* loadData() {
-        this.dataSource.load(
-            this.search.nativeElement.value,
-            (this.paginator.pageIndex + 1),
-            (this.paginator.pageSize),
-            this.sort.active,
-            this.sort.direction
-        );
-    }*/
-
-
-    /**
-     *
-     * @param blob
-     */
-    showFile(blob) {
-        const newBlob = new Blob([blob], {type: 'application/pdf'});
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(newBlob);
-            return;
-        }
-        const data = window.URL.createObjectURL(newBlob);
-        const link = document.createElement('a');
-        link.href = data;
-        link.download = 'statement.pdf';
-        link.click();
-        setTimeout(function() {
-            window.URL.revokeObjectURL(data);
-        }, 100);
+    onSelected(invoice: InvoiceModel): void {
+       // this.selectedRowIndex = invoice.id;
+        this.invoiceService.changeSelectedInvoice(invoice);
     }
 
     /**
@@ -554,7 +239,6 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
      */
    delete(landlord: InvoiceModel) {
        // this.loader = true;
-        this.propertyEntityService.delete(landlord);
      /*   this.service.delete(lead)
             .subscribe((data) => {
                     this.loader = false;
@@ -570,5 +254,46 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }
                 });*/
+    }
+
+    /**
+     *
+     * @param row
+     */
+    downloadStatement(row: any) {
+        console.log('download invoice');
+        this.loader = true;
+        this.invoiceService.downloadInvoice({id: row.id, pdf: true})
+            .subscribe((res) => {
+                    this.loader = false;
+                    this.showFile(res);
+                },
+                () => {
+                    this.loader = false;
+                    this.notification.showNotification('danger', 'Error Downloading File!');
+                }
+            );
+    }
+
+    /**
+     * Display displayed file
+     * @param blob
+     */
+    showFile(blob) {
+        const newBlob = new Blob([blob], {type: 'application/pdf'});
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(newBlob);
+            return;
+        }
+
+        const data = window.URL.createObjectURL(newBlob);
+        const link = document.createElement('a');
+        link.href = data;
+        link.download = 'invoice.pdf';
+        link.click();
+        setTimeout(function() {
+            window.URL.revokeObjectURL(data);
+        }, 100);
     }
 }

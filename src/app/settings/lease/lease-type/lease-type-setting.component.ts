@@ -7,12 +7,13 @@ import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
-import { LeaseTypeEntityService } from './data/lease-type-entity.service';
 import { LeaseTypeModel } from './model/lease-type-model';
 import { AddLeaseTypeComponent } from './add/add-lease-type.component';
+import { LeaseTypeDataSource } from './data/lease-type-data.source';
+import { LeaseTypeService } from './data/lease-type.service';
 
 @Component({
-    selector: 'robi-leaseType-setting',
+    selector: 'robi-lease-type-setting',
     templateUrl: './lease-type-setting.component.html',
     styleUrls: ['./lease-type-setting.component.scss']
 })
@@ -28,24 +29,23 @@ export class LeaseTypeSettingComponent implements OnInit, AfterViewInit {
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
+    dataSource: LeaseTypeDataSource;
+
     // Search field
-    @ViewChild('search', {static: true}) search: ElementRef;
+    @ViewChild('search') search: ElementRef;
+
     // pagination
-    @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
     // Pagination
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
-
+    meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-    utilities$: any;
-    isLoaded: boolean;
-    dataSource$: any;
-    meta: any;
-    metax: any;
-
-    constructor(private leaseTypeEntityService: LeaseTypeEntityService, private notification: NotificationService,
+    constructor(private leaseTypeService: LeaseTypeService,
+                private notification: NotificationService,
                 private dialog: MatDialog) {
     }
 
@@ -55,47 +55,17 @@ export class LeaseTypeSettingComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
-        // load Utilities
-        this.loadUtilities();
-
-        this.dataSource$ = this.leaseTypeEntityService.entities$;
-
-        /*this.leaseTypeEntityService.selectors$.collection$.subscribe(xxx => {
-            this.meta = xxx;
-        });
-        this.metax = this.meta.meta;*/
-
-    }
-
-    /**
-     * Load Property entities either from store or API
-     */
-    loadUtilities() {
-        this.leaseTypeEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.leaseTypeEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.leaseTypeEntityService.entities$;
-        });
-    }
-
-    /**
-     * Fetch data from data source
-     */
-    loadData() {
+        this.dataSource = new LeaseTypeDataSource(this.leaseTypeService);
+        // Load pagination data
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
+        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
+        this.dataSource.load('', 0, 0, 'lease_type_name', 'desc');
     }
 
     /**
      * Handle search and pagination
      */
     ngAfterViewInit() {
-
         fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
@@ -121,49 +91,16 @@ export class LeaseTypeSettingComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Add dialog launch
+     * Fetch data from data lead
      */
-    addDialog(mode: string, leaseType?: LeaseTypeModel) {
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-
-        dialogConfig.data = {leaseType,
-            mode: mode
-        };
-
-        const dialogRef = this.dialog.open(AddLeaseTypeComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    // this.loadData();
-                }
-            }
+    loadData() {
+        this.dataSource.load(
+            this.search.nativeElement.value,
+            (this.paginator.pageIndex + 1),
+            (this.paginator.pageSize),
+            this.sort.active,
+            this.sort.direction
         );
-    }
-
-    /**
-     * Open Edit form
-     * @param role
-     */
-    openConfirmationDialog(role: LeaseTypeModel) {
-
-        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(role);
-            }
-            this.dialogRef = null;
-        });
-    }
-
-    /**
-     * Remove resource from db
-     * @param role
-     */
-    delete(role: LeaseTypeModel) {
     }
 
     /**
@@ -172,5 +109,65 @@ export class LeaseTypeSettingComponent implements OnInit, AfterViewInit {
     clearSearch() {
         this.search.nativeElement.value = '';
         this.loadData()
+    }
+
+    /**
+     * @param isAdd
+     * @param leaseType
+     */
+    addDialog(isAdd = true, leaseType?: LeaseTypeModel) {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {leaseType, isAdd};
+
+        const dialogRef = this.dialog.open(AddLeaseTypeComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe(
+            (val) => {
+                if ((val)) {
+                    this.loadData();
+                }
+            }
+        );
+    }
+
+    /**
+     * Open Edit form
+     * @param leaseType
+     */
+    openConfirmationDialog(leaseType: LeaseTypeModel) {
+        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+            disableClose: true
+        });
+        this.dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.delete(leaseType);
+            }
+            this.dialogRef = null;
+        });
+    }
+
+    /**
+     * Remove resource from db
+     * @param leaseType
+     */
+    delete(leaseType: LeaseTypeModel) {
+        this.loader = true;
+        this.leaseTypeService.delete(leaseType)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.loadData();
+                    this.notification.showNotification('success', 'Success !! LeaseType has been deleted.');
+                },
+                (error) => {
+                    this.loader = false;
+                    if (!error.error['error']) {
+                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
+                            ' Check Connection and retry. ');
+                    } else {
+                        this.notification.showNotification('danger', 'Delete Error !! ');
+                    }
+                });
     }
 }

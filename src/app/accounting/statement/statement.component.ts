@@ -138,8 +138,10 @@ export class StatementComponent implements OnInit  {
             .subscribe((res) => {
                     this.loader = false;
                     // console.log(res);
-                    this.dataSource = res.data.statement;
-                    this.account = res.data;
+                   // this.dataSource = res.data.statement;
+                    this.dataSource = res.statement;
+                   // this.account = res.data;
+                    this.account = res;
                 },
                 () => {
                     this.loader = false;
@@ -171,8 +173,10 @@ export class StatementComponent implements OnInit  {
             .subscribe((res) => {
                 console.log(res);
                     this.loader = false;
-                    this.dataSource = res.data.statement;
-                    this.account = res.data;
+                  //  this.dataSource = res.data.statement;
+                    this.dataSource = res.statement;
+                  //  this.account = res.data;
+                    this.account = res;
                 },
                 () => {
                     this.loader = false;
@@ -202,8 +206,10 @@ export class StatementComponent implements OnInit  {
         this.accountingService.getGeneralAccountStatement({id: id, pdf: pdf})
             .subscribe((res) => {
                     this.loader = false;
-                    this.dataSource = res.data.statement;
-                    this.account = res.data;
+                  //  this.dataSource = res.data.statement;
+                    this.dataSource = res.statement;
+                   // this.account = res.data;
+                    this.account = res;
                 },
                 () => {
                     this.loader = false;

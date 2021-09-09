@@ -8,13 +8,9 @@
         <span> Account Statement </span>
     </div>
     <div class="row col-12">
-        <div class="col-6">
+        <div class="col-12">
             <div class="row">A/C Name: {{account?.account_display_name}}</div>
             <div class="row">A/C Number: {{account?.account_number}}</div>
-        </div>
-        <div class="col-6">
-            <div class="row"> A/C Type: {{account?.accountType?.name}} </div>
-            <div class="row"> A/C Class: {{account?.accountType?.accountClass?.name}} </div>
         </div>
     </div>
 </div>
@@ -69,10 +65,11 @@
     <button mat-button class="mat-raised-button button-separate" [mat-dialog-close]="true">Close</button>
     <ng-container *ngIf="!loader" align="right">
 
-        <button *ngIf="dataSource.length > 0" mat-raised-button matTooltip="Download Account Statement." [matTooltipPosition]="'above'" (click)="downloadPdf()">
+      <!--  <button *ngIf="dataSource.length > 0" mat-raised-button matTooltip="Download Account Statement."
+                [matTooltipPosition]="'above'" (click)="downloadPdf()">
             <mat-icon>picture_as_pdf</mat-icon>
              Download
-        </button>
+        </button>-->
 
     </ng-container>
 </mat-dialog-actions>

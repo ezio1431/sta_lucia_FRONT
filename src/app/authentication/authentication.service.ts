@@ -5,13 +5,19 @@ import { Router } from '@angular/router';
 // import * as jwt_decode from 'jwt-decode';
 import { BaseService } from '../shared/base-service';
 import { User } from './model/user.model';
+import { select, Store } from '@ngrx/store';
+import { AppState } from '../reducers';
+import { selectorIsAgent, selectorIsLandlord, selectorIsTenant } from './authentication.selectors';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class AuthenticationService extends BaseService<User>{
+export class AuthenticationService extends BaseService<User> {
 
     storageKey = 'xbe3295963d1091720c8513f78f83c216332190ff714a5239c8b49190443be288';
 
-    constructor(private http: HttpClient, private router: Router) {
+    constructor(private http: HttpClient,
+                private router: Router,
+                private store: Store<AppState>) {
         super( http, '');
     }
 
@@ -34,8 +40,20 @@ export class AuthenticationService extends BaseService<User>{
      *  Logout API level
      */
     logout() {
-        return this.http.get<any>(`${super.getApiUrl()}/logout`)
+        return this.http.post<any>(`${super.getApiUrl()}/logout`, {})
             .pipe(map((data) => {
             }));
+    }
+
+    isAdmin(): Observable<boolean> {
+     return  this.store.pipe(select(selectorIsAgent));
+    }
+
+    isTenant() {
+        return  this.store.pipe(select(selectorIsTenant));
+    }
+
+    isLandlord() {
+        this.store.pipe(select(selectorIsLandlord)).subscribe(isLandlord => !!isLandlord);
     }
 }

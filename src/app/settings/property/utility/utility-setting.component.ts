@@ -7,12 +7,10 @@ import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
-import { UtilityEntityService } from './data/utility-entity.service';
 import { UtilityModel } from './model/utility-model';
 import { AddUtilityComponent } from './add/add-utility.component';
 import { UtilityDataSource } from './data/utility-data.source';
-import { select, Store } from '@ngrx/store';
-import { selectorUtilityPage, utilitySelectors } from './data/ulitity-selectors';
+import { UtilityService } from './data/utility.service';
 
 export interface PageQuery {
     pageIndex: number,
@@ -36,31 +34,23 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
+    dataSource: UtilityDataSource;
+
     // Search field
-    @ViewChild('search', {static: true}) search: ElementRef;
+    @ViewChild('search') search: ElementRef;
+
     // pagination
-    @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
     // Pagination
     length: number;
     pageIndex = 0;
-    pageSizeOptions: number[] = [3, 5, 10, 25, 50, 100];
-
+    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+    meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-    utilities$: any;
-    isLoaded: boolean;
-    dataSource$: any;
-    utilitiesDataSource: UtilityDataSource;
-    loading$: any;
-
-    meta: any;
-    metax: any;
-
-
-    paginator$: any;
-
-    constructor(private utilityEntityService: UtilityEntityService, private notification: NotificationService,
-                private dialog: MatDialog, private store: Store) {
+    constructor(private utilityService: UtilityService, private notification: NotificationService,
+                private dialog: MatDialog) {
     }
 
     /**
@@ -69,101 +59,18 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
-        this.utilitiesDataSource = new UtilityDataSource(this.store, null, this.utilityEntityService);
-
-        const initialPage: PageQuery = {
-          pageIndex: 0,
-          pageSize: 3
-        };
-
-        this.utilitiesDataSource.loadUtilities(initialPage);
-
-      /*  console.log('utilitySelectors');
-        console.log(utilitySelectors);
-      //  console.log(selectorUtilityPage);
-        console.log();
-        this.store.pipe(select(selectorUtilityPage(initialPage))).subscribe(xxx => console.log(xxx));*/
-
-        // load Utilities
-      //  this.loadUtilities();
-      //  this.loadData();
-
-      //  this.dataSource$ = this.utilityEntityService.entities$;
-        this.loading$ = this.utilityEntityService.loading$;
-        this.paginator$ = this.utilityEntityService.selectors$.collection$;
-
-       /* this.utilityEntityService.selectors$.collection$.subscribe(xxx => {
-
-
-            console.log('mettaaxxx', xxx['meta']);
-            this.meta = xxx;
-        });
-        this.metax = this.meta.meta;*/
-
-    }
-
-    /**
-     * Load Property entities either from store or API
-     */
-    loadUtilities() {
-        this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                        this.utilityEntityService.getAll();
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.utilityEntityService.entities$;
-        });
-    }
-
-    /**
-     * Fetch data from data source
-     */
-    loadData() {
-        this.utilityEntityService.loaded$
-            .pipe(
-                tap(loaded => {
-                    this.isLoaded = loaded;
-                    if (!loaded) {
-                       // this.utilityEntityService.getWithQuery();
-
-
-                        this.utilityEntityService.getWithQuery({
-                            'filter': '',
-                            'page': (this.paginator.pageIndex + 1).toString(),
-                            'limit': (this.paginator.pageSize).toString(),
-                            'sortField': '',
-                            'sortDirection': ''
-                        });
-
-
-
-                    }
-                }),
-            ).subscribe(data => {
-            this.utilities$ = this.utilityEntityService.entities$;
-        });
-    }
-
-    xxxload() {
-        console.log('load data', (this.paginator.pageIndex + 1).toString());
-        const newPage: PageQuery = {
-            pageIndex: this.paginator.pageIndex,
-            pageSize: this.paginator.pageSize
-        };
-        this.utilitiesDataSource.loadUtilities(newPage);
+        this.dataSource = new UtilityDataSource(this.utilityService);
+        // Load pagination data
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
+        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
+        this.dataSource.load('', 0, 0, 'utility_name', 'desc');
     }
 
     /**
      * Handle search and pagination
      */
     ngAfterViewInit() {
-        console.log('gikure ... ngAfterViewInit');
-        /*fromEvent(this.search.nativeElement, 'keyup')
+        fromEvent(this.search.nativeElement, 'keyup')
             .pipe(
                 debounceTime(1000),
                 distinctUntilChanged(),
@@ -171,10 +78,10 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
                     this.paginator.pageIndex = 0;
                     this.loadData();
                 })
-            ).subscribe();*/
+            ).subscribe();
 
         this.paginator.page.pipe(
-            tap(() => this.xxxload() )
+            tap(() => this.loadData() )
         ).subscribe();
 
         // reset the paginator after sorting
@@ -182,28 +89,48 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
 
         merge(this.sort.sortChange, this.paginator.page)
             .pipe(
-                tap(() => this.xxxload())
+                tap(() => this.loadData())
             )
             .subscribe();
     }
 
     /**
-     * Add dialog launch
+     * Fetch data from data lead
      */
-    addDialog(mode: string, utility?: UtilityModel) {
+    loadData() {
+        this.dataSource.load(
+            this.search.nativeElement.value,
+            (this.paginator.pageIndex + 1),
+            (this.paginator.pageSize),
+            this.sort.active,
+            this.sort.direction
+        );
+    }
+
+    /**
+     * Empty search box
+     */
+    clearSearch() {
+        this.search.nativeElement.value = '';
+        this.loadData()
+    }
+
+    /**
+     * @param isAdd
+     * @param utility
+     */
+    addDialog(isAdd = true, utility?: UtilityModel) {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
 
-        dialogConfig.data = {utility,
-            mode: mode
-        };
+        dialogConfig.data = {utility, isAdd};
 
         const dialogRef = this.dialog.open(AddUtilityComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(
             (val) => {
                 if ((val)) {
-                     this.xxxload();
+                     this.loadData();
                 }
             }
         );
@@ -231,13 +158,21 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
      * @param utility
      */
     delete(utility: UtilityModel) {
-    }
-
-    /**
-     * Empty search box
-     */
-    clearSearch() {
-        this.search.nativeElement.value = '';
-        this.loadData()
+        this.loader = true;
+        this.utilityService.delete(utility)
+            .subscribe((data) => {
+                    this.loader = false;
+                    this.loadData();
+                    this.notification.showNotification('success', 'Success !! Utility has been deleted.');
+                },
+                (error) => {
+                    this.loader = false;
+                    if (!error.error['error']) {
+                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
+                            ' Check Connection and retry. ');
+                    } else {
+                        this.notification.showNotification('danger', 'Delete Error !! ');
+                    }
+                });
     }
 }

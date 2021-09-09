@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
         MatIconModule
     ],
     declarations: [
-        ConfirmationDialogComponent
+       // ConfirmationDialogComponent
     ],
     entryComponents: [ConfirmationDialogComponent],
     exports: [

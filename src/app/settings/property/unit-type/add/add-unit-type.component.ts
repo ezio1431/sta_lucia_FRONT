@@ -3,8 +3,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
-import { UnitTypeEntityService } from '../data/unit-type-entity.service';
 import { UnitTypeModel } from '../model/unit-type-model';
+import { AmenityService } from '../../amenity/data/amenity.service';
+import { UnitTypeService } from '../data/unit-type.service';
 
 @Component({
     selector: 'robi-add-unit-type',
@@ -24,21 +25,21 @@ export class AddUnitTypeComponent implements OnInit  {
 
     formGroup: FormGroup;
 
-    mode: 'add' | 'edit';
+    isAdd: boolean;
     unitType: UnitTypeModel;
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
-                private unitTypeEntityService: UnitTypeEntityService,
+                private unitTypeService: UnitTypeService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddUnitTypeComponent>) {
-        this.mode = row.mode;
+        this.isAdd = row.isAdd;
         this.unitType = row.unitType;
     }
 
     ngOnInit() {
 
-        if (this.mode === 'add') {
+        if (this.isAdd) {
             this.form = this.fb.group({
                 unit_type_name: ['', [Validators.required,
                     Validators.minLength(2)]],
@@ -47,12 +48,12 @@ export class AddUnitTypeComponent implements OnInit  {
             });
         }
 
-        if (this.mode === 'edit') {
+        if (!this.isAdd) {
             this.form = this.fb.group({
-                unit_type_name: [this.unitType.unit_type_name, [Validators.required,
+                unit_type_name: [this.unitType?.unit_type_name, [Validators.required,
                     Validators.minLength(3)]],
-                unit_type_display_name: [this.unitType.unit_type_display_name],
-                unit_type_description: [this.unitType.unit_type_description]
+                unit_type_display_name: [this.unitType?.unit_type_display_name],
+                unit_type_description: [this.unitType?.unit_type_description]
             });
         }
     }
@@ -67,9 +68,9 @@ export class AddUnitTypeComponent implements OnInit  {
 
         this.loader = true;
 
-        this.unitTypeEntityService.add(body).subscribe((data) => {
+        this.unitTypeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Unit Type created.');
+                this.notification.showNotification('success', 'Success !! UnitType created.');
             },
             (error) => {
                 this.errorInForm.next(true);
@@ -107,27 +108,27 @@ export class AddUnitTypeComponent implements OnInit  {
         this.loader = true;
         this.errorInForm.next(false);
 
-        this.unitTypeEntityService.update(body).subscribe((data) => {
+        this.unitTypeService.update(body).subscribe((data) => {
                 this.loader = false;
 
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! Unit Type has been updated.');
+                this.notification.showNotification('success', 'Success !! UnitType has been updated.');
 
             },
             (error) => {
                 this.loader = false;
                 this.errorInForm.next(true);
-               // this.formError$.subscribe(subscriber => {subscriber.next(true)});
+                // this.formError$.subscribe(subscriber => {subscriber.next(true)});
 
-                if (error.unitType === 0) {
+                if (error.utility === 0) {
                     // notify error
                     return;
                 }
                 // An array of all form errors as returned by server
                 this.formErrors = error?.error;
-              //  this.formErrors = error.error.error.errors;
+                //  this.formErrors = error.error.error.errors;
 
                 if (this.formErrors) {
                     // loop through from fields, If has an error, mark as invalid so mat-error can show
@@ -145,18 +146,7 @@ export class AddUnitTypeComponent implements OnInit  {
      * Create or Update Data
      */
     createOrUpdate() {
-        switch (this.mode) {
-            case 'edit' : {
-                this.update();
-            }
-                break;
-            case 'add' : {
-                this.create();
-            }
-                break;
-            default :
-                break;
-        }
+        this.isAdd ? this.create() : this.update();
     }
 
     close() {

@@ -38,7 +38,17 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-12">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label> Unit Floor</mat-label>
+                <input  matInput type="number" formControlName="unit_floor" placeholder="Unit Floor">
+                <mat-error align="start" *ngIf="formErrors?.unit_floor" class="form__error">{{ formErrors.unit_floor }}</mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
             <mat-form-field class="full-width" color="primary" appearance="outline">
                 <mat-label>Rent Amount</mat-label>
                 <input matInput type="number" min="0" formControlName="rent_amount" placeholder="Rent Amount">
@@ -46,23 +56,17 @@
             </mat-form-field>
         </div>
 
-        <div class="col-sm-6">
-            <!--<mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Rent Period</mat-label>
-                <input matInput formControlName="rent_period" placeholder="Rent Period">
-                <mat-error align="start" *ngIf="formErrors?.rent_period" class="form__error">{{ formErrors.rent_period }}</mat-error>
-            </mat-form-field>-->
-
+      <!--  <div class="col-sm-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Rent Period</mat-label>
-                <mat-select placeholder="Rent Period" formControlName="rent_period">
-                    <mat-option *ngFor="let rentPeriod of rentPeriods" [value]="rentPeriod.key">
-                        {{rentPeriod.value}}
+                <mat-label>Billing Frequency *</mat-label>
+                <mat-select placeholder="Billing Frequency *" formControlName="billing_frequency">
+                    <mat-option *ngFor="let billingFrequency of billingFrequencies" [value]="billingFrequency.key">
+                        {{billingFrequency.value}}
                     </mat-option>
                 </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.rent_period" class="form__error">{{ formErrors.rent_period }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.billing_frequency" class="form__error">{{ formErrors.billing_frequency }}</mat-error>
             </mat-form-field>
-        </div>
+        </div>-->
     </div>
 
     <div class="row">
@@ -114,7 +118,7 @@
         </div>
     </div>
 
-    <div class="row">
+  <!--  <div class="row">
         <div class="col-sm-12" [@.disabled]="disableAnimation">
 
             <mat-accordion>
@@ -161,7 +165,7 @@
             </mat-accordion>
 
         </div>
-    </div>
+    </div>-->
 
 
 </mat-dialog-content>
@@ -177,7 +181,7 @@
 
 <mat-dialog-actions align="center">
     <button [disabled]="loader" mat-button class="mr-2" color="primary" [mat-dialog-close]="true" (click)="close()">Cancel</button>
-    <button class="mat-raised-button mat-primary" (click)="closeDialog(form.value)" [disabled]="!form.valid || loader">
+    <button mat-raised-button color="primary" (click)="closeDialog(form.value)" [disabled]="!form.valid || loader">
         Continue
         <mat-icon color="material-icons">arrow_right</mat-icon>
     </button>

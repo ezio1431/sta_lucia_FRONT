@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GeneralSettingModel } from './model/general-setting.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { GeneralSettingService } from './data/general-setting.service';
 import { NotificationService } from '../../shared/notification.service';
 import { Observable, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { SettingsState, State } from '../../core/settings/settings.model';
 import { select, Store } from '@ngrx/store';
 import { ROUTE_ANIMATIONS_ELEMENTS } from '../../core/animations/route.animations';
@@ -47,9 +46,6 @@ export class GeneralSettingComponent implements OnInit {
     amountDecimalSeparators: any;
     amountDecimals: any;
 
-
-
-
     routeAnimationsElements = ROUTE_ANIMATIONS_ELEMENTS;
     settings$: Observable<SettingsState>;
 
@@ -77,14 +73,13 @@ export class GeneralSettingComponent implements OnInit {
         { value: 'zh-cn', label: 'zh-cn' },
         { value: 'he', label: 'he' }
     ];
-
     constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
                 private generalSettingService: GeneralSettingService, private notification: NotificationService ) {
 
         this.form = this.fb.group({
-            business_name: ['', [Validators.required,
-                Validators.minLength(3)]],
-            business_type: ['', [Validators.required,
+            theme: [''],
+            language: [''],
+            company_name: ['', [Validators.required,
                 Validators.minLength(3)]],
             email: ['',
                 [Validators.required,
@@ -93,6 +88,7 @@ export class GeneralSettingComponent implements OnInit {
             phone: [''],
             physical_address: [''],
             postal_address: [''],
+            website_url: [''],
             postal_code: [''],
             date_format: [''],
             amount_thousand_separator: [''],
@@ -105,7 +101,8 @@ export class GeneralSettingComponent implements OnInit {
         this.settings$ = this.store.pipe(select(selectSettings));
 
         if (this.route.snapshot.data['setting']) {
-            this.setting = this.route.snapshot.data['setting'].data;
+            this.setting = this.route.snapshot.data['setting'];
+
             this.prePopulateForm(this.setting);
             this.settingId = this.setting.id;
             // Fetch photo
@@ -146,7 +143,6 @@ export class GeneralSettingComponent implements OnInit {
         );
     }
 
-
     /**
      *
      * @param setting
@@ -155,8 +151,9 @@ export class GeneralSettingComponent implements OnInit {
         this.setting = setting;
 
         this.form.patchValue({
-            business_name: this.setting.business_name,
-            business_type: this.setting.business_type,
+            theme: '',
+            language: '',
+            company_name: this.setting.company_name,
             email: this.setting.email,
             currency: this.setting.currency,
             phone: this.setting.phone,
@@ -166,6 +163,7 @@ export class GeneralSettingComponent implements OnInit {
             physical_address: this.setting.physical_address,
             postal_address: this.setting.postal_address,
             postal_code: this.setting.postal_code,
+            website_url: this.setting.website_url,
             logo: this.setting.logo,
             date_format: this.setting.date_format,
             amount_thousand_separator: this.setting.amount_thousand_separator,
@@ -292,11 +290,7 @@ export class GeneralSettingComponent implements OnInit {
         this.generalSettingService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    // notify success
-                    this.notification.showNotification('success', 'Success !! Admin Setting has been updated.');
-                    setTimeout(() => {
-                        this.notification.showNotification('success', 'Action !! Login to continue ...');
-                    }, 1000);
+                    this.notification.showNotification('success', 'Success !! Setting has been updated.');
                 },
                 (error) => {
                     this.loader = false;
@@ -317,5 +311,4 @@ export class GeneralSettingComponent implements OnInit {
                     }
                 });
     }
-
 }

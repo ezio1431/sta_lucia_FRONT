@@ -1,14 +1,13 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { fromEvent, merge } from 'rxjs';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { merge } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
 import { PropertyService } from '../../../properties/data/property.service';
 import { PropertyDataSource } from '../../../properties/data/property-data.source';
 import { LandlordService } from '../../data/landlord.service';
-
+import { PropertyModel } from '../../../properties/models/property-model';
 
 @Component({
     selector: 'robi-landlord-property',
@@ -17,8 +16,10 @@ import { LandlordService } from '../../data/landlord.service';
 })
 export class LandlordPropertyComponent implements OnInit, AfterViewInit {
     propertyColumns = [
-        'member_id',
-        'id_number'
+        'property_code',
+        'property_name',
+        'location',
+        'total_units',
     ];
 
     // Data for the list table display
@@ -39,7 +40,7 @@ export class LandlordPropertyComponent implements OnInit, AfterViewInit {
     loader = false;
 
     landlordData: any;
-    landlordId: string;
+    landlordID: string;
 
     constructor(private notification: NotificationService, private propertyService: PropertyService,
                 private landlordService: LandlordService) {}
@@ -47,31 +48,29 @@ export class LandlordPropertyComponent implements OnInit, AfterViewInit {
     ngOnInit() {
         this.landlordService.selectedLandlordChanges$.subscribe(data => {
             if (data) {
-                console.log('this.landlordService.selectedLandlordChanges$', data);
                 this.landlordData = data;
-                this.landlordId = data.id;
+                this.landlordID = data.id;
             }
         });
 
         this.propertyDataSource = new PropertyDataSource(this.propertyService);
-        // Load pagination data
         this.propertyDataSource.meta$.subscribe((res) => this.meta = res);
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.propertyDataSource.load('', 0, 0, 'created_at',
-            'desc', 'landlord_id', this.landlordId);
+        this.propertyDataSource.loadNested(
+            this.landlordService.nestedPropertiesUrl(this.landlordID),
+            '', 0, 0);
     }
 
     /**
      * Fetch data from data lead
      */
     loadData() {
-        this.propertyDataSource.load(
+        this.propertyDataSource.loadNested(
+            this.landlordService.nestedPropertiesUrl(this.landlordID),
             this.search.nativeElement.value,
             (this.paginator.pageIndex + 1),
             (this.paginator.pageSize),
             this.sort.active,
-            this.sort.direction,
-            'landlord_id', this.landlordId
+            this.sort.direction
         );
     }
 
@@ -99,5 +98,12 @@ export class LandlordPropertyComponent implements OnInit, AfterViewInit {
     clearSearch() {
         this.search.nativeElement.value = '';
         this.loadData()
+    }
+
+    /**
+     * @param property
+     */
+    onPropertySelected(property: PropertyModel): void {
+        this.propertyService.changeSelectedProperty(property);
     }
 }

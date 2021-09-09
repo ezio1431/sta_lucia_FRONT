@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 
-import { SharedModule } from '../../../shared/shared.module';
 import { PaymentMethodSettingRoutingModule } from './payment-method-setting-routing.module';
 import { PaymentMethodSettingComponent } from './payment-method-setting.component';
 import { AddPaymentMethodComponent } from './add/add-payment-method.component';
-
+import { SharedModule } from '../../../shared/shared.module';
 
 @NgModule({
     imports: [
@@ -20,6 +19,4 @@ import { AddPaymentMethodComponent } from './add/add-payment-method.component';
     ]
 })
 
-export class PaymentMethodSettingModule {
-
-}
+export class PaymentMethodSettingModule {}

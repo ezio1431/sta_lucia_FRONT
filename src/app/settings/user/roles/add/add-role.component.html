@@ -27,6 +27,6 @@
 </div>
 
 <mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mat-raised-button button-separate" [mat-dialog-close]="true" (click)="close()">Close</button>
-    <button class="mat-raised-button mat-primary" (click)="create()" [disabled]="!form.valid || loader">Save</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">Cancel</button>
+    <button mat-raised-button  color="primary" (click)="create()" [disabled]="!form.valid || loader">Save</button>
 </mat-dialog-actions>

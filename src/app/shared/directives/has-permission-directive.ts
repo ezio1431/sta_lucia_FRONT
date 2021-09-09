@@ -1,7 +1,7 @@
 import { Directive, ElementRef, Input, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
-import { selectorScopes } from '../../authentication/auth.selectors';
+import { selectorUserScopes } from '../../authentication/authentication.selectors';
 
 @Directive({
     selector: '[robiPermission]'
@@ -20,7 +20,7 @@ export class HasPermissionDirective implements OnInit {
 
     ngOnInit() {
 
-        this.store.pipe(select(selectorScopes)).subscribe(scopes => {
+        this.store.pipe(select(selectorUserScopes)).subscribe(scopes => {
             this.userScopes = scopes;
             this.updateView();
         });

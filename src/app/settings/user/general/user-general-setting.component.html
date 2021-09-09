@@ -1,4 +1,9 @@
 <div class="row">
+    <div class="fab-container">
+        <button mat-fab class="fab-toggler" (click)="addDialog()">
+            <mat-icon>add</mat-icon>
+        </button>
+    </div>
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
@@ -6,7 +11,8 @@
                 <div class="row search-form-section">
 
                     <div class="col-3">
-                        <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new" (click)="addDialog()">
+                        <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
+                                (click)="addDialog()">
                             <mat-icon>add</mat-icon> New User
                         </button>
 
@@ -24,11 +30,6 @@
                 <div class="table-responsive">
 
                     <mat-table #table [dataSource]="dataSource" matSort matSortActive="first_name" matSortDirection="asc" matSortDisableClear>
-
-                        <ng-container matColumnDef="branch_id">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header> Branch </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.branch?.name}} </mat-cell>
-                        </ng-container>
 
                         <ng-container matColumnDef="role_id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header> Role </mat-header-cell>
@@ -57,7 +58,7 @@
                                     <mat-icon>more_vert</mat-icon>
                                 </button>
                                 <mat-menu #menu="matMenu">
-                                    <button mat-menu-item (click)="editDialog(row)">
+                                    <button mat-menu-item (click)="addDialog(false, row)">
                                         <mat-icon color="accent">edit</mat-icon>
                                         <span>Edit</span>
                                     </button>

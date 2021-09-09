@@ -1,44 +1,36 @@
 import { BaseModel } from '../../shared/models/base-model';
 
 export class PropertyModel extends BaseModel {
-    company_id: string;
-    first_name: string;
-    middle_name: string;
-    last_name: string;
-    nationality: string;
-    id_number: string;
-    passport_number: string;
-    county: string;
+    agent_id: string;
+    property_code: string;
+    landlord_id: string;
+    landlord: any;
+    property_name: string;
+    property_photo: string;
+    property_status: string;
+    property_type_id: string;
+    location: string;
+    latitude: string;
+    longitude: string;
+    address_1: string;
+    address_2: string;
+    country: string;
+    state: string;
     city: string;
-    phone: string;
-    email: string;
-    postal_address: string;
-    residential_address: string;
-    status_id: string;
-    group_id: string;
+    zip: string;
 
-    date_of_birth: string;
-    date_of_birth_display: string;
-    date_became_member: string;
-    date_became_member_display: string;
+    total_vacant_units: string;
+    total_units: string;
+    unit_total: string;
+    property_type: any;
 
-    passport_photo: File | null;
-    national_id_image: File | null;
-    membership_form: string;
+    extra_charges: any;
+    units: any;
+    late_fees: any;
+    utility_costs: any;
+    payment_methods: any;
+    vacant_units: any;
 
-    created_by: string;
-    updated_by: string;
-
-    account: {
-        id: string;
-        branch_id: string;
-        account_number: string;
-        account_code: string;
-        account_name: string;
-        account_type_id: string;
-        account_status_id: string;
-        other_details: string;
-        closed_on: string;
-    };
-    assets: [];
+    agent_commission_value: string;
+    agent_commission_type: string;
 }

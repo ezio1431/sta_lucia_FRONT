@@ -3,8 +3,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
-import { UtilityEntityService } from '../data/utility-entity.service';
 import { UtilityModel } from '../model/utility-model';
+import { UtilityService } from '../data/utility.service';
 
 @Component({
     selector: 'robi-add-utility',
@@ -24,21 +24,21 @@ export class AddUtilityComponent implements OnInit  {
 
     formGroup: FormGroup;
 
-    mode: 'add' | 'edit';
+    isAdd: boolean;
     utility: UtilityModel;
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
-                private utilityEntityService: UtilityEntityService,
+                private utilityService: UtilityService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddUtilityComponent>) {
-        this.mode = row.mode;
+        this.isAdd = row.isAdd;
         this.utility = row.utility;
     }
 
     ngOnInit() {
 
-        if (this.mode === 'add') {
+        if (this.isAdd) {
             this.form = this.fb.group({
                 utility_name: ['', [Validators.required,
                     Validators.minLength(2)]],
@@ -47,7 +47,7 @@ export class AddUtilityComponent implements OnInit  {
             });
         }
 
-        if (this.mode === 'edit') {
+        if (!this.isAdd) {
             this.form = this.fb.group({
                 utility_name: [this.utility.utility_name, [Validators.required,
                     Validators.minLength(3)]],
@@ -67,7 +67,7 @@ export class AddUtilityComponent implements OnInit  {
 
         this.loader = true;
 
-        this.utilityEntityService.add(body).subscribe((data) => {
+        this.utilityService.create(body).subscribe((data) => {
                 this.onSaveComplete();
                 this.notification.showNotification('success', 'Success !! Utility created.');
             },
@@ -107,7 +107,7 @@ export class AddUtilityComponent implements OnInit  {
         this.loader = true;
         this.errorInForm.next(false);
 
-        this.utilityEntityService.update(body).subscribe((data) => {
+        this.utilityService.update(body).subscribe((data) => {
                 this.loader = false;
 
                 this.dialogRef.close(this.form.value);
@@ -145,18 +145,7 @@ export class AddUtilityComponent implements OnInit  {
      * Create or Update Data
      */
     createOrUpdate() {
-        switch (this.mode) {
-            case 'edit' : {
-                this.update();
-            }
-                break;
-            case 'add' : {
-                this.create();
-            }
-                break;
-            default :
-                break;
-        }
+        this.isAdd ? this.create() : this.update();
     }
 
     close() {

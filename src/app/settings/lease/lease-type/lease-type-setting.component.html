@@ -1,6 +1,6 @@
 <div class="row">
     <div class="fab-container">
-        <button mat-fab class="fab-toggler" (click)="addDialog('add')">
+        <button mat-fab class="fab-toggler" (click)="addDialog()">
             <mat-icon>add</mat-icon>
         </button>
     </div>
@@ -20,7 +20,7 @@
 
                 <div class="table-responsive">
 
-                    <mat-table #table [dataSource]="dataSource$ | async" matSort matSortActive="utility_display_name" matSortDirection="asc" matSortDisableClear>
+                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="lease_type_name" matSortDirection="asc" matSortDisableClear>
 
                         <ng-container matColumnDef="lease_type_name">
                             <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
@@ -41,7 +41,7 @@
                             <mat-header-cell *matHeaderCellDef> Actions  </mat-header-cell>
                             <mat-cell *matCellDef="let row" class="button-row">
                                 <button mat-icon-button matTooltip="Edit"
-                                        [matTooltipPosition]="'above'" (click)="addDialog('edit', row)">
+                                        [matTooltipPosition]="'above'" (click)="addDialog(false, row)">
                                     <mat-icon color="accent">edit</mat-icon>
                                     Edit
                                 </button>
@@ -64,7 +64,7 @@
                     </div>
 
                     <mat-paginator #paginator
-                                   [length]="metax?.total"
+                                   [length]="meta?.total"
                                    [pageIndex]="pageIndex"
                                    [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
                     </mat-paginator>

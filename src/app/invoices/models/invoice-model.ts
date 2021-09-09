@@ -6,6 +6,8 @@ export class InvoiceModel extends BaseModel {
     unit_id: string;
 
     utility_id: string;
+    period_id: string;
+    period: any;
 
     base_charge: string;
     previous_reading: string;
@@ -15,7 +17,22 @@ export class InvoiceModel extends BaseModel {
     units: string;
     total: string;
 
+    lease_id: string;
+    lease: any;
+    payment_summary: any;
+    waiver_summary: any;
 
+    summary: {
+        amount_due: string;
+        amount_paid: string;
+        count: number;
+        invoice_amount: string;
+        status: {
+            status_text: string;
+            status_icon: string;
+            status_color: string;
+        }
+    };
     invoice_number: string;
     invoice_total: string;
     invoice_discount: string;

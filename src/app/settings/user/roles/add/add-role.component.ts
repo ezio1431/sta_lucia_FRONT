@@ -6,7 +6,7 @@ import { RoleSettingService } from '../../data/role-setting.service';
 import { NotificationService } from '../../../../shared/notification.service';
 
 @Component({
-    selector: 'app-add-role',
+    selector: 'robi-add-role',
     styles: [],
     templateUrl: './add-role.component.html'
 })

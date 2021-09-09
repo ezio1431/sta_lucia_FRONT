@@ -6,22 +6,14 @@ import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation
 
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { RoleSettingDataSource } from '../data/role-setting-data.source';
 import { AddAmenityComponent } from './add/add-amenity.component';
-import { RoleSettingModel } from '../model/role-setting-model';
-import { EditAmenityComponent } from './edit/edit-amenity.component';
-import { CheckboxItem } from './edit/check-box-item';
-import { RoleSettingService } from '../data/role-setting.service';
 import { NotificationService } from '../../../shared/notification.service';
-import { PermissionSettingService } from '../data/permission-setting.service';
-import { select, Store } from '@ngrx/store';
-import { selectAllAmenities } from './store/amenities.selectors';
 import { AmenityDataSource } from './data/amenity-data.source';
-import { AmenityEntityService } from './data/amenity-entity.service';
-import { PageQuery } from '../utility/utility-setting.component';
+import { AmenityService } from './data/amenity.service';
+import { AmenityModel } from './model/amenity-model';
 
 @Component({
-    selector: 'robi-utility-setting',
+    selector: 'robi-amenity-setting',
     templateUrl: './amenity-setting.component.html',
     styleUrls: ['./amenity-setting.component.css']
 })
@@ -37,32 +29,24 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
+    dataSource: AmenityDataSource;
+
     // Search field
-    @ViewChild('search', {static: true}) search: ElementRef;
+    @ViewChild('search') search: ElementRef;
+
     // pagination
-    @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
     // Pagination
     length: number;
     pageIndex = 0;
-    pageSizeOptions: number[] = [3, 5, 10, 25, 50, 100];
+    pageSizeOptions: number[] = [5, 10, 25, 50, 100];
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-    // Data for the list table display
-    dataSource: RoleSettingDataSource;
-
-    allPermissions: any;
-    allPermissionsOptions = new Array<CheckboxItem>();
-
-    rolePermissions: any;
-
-    amenities$: any;
-
-    amenitiesDataSource: AmenityDataSource;
-
-    constructor(private roleService: RoleSettingService, private permissionService: PermissionSettingService,
-                private notification: NotificationService, private dialog: MatDialog,
-                private store: Store, private amenityEntityService: AmenityEntityService) {
+    constructor(private amenityService: AmenityService,
+                private notification: NotificationService,
+                private dialog: MatDialog) {
     }
 
     /**
@@ -71,99 +55,43 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
-        this.amenitiesDataSource = new AmenityDataSource(this.store, null, this.amenityEntityService);
+        this.dataSource = new AmenityDataSource(this.amenityService);
         // Load pagination data
-        this.amenitiesDataSource.meta$.subscribe((res) => this.meta = res);
-
-        const initialPage: PageQuery = {
-            pageIndex: 0,
-            pageSize: 3
-        };
-        this.amenitiesDataSource.loadAmenities(initialPage);
-
-        console.log('this.amenitiesDataSource');
-        console.log(this.amenitiesDataSource);
-
-        this.amenities$ = this.store.pipe(select(selectAllAmenities));
-
-      //  this.dataSource = new RoleSettingDataSource(this.roleService);
-
-        // Load pagination data
-    //    this.dataSource.meta$.subscribe((res) => this.meta = res);
-
+        this.dataSource.meta$.subscribe((res) => this.meta = res);
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-    //    this.dataSource.load('', 0, 0, 'updated_at', 'desc');
-
-        // Fetch all permissions
-     /*   this.permissionService.list(['name', 'display_name'])
-            .subscribe((res) => {
-                    this.allPermissions = res;
-                    this.allPermissionsOptions = this.allPermissions.map(
-                        x => new CheckboxItem(x.id, x.display_name));
-                },
-                () => this.allPermissions = []
-            );
-*/
-    }
-
-    xxxload() {
-        console.log('load data', (this.paginator.pageIndex + 1).toString());
-        const newPage: PageQuery = {
-            pageIndex: this.paginator.pageIndex,
-            pageSize: this.paginator.pageSize
-        };
-        this.amenitiesDataSource.loadAmenities(newPage);
+        this.dataSource.load('', 0, 0, 'amenity_name', 'desc');
     }
 
     /**
-     * Add dialog launch
+     * Handle search and pagination
      */
-    addDialog() {
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-
-        const dialogRef = this.dialog.open(AddAmenityComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
+    ngAfterViewInit() {
+        fromEvent(this.search.nativeElement, 'keyup')
+            .pipe(
+                debounceTime(1000),
+                distinctUntilChanged(),
+                tap(() => {
+                    this.paginator.pageIndex = 0;
                     this.loadData();
-                }
-            }
-        );
+                })
+            ).subscribe();
+
+        this.paginator.page.pipe(
+            tap(() => this.loadData() )
+        ).subscribe();
+
+        // reset the paginator after sorting
+        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+        merge(this.sort.sortChange, this.paginator.page)
+            .pipe(
+                tap(() => this.loadData())
+            )
+            .subscribe();
     }
 
     /**
-     * Edit dialog launch
-     */
-    editDialog(role: RoleSettingModel) {
-
-        const id = role.id;
-
-        const data = {
-            role,
-            permOptions: this.allPermissionsOptions
-        };
-
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.data = {role,
-            permOptions: this.allPermissionsOptions};
-
-        const dialogRef = this.dialog.open(EditAmenityComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    this.loadData();
-                }
-            }
-        );
-    }
-
-    /**
-     * Fetch data from data source
+     * Fetch data from data lead
      */
     loadData() {
         this.dataSource.load(
@@ -176,47 +104,45 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Handle search and pagination
+     * Empty search box
      */
-    ngAfterViewInit() {
+    clearSearch() {
+        this.search.nativeElement.value = '';
+        this.loadData()
+    }
 
-        console.log('gikure ... ngAfterViewInit');
-        /*fromEvent(this.search.nativeElement, 'keyup')
-            .pipe(
-                debounceTime(1000),
-                distinctUntilChanged(),
-                tap(() => {
-                    this.paginator.pageIndex = 0;
+    /**
+     * @param isAdd
+     * @param amenity
+     */
+    addDialog(isAdd = true, amenity?: AmenityModel) {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {amenity, isAdd};
+
+        const dialogRef = this.dialog.open(AddAmenityComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe(
+            (val) => {
+                if ((val)) {
                     this.loadData();
-                })
-            ).subscribe();*/
-
-        this.paginator.page.pipe(
-            tap(() => this.xxxload() )
-        ).subscribe();
-
-        // reset the paginator after sorting
-        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
-        merge(this.sort.sortChange, this.paginator.page)
-            .pipe(
-                tap(() => this.xxxload())
-            )
-            .subscribe();
+                }
+            }
+        );
     }
 
     /**
      * Open Edit form
-     * @param role
+     * @param amenity
      */
-    openConfirmationDialog(role: RoleSettingModel) {
-
+    openConfirmationDialog(amenity: AmenityModel) {
         this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true
         });
         this.dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.delete(role);
+                this.delete(amenity);
             }
             this.dialogRef = null;
         });
@@ -224,15 +150,15 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
 
     /**
      * Remove resource from db
-     * @param role
+     * @param amenity
      */
-    delete(role: RoleSettingModel) {
+    delete(amenity: AmenityModel) {
         this.loader = true;
-        this.roleService.delete(role)
+        this.amenityService.delete(amenity)
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Role has been deleted.');
+                    this.notification.showNotification('success', 'Success !! Amenity has been deleted.');
                 },
                 (error) => {
                     this.loader = false;
@@ -243,13 +169,5 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }
                 });
-    }
-
-    /**
-     * Empty search box
-     */
-    clearSearch() {
-        this.search.nativeElement.value = '';
-        this.loadData()
     }
 }

@@ -2,8 +2,7 @@ import { CanLoad, Route, Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../reducers';
-import { selectorScopes } from './auth.selectors';
-import { AuthActions } from './action-types';
+import { selectorUserScopes } from './authentication.selectors';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionGuardService implements CanLoad  {
@@ -18,7 +17,7 @@ export class PermissionGuardService implements CanLoad  {
         this.permissions = route.data.permissions;
 
         // Fetch all scopes from redux store
-        this.store.pipe(select(selectorScopes)).subscribe(scopes => {
+        this.store.pipe(select(selectorUserScopes)).subscribe(scopes => {
             this.userScopes = scopes;
         });
 

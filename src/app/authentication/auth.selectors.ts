@@ -41,11 +41,20 @@ export const settings = createSelector(
     }
 );
 
-export const branch = createSelector(
+export const generalSettings = createSelector(
     selectAuthState,
     auth => {
-        if (auth.user) {
-            return auth.user.branch_id;
+        if (auth) {
+            return auth?.g_settings;
+        }
+    }
+);
+
+export const loggedInUserNames = createSelector(
+    selectAuthState,
+    auth => {
+        if (auth) {
+            return auth?.first_name + ' ' + auth?.last_name;
         }
     }
 );
@@ -54,7 +63,7 @@ export const activeUser = createSelector(
     selectAuthState,
     auth => {
         if (auth.user) {
-            return auth.user.first_name +' '+ auth.user.last_name;
+            return auth.user.first_name + ' ' + auth.user.last_name;
         }
     }
 );

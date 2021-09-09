@@ -1,60 +1,61 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatStepper } from '@angular/material/stepper';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
-import { PaymentMethodEntityService } from '../data/payment-method-entity.service';
+import { BehaviorSubject } from 'rxjs';
 import { PaymentMethodModel } from '../model/payment-method-model';
+import { PaymentMethodService } from '../data/payment-method.service';
 
 @Component({
-    selector: 'robi-add-lease-ype',
+    selector: 'robi-add-payment-method',
     styles: [],
     templateUrl: './add-payment-method.component.html'
 })
+
 export class AddPaymentMethodComponent implements OnInit  {
 
     form: FormGroup;
 
     formErrors: any;
-    // formError$: Observable<boolean>;
-
     private errorInForm = new BehaviorSubject<boolean>(false);
     formError$ = this.errorInForm.asObservable();
 
-    loader = false;
-
-    formGroup: FormGroup;
-
-    mode: 'add' | 'edit';
     paymentMethod: PaymentMethodModel;
 
-    @ViewChild('stepper', {static: true }) stepper: MatStepper;
+    loader = false;
+
+    roles: any = [];
+    employees: any = [];
+    branches: any = [];
+    isAdd: boolean;
+
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
-                private paymentMethodEntityService: PaymentMethodEntityService,
+                private paymentMethodService: PaymentMethodService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddPaymentMethodComponent>) {
-        this.mode = row.mode;
+        this.roles = row.roles;
+        this.employees = row.employees;
+        this.branches = row.branches;
+        this.isAdd = row.isAdd;
         this.paymentMethod = row.paymentMethod;
     }
 
     ngOnInit() {
-
-        if (this.mode === 'add') {
+        if (this.isAdd) {
             this.form = this.fb.group({
                 payment_method_name: ['', [Validators.required,
-                    Validators.minLength(2)]],
+                    Validators.minLength(3)]],
                 payment_method_display_name: [''],
-                payment_method_description: ['']
+                payment_method_description: ['', [Validators.required,
+                    Validators.minLength(3)]],
             });
         }
-
-        if (this.mode === 'edit') {
+        if (!this.isAdd) {
             this.form = this.fb.group({
                 payment_method_name: [this.paymentMethod?.payment_method_name, [Validators.required,
-                    Validators.minLength(3)]],
+                    Validators.minLength(2)]],
                 payment_method_display_name: [this.paymentMethod?.payment_method_display_name],
                 payment_method_description: [this.paymentMethod?.payment_method_description]
             });
@@ -71,9 +72,9 @@ export class AddPaymentMethodComponent implements OnInit  {
 
         this.loader = true;
 
-        this.paymentMethodEntityService.add(body).subscribe((data) => {
+        this.paymentMethodService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! PaymentMethod created.');
+                this.notification.showNotification('success', 'Success !! Payment Method created.');
             },
             (error) => {
                 this.errorInForm.next(true);
@@ -85,10 +86,10 @@ export class AddPaymentMethodComponent implements OnInit  {
                     return;
                 }
                 // An array of all form errors as returned by server
-                this.formErrors = error?.error;
+                // this.formErrors = error?.error;
+                this.formErrors = error;
 
                 if (this.formErrors) {
-
                     // loop through from fields, If has an error, mark as invalid so mat-error can show
                     for (const prop in this.formErrors) {
                         if (this.form) {
@@ -110,30 +111,20 @@ export class AddPaymentMethodComponent implements OnInit  {
         this.loader = true;
         this.errorInForm.next(false);
 
-        this.paymentMethodEntityService.update(body).subscribe((data) => {
+        this.paymentMethodService.update(body).subscribe((data) => {
                 this.loader = false;
-
                 this.dialogRef.close(this.form.value);
-
                 // notify success
-                this.notification.showNotification('success', 'Success !! PaymentMethod has been updated.');
-
+                this.notification.showNotification('success', 'Success !! Payment Method has been updated.');
             },
             (error) => {
                 this.loader = false;
                 this.errorInForm.next(true);
-               // this.formError$.subscribe(subscriber => {subscriber.next(true)});
-
-                if (error.paymentMethod === 0) {
-                    // notify error
+                if (error.utility === 0) {
                     return;
                 }
-                // An array of all form errors as returned by server
                 this.formErrors = error?.error;
-              //  this.formErrors = error.error.error.errors;
-
                 if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
                     for (const prop in this.formErrors) {
                         if (this.form) {
                             this.form.controls[prop]?.markAsTouched();
@@ -148,19 +139,11 @@ export class AddPaymentMethodComponent implements OnInit  {
      * Create or Update Data
      */
     createOrUpdate() {
-        switch (this.mode) {
-            case 'edit' : {
-                this.update();
-            }
-                break;
-            case 'add' : {
-                this.create();
-            }
-                break;
-            default :
-                break;
-        }
-       // this.dialogRef.close(this.form.value);
+        this.isAdd ? this.create() : this.update();
+    }
+
+    save() {
+        this.dialogRef.close(this.form.value);
     }
 
     close() {
@@ -177,4 +160,3 @@ export class AddPaymentMethodComponent implements OnInit  {
     }
 
 }
-

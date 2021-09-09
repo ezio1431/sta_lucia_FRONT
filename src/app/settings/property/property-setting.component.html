@@ -10,11 +10,11 @@
                 <nav mat-tab-nav-bar>
                     <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/property']">
-                        <span class="nav-text"> Property</span></a>
-
-                    <a mat-tab-link routerLinkActive #property_type="routerLinkActive" [active]="property_type.isActive"
-                       [routerLink]="['property_types']">
                         <span class="nav-text"> Property Types</span></a>
+
+                    <!--<a mat-tab-link routerLinkActive #property_type="routerLinkActive" [active]="property_type.isActive"
+                       [routerLink]="['property_types']">
+                        <span class="nav-text"> Property Types</span></a>-->
 
                     <a mat-tab-link routerLinkActive #amenity="routerLinkActive" [active]="amenity.isActive"
                        [routerLink]="['amenities']">

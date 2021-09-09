@@ -3,53 +3,40 @@ import { PropertyRoutingModule } from './property-routing.module';
 import { PropertyComponent } from './property.component';
 import { AddPropertyComponent } from './add/add-property.component';
 import { SharedModule } from '../shared/shared.module';
-import {
-    EntityDataService,
-    EntityDefinitionService,
-    EntityMetadataMap,
-} from '@ngrx/data';
-import { PropertyDataService } from './data/property-data.service';
 import { ViewPropertyGeneralComponent } from './view/general/view-property-general.component';
 import { ViewPropertyComponent } from './view/view-property.component';
 import { PropertyUnitDetailsComponent } from './add/unit-details/property-unit-details.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
-
-const entityMetaData: EntityMetadataMap = {
-    Property: {
-        additionalCollectionState: {
-            meta: {
-                current_page: 1,
-                from: 1,
-                last_page: '',
-                path: '',
-                per_page: '',
-                to: '',
-                total: ''
-            }
-        }
-    }
-};
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ChartistModule } from 'ng-chartist';
+import { PropertyLeaseComponent } from './view/lease/property-lease.component';
+import { PropertyInvoiceComponent } from './view/invoice/property-invoice.component';
+import { PropertyNoticeComponent } from './view/notice/property-notice.component';
+import { PropertyUnitComponent } from './view/unit/property-unit.component';
 
 @NgModule({
     imports: [
         SharedModule,
         PropertyRoutingModule,
-        NgxMatSelectSearchModule
+        NgxMatSelectSearchModule,
+        NgxChartsModule,
+        ChartistModule
     ],
     declarations: [
         PropertyComponent,
         AddPropertyComponent,
         ViewPropertyGeneralComponent,
         ViewPropertyComponent,
-        PropertyUnitDetailsComponent
+        PropertyUnitDetailsComponent,
+        PropertyLeaseComponent,
+        PropertyInvoiceComponent,
+        PropertyNoticeComponent,
+        PropertyUnitComponent
     ]
 })
 
 export class PropertyModule {
 
-    constructor (private eds: EntityDefinitionService, private entityDataService: EntityDataService,
-                 private landlordDataService: PropertyDataService) {
-     //   eds.registerMetadataMap(entityMetaData);
-     //   entityDataService.registerService('Property', landlordDataService)
+    constructor () {
     }
 }

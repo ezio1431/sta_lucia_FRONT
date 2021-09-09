@@ -1,112 +1,79 @@
 <div class="main-content">
-    <div class="container-fluid" *ngIf="landlord$ | async as landlord">
+    <div class="container-fluid" *ngIf="leaseData$ | async as lease">
         <div class="row">
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header card-header-info">
-                            <h4 class="card-title">Properties</h4>
-                            <p class="card-category"></p>
+                            <div class="row">
+                                <div class="col-8">
+                                    <h4 class="card-title">Lease Details</h4>
+                                    <p class="card-category">{{lease?.lease_number}}</p>
+                                </div>
+                                <div class="col-4 text-right" *ngIf="isAdmin$ | async">
+                                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                                        <mat-icon>more_vert</mat-icon>
+                                    </button>
+                                    <mat-menu #menu="matMenu">
+                                        <button *ngIf="lease?.terminated_on == null" mat-menu-item matTooltip="Edit Lease." [matTooltipPosition]="'above'"
+                                                routerLink="edit" (click)="onSelected(lease)">
+                                            <mat-icon>edit</mat-icon>
+                                            <span>Edit Lease</span>
+                                        </button>
+                                    </mat-menu>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
-
                             <nav mat-tab-nav-bar>
-
-                                <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
-                                   routerLink="/landlords/{{id}}">
+                                <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive"
+                                   [routerLinkActiveOptions]="{exact: true}"
+                                   routerLink="/leases/{{leaseID}}">
                                     <span class="nav-text">  Info </span></a>
 
-                                <a mat-tab-link routerLinkActive #properties="routerLinkActive" [active]="properties.isActive" [routerLink]="['properties']">
-                                    <span class="nav-text">   Properties </span></a>
+                                <a mat-tab-link routerLinkActive #invoices="routerLinkActive" [active]="invoices.isActive"
+                                   [routerLink]="['invoices']">
+                                    <span class="nav-text">   Invoices </span></a>
 
-                                <a mat-tab-link routerLinkActive #documents="routerLinkActive" [active]="documents.isActive" [routerLink]="['documents']">
-                                    <span class="nav-text">  Documents </span></a>
+                               <!-- <a mat-tab-link routerLinkActive #documents="routerLinkActive" [active]="documents.isActive"
+                                   [routerLink]="['documents']">
+                                    <span class="nav-text">  Documents </span></a>-->
                             </nav>
-
                             <router-outlet></router-outlet>
-
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card card-lift--hover shadow border-0 card-profile">
-                        <div class="front">
-                            <div class="cover">
-                                <img class="img" src="../../assets/img/images/rotating_card_thumb3.png"/>
-                            </div>
-                            <div class="card-avatar">
-                                <img [src]="landlord.profile_pic"/>
-                                <!--<img class="img" src="../../../assets/img/images/2.jpg"/>-->
-
-                            </div>
-
-
-                            <div class="content">
-                                <div class="main">
-                                    <h3 class="name">
-                                        {{landlord.first_name}} {{landlord.last_name}}
-                                    </h3>
-                                    <p class="profession">
-                                        <button mat-stroked-button disabled>
-                                            <mat-icon color="accent">phone</mat-icon>
-                                            <span>{{landlord?.phone}}</span>
-                                        </button>
-                                    </p>
-                                    <div class="stats-container">
-                                        <div class="property-stats">
-                                            <p>
-                                                <button mat-icon-button (click)="logoFileInput.click()">
-                                                    <i class="material-icons">attachment</i>photo
-                                                </button>
-                                            </p>
-                                        </div>
-                                        <div class="property-stats">
-                                            <p>
-                                                <button mat-icon-button (click)="addDialog('edit', landlord)">
-                                                    <i class="material-icons">edit</i>edit
-                                                </button>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                </div>
-                            </div>
-                        </div> <!-- end front panel -->
-                    </div>
-
-
-
                         <div class="card">
                             <div class="card-header card-header-info">
                                 <h4 class="card-title">Summary</h4>
                                 <p class="card-category"></p>
                             </div>
                             <div class="card-body">
-                                <div class="card-category text-gray"> Properties: 10</div>
-                                <div class="card-category text-gray"> Units: 320</div>
-                                <div class="card-category text-gray"> Charge rate: 10%</div>
+                                <div class="card-category text-gray"> Lease: {{lease?.lease_number}}</div>
+                                <div class="card-category text-gray">
+                                    Property: {{lease?.property?.property_name}} - ({{lease?.property?.property_code}})
+                                </div>
+                                <div class="card-category text-gray"> Unit: {{lease?.unit_names}}</div>
+                                <div class="card-category text-gray"> Tenant: {{lease?.tenant_names}}</div>
+                                <div class="card-category text-gray"> Start Date: {{lease?.start_date}}</div>
                             </div>
                         </div>
+                    <div class="card" *ngIf="isAdmin$ | async">
+                        <button *ngIf="lease?.terminated_on == null" mat-raised-button  color="warn" (click)="terminateLease(lease)">
+                            Terminate Lease ({{lease?.lease_number}})
+                        </button>
 
 
-
-                 <!--   <div class="card card-profile">
-                        <div class="card-profile">
-                            <div class="card-avatar" *ngIf="imageToShow">
-                                <img [src]="imageToShow" alt="Profile Picture">
+                        <ng-container *ngIf="lease?.terminated_on != null">
+                            <div class="card-header-warning">
+                                <h4 class="card-title">Terminated</h4>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="card-category text-gray">{{memberData?.first_name}} {{memberData?.middle_name}} {{memberData?.last_name}}</h6>
-                            <h4 class="card-title"> A/C #. {{memberData?.account?.account_number}}</h4>
-                            <div class="card-description">
-                                <div>Phone: {{memberData?.phone}}</div>
-                                <div>Email: {{memberData?.email}}</div>
-                                Branch: {{memberData?.branch?.name}}
+                            <div class="card-body">
+                               <div>By: {{lease?.terminate_user?.first_name}}</div>
+                               <div>On: {{lease?.terminated_on}}</div>
                             </div>
-                            Joined: {{memberData?.date_became_member_display}}
-                        </div>
-                    </div>-->
+                        </ng-container>
+                    </div>
                 </div>
         </div>
     </div>

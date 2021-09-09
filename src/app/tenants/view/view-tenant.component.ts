@@ -2,78 +2,47 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NotificationService } from '../../shared/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TenantEntityService } from '../data/tenant-entity.service';
-import { Observable } from 'rxjs';
-import { first, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 import { TenantModel } from '../models/tenant-model';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { AddTenantComponent } from '../add/add-tenant.component';
+import { TenantService } from '../data/tenant.service';
 
 @Component({
-    selector: 'robi-view-property',
+    selector: 'robi-view-tenant',
     styleUrls: ['./view-tenant.component.scss'],
     templateUrl: './view-tenant.component.html'
 })
 export class ViewTenantComponent implements OnInit, AfterViewInit  {
 
     form: FormGroup;
-    generalForm: FormGroup;
-    guarantorForm: FormGroup;
-    assetForm: FormGroup;
 
     formErrors: any;
 
     loader = false;
 
-    memberStatuses: any = [];
-    members: any = [];
-    guarantorStatues: any = [];
-
-    id: string;
-
-    routeData: any;
-
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    imageToShow: any;
-
-    landlord$: Observable<any>;
-
+    tenantID: string;
+    tenantData$: Observable<TenantModel>;
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
-                private propertyEntityService: TenantEntityService,
                 private notification: NotificationService,
+                private tenantService: TenantService,
                 private router: Router, private route: ActivatedRoute) {
     }
 
     ngOnInit() {
-        this.id = this.route.snapshot.paramMap.get('id');
-
-      /*  this.landlord$ = this.propertyEntityService.entities$
-            .pipe(
-                map(landlords => {
-                   return landlords.find(property => property.id === this.id);
-                })
-            );*/
-
-     //   this.landlord$ = this.propertyEntityService.selectedLandlordChanges$;
-    //    this.landlord$ = this.propertyEntityService.getByKey(this.id);
-
-
-        /*this.landlord$ = this.propertyEntityService.entities$
-            .pipe(
-                map(landlords => {
-                    this.nextPage++;
-                    return landlords;
-                })
-            );*/
-
-        this.landlord$ = this.propertyEntityService.entities$
-            .pipe(
-                map(entities => entities.find(property => property.id === this.id))
-            );
+        this.tenantID = this.route.snapshot.paramMap.get('id');
+        this.tenantService.selectedTenantChanges$.subscribe(data => {
+            if (data) {
+                this.tenantData$ = of(data);
+            }
+            if (!data) {
+                this.tenantService.getById(this.tenantID).subscribe(tenant => {
+                    this.tenantData$ = of(tenant);
+                    this.tenantService.changeSelectedTenant(tenant);
+                });
+            }
+        });
     }
 
     /**
@@ -103,4 +72,7 @@ export class ViewTenantComponent implements OnInit, AfterViewInit  {
 
     ngAfterViewInit(): void {}
 
+    onSelected(tenant: TenantModel) {
+        this.tenantService.changeSelectedTenant(tenant);
+    }
 }

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup} from '@angular/forms';
 import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -8,15 +8,12 @@ import { AccountingDataSource } from '../data/accounting-data.source';
 import { AccountingService } from '../data/accounting.service';
 import { GeneralJournalService } from '../data/general-journal.service';
 import { NotificationService } from '../../shared/notification.service';
-// import { MemberService } from '../../members/data/member.service';
-// import { BranchService } from '../../settings/branch/general/data/branch.service';
 import { AccountingModel } from '../models/accounting-model';
 import { StatementComponent } from '../statement/statement.component';
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
-import { select, Store } from '@ngrx/store';
-import { AppState } from '../../reducers';
-// import { branch } from '../../auth/auth.selectors';
+import { PropertyService } from '../../properties/data/property.service';
+import { PdfStatementComponent } from '../pdf-statement/pdf-statement.component';
 
 @Component({
     selector: 'robi-ledger',
@@ -26,47 +23,28 @@ import { AppState } from '../../reducers';
 export class LedgerComponent implements OnInit, AfterViewInit {
     displayedColumns = [
         'account_number',
-        /* 'account_code',*/
-        'account_class_id',
-        'account_type_id',
         'account_name',
         'balance',
         'actions',
     ];
-
     loader = false;
-
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
-
-    // Search field
     @ViewChild('search') search: ElementRef;
-
-    // pagination
     @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
-
     // Pagination
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
-
-    // Data for the list table display
     dataSource: AccountingDataSource;
-
-    members: any;
-    branches: any;
-    branchId: any;
-
+    properties$: any;
+    propertyID: any;
     form: FormGroup;
-
     constructor(private fb: FormBuilder, private service: AccountingService,
                 private generalJournalService: GeneralJournalService,
                 private notification: NotificationService, private dialog: MatDialog,
-                private memberService: NotificationService, private branchService: NotificationService,
-                private store: Store<AppState>) {
-       // this.store.pipe(select(branch)).subscribe(user => this.branchId = user);
-    }
+                private memberService: NotificationService, private propertyService: PropertyService) {}
 
     /**
      * Initialize data lead
@@ -74,66 +52,63 @@ export class LedgerComponent implements OnInit, AfterViewInit {
      * Initial data load
      */
     ngOnInit() {
-
         this.dataSource = new AccountingDataSource(this.service);
-
-        // Load pagination data
         this.dataSource.meta$.subscribe((res) => this.meta = res);
-
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.dataSource.load('', 0, 0, 'account_number', 'desc', 'branch_id', this.branchId);
-
-      /*  this.branchService.list(['name'])
-            .subscribe((res) => this.branches = res,
-                () => this.branches = []
-            );*/
-
+        this.dataSource.load('', 0, 0, 'account_number', 'desc', 'property_id', this.propertyID);
+        this.properties$ = this.propertyService.list(['property_name']);
         this.form = this.fb.group({
-            branch_id: [this.branchId],
+            property_id: [this.propertyID],
             include_members: ['']
         });
-
     }
 
     /**
      *
      * @param value
      */
-    onBranchChange(value) {
-        this.branchId = value;
+    onPropertyChange(value) {
+        this.propertyID = value;
         this.loadData();
     }
 
     viewStatement(account: AccountingModel) {
-
         const id = account.id;
-
         const dialogConfig = new MatDialogConfig();
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
-       // dialogConfig.data = {id};
-
         dialogConfig.data = {
             id: id,
             type: 'general'
         };
-
         const dialogRef = this.dialog.open(StatementComponent, dialogConfig);
+    }
+
+    viewPdfStatement(account: AccountingModel) {
+        const id = account?.id;
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {
+            id: id
+        };
+        dialogConfig.width = '600px';
+
+        const dialogRef = this.dialog.open(PdfStatementComponent, dialogConfig);
     }
 
     /**
      * Fetch data from data lead
      */
     loadData() {
-       // console.log(this.sort.direction);
         this.dataSource.load(
             this.search.nativeElement.value,
             (this.paginator.pageIndex + 1),
             (this.paginator.pageSize),
             this.sort.active,
             this.sort.direction,
-            'branch_id',
-            this.branchId
+            'property_id',
+            this.propertyID
         );
     }
 
@@ -176,46 +151,4 @@ export class LedgerComponent implements OnInit, AfterViewInit {
         this.search.nativeElement.value = '';
         this.loadData()
     }
-
-    /**
-     *
-     * @param row
-     */
-    downloadStatement(row: any) {
-
-        this.loader = true;
-        this.service.downloadGeneralAccountStatement({id: row.id, pdf: true})
-            .subscribe((res) => {
-                    this.loader = false;
-                    this.showFile(res);
-                },
-                () => {
-                    this.loader = false;
-                    this.notification.showNotification('danger', 'Error Downloading File!');
-                }
-            );
-    }
-
-
-    /**
-     *
-     * @param blob
-     */
-    showFile(blob) {
-        const newBlob = new Blob([blob], {type: 'application/pdf'});
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(newBlob);
-            return;
-        }
-        const data = window.URL.createObjectURL(newBlob);
-        const link = document.createElement('a');
-        link.href = data;
-        link.download = 'statement.pdf';
-        link.click();
-        setTimeout(function() {
-            window.URL.revokeObjectURL(data);
-        }, 100);
-    }
-
 }

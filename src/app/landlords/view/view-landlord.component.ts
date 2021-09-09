@@ -1,13 +1,10 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { NotificationService } from '../../shared/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LandlordEntityService } from '../data/landlord-entity.service';
-import { Observable } from 'rxjs';
-import { first, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 import { LandlordModel } from '../models/landlord-model';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { AddLandlordComponent } from '../add/add-landlord.component';
+import { LandlordService } from '../data/landlord.service';
 
 @Component({
     selector: 'robi-view-landlord',
@@ -15,65 +12,28 @@ import { AddLandlordComponent } from '../add/add-landlord.component';
     templateUrl: './view-landlord.component.html'
 })
 export class ViewLandlordComponent implements OnInit, AfterViewInit  {
-
-    form: FormGroup;
-    generalForm: FormGroup;
-    guarantorForm: FormGroup;
-    assetForm: FormGroup;
-
-    formErrors: any;
-
-    loader = false;
-
-    memberStatuses: any = [];
-    members: any = [];
-    guarantorStatues: any = [];
-
-    id: string;
-
-    routeData: any;
-
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    imageToShow: any;
-
+    landlordID: string;
     landlord$: Observable<any>;
+    landlordData$: Observable<LandlordModel>;
 
-    constructor(private fb: FormBuilder,
-                private dialog: MatDialog,
-                private landlordEntityService: LandlordEntityService,
-                private notification: NotificationService,
+    constructor(private dialog: MatDialog,
+                private landlordService: LandlordService,
                 private router: Router, private route: ActivatedRoute) {
     }
 
     ngOnInit() {
-        this.id = this.route.snapshot.paramMap.get('id');
-
-      /*  this.landlord$ = this.landlordEntityService.entities$
-            .pipe(
-                map(landlords => {
-                   return landlords.find(landlord => landlord.id === this.id);
-                })
-            );*/
-
-     //   this.landlord$ = this.landlordEntityService.selectedLandlordChanges$;
-    //    this.landlord$ = this.landlordEntityService.getByKey(this.id);
-
-
-        /*this.landlord$ = this.landlordEntityService.entities$
-            .pipe(
-                map(landlords => {
-                    this.nextPage++;
-                    return landlords;
-                })
-            );*/
-
-        this.landlord$ = this.landlordEntityService.entities$
-            .pipe(
-                map(entities => entities.find(landlord => landlord.id === this.id))
-            );
+        this.landlordID = this.route.snapshot.paramMap.get('id');
+        this.landlordService.selectedLandlordChanges$.subscribe(data => {
+            if (data) {
+                this.landlordData$ = of(data);
+            }
+            if (!data) {
+                this.landlordService.getById(this.landlordID).subscribe(landlord => {
+                    this.landlordData$ = of(landlord);
+                    this.landlordService.changeSelectedLandlord(landlord);
+                });
+            }
+        });
     }
 
     /**
@@ -98,9 +58,9 @@ export class ViewLandlordComponent implements OnInit, AfterViewInit  {
         );
     }
 
-    onOutletActivated(componentReference) {
-    }
-
     ngAfterViewInit(): void {}
 
+    onSelected(landlord: LandlordModel): void {
+        this.landlordService.changeSelectedLandlord(landlord);
+    }
 }

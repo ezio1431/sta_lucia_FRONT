@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NotificationService } from '../../../shared/notification.service';
 import { MatDialog } from '@angular/material/dialog';
-import { LandlordEntityService } from '../../data/landlord-entity.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { LandlordService } from '../../data/landlord.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LandlordModel } from '../../models/landlord-model';
 
 @Component({
     selector: 'robi-view-landlord-general',
@@ -24,24 +26,37 @@ export class ViewLandlordGeneralComponent implements OnInit {
     loader = false;
     memberShipForm = false;
 
-    landlord$: Observable<any>;
+    landlordID: string;
+    landlord$: Observable<LandlordModel>;
+    landlordData$: Observable<LandlordModel>;
 
-    constructor(private landlordEntityService: LandlordEntityService, private notification: NotificationService,
-                private dialog: MatDialog) {}
+    constructor(private landlordService: LandlordService,
+                private router: Router, private route: ActivatedRoute) {}
 
     ngOnInit() {
-      //  this.landlord$ = this.landlordEntityService.selectedLandlordChanges$;
+        this.landlord$ = this.landlordService.selectedLandlordChanges$;
 
-        this.landlordEntityService.selectedLandlordChanges$.subscribe(landlord =>
-            this.landlord$ = this.landlordEntityService.entities$
-                .pipe(
-                    map(entities => entities.find(entity => entity.id === landlord.id))
-                )
-        );
+        this.landlordID = this.route.snapshot.paramMap.get('id');
+        this.landlordData$ = this.landlordService.selectedLandlordChanges$;
 
-      /*  this.landlord$ = this.landlordEntityService.entities$
-            .pipe(
-                map(entities => entities.find(landlord => landlord.id === this.id))
-            );*/
+        this.landlordService.selectedLandlordChanges$.subscribe(data => {
+            if (!data) {
+                this.landlordData$ = this.landlordService.getById(this.landlordID);
+            }
+        });
+
+
+        this.landlordID = this.route.snapshot.paramMap.get('id');
+        this.landlordService.selectedLandlordChanges$.subscribe(data => {
+            if (data) {
+                this.landlordData$ = of(data);
+            }
+            if (!data) {
+                this.landlordService.getById(this.landlordID).subscribe(landlord => {
+                    this.landlordData$ = of(landlord);
+                    this.landlordService.changeSelectedLandlord(landlord);
+                });
+            }
+        });
     }
 }

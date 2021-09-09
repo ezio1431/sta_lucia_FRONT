@@ -1,159 +1,223 @@
-import { Component, OnInit } from '@angular/core';
-import * as Chartist from 'chartist';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { selectorAccessToken, selectorScopes } from '../authentication/auth.selectors';
 import { LocalStorageService } from '../core/local-storage/local-storage.service';
-import * as jwt_decode from 'jwt-decode';
-
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { merge, Observable, of, ReplaySubject, Subject } from 'rxjs';
+import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
+import { PropertyService } from '../properties/data/property.service';
+import {
+    selectorUserID, selectorUserScopes
+} from '../authentication/authentication.selectors';
+import { VacantUnitService } from '../units/data/vacant-unit.service';
+import { MatPaginator } from '@angular/material/paginator';
+import { VacantUnitDataSource } from '../units/data/vacant-unit-data.source';
+import { MatSort } from '@angular/material/sort';
+import { AdminSummaryModel } from './model/admin-summary-model';
+import { ActivatedRoute } from '@angular/router';
+import { ChartType } from 'chart.js';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'robi-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
 
     scopes$: any;
+    formBillingStats: FormGroup;
+    properties: any = [];
 
-  constructor(private store: Store, private localStorageService: LocalStorageService) { }
-  startAnimationForLineChart(chart) {
-      let seq: any, delays: any, durations: any;
-      seq = 0;
-      delays = 80;
-      durations = 500;
+    /** control for filter for server side. */
+    public propertyServerSideFilteringCtrl: FormControl = new FormControl();
 
-      chart.on('draw', function(data) {
-        if(data.type === 'line' || data.type === 'area') {
-          data.element.animate({
-            d: {
-              begin: 600,
-              dur: 700,
-              from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
-              to: data.path.clone().stringify(),
-              easing: Chartist.Svg.Easing.easeOutQuint
-            }
-          });
-        } else if(data.type === 'point') {
-              seq++;
-              data.element.animate({
-                opacity: {
-                  begin: seq * delays,
-                  dur: durations,
-                  from: 0,
-                  to: 1,
-                  easing: 'ease'
-                }
-              });
-          }
+    /** indicate search operation is in progress */
+    public searching = false;
+
+    /** list of banks filtered after simulating server side search */
+    public  filteredServerSideProperties: ReplaySubject<any> = new ReplaySubject<any>(1);
+
+    /** Subject that emits when the component has been destroyed. */
+    protected _onDestroy = new Subject<void>();
+
+    propertiesFiltered$: Observable<any>;
+    periods$: Observable<any>;
+    LoggedInUserId: string;
+
+    vacantUnitColumns = [
+        'unit_mode',
+        'unit_type_id',
+        'unit_name',
+        'property_id',
+        'location'
+    ];
+    loader = false;
+
+    vacantUnitsDataSource: VacantUnitDataSource;
+    // Search field
+    @ViewChild('search') search: ElementRef;
+
+    // pagination
+    @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
+
+    // Pagination
+    length: number;
+    pageIndex = 0;
+    pageSizeOptions: number[] = [3, 5, 10, 25, 50, 100];
+    meta: any;
+    @ViewChild(MatSort, {static: true}) sort: MatSort;
+
+    billingForm: FormGroup;
+    adminSummary: AdminSummaryModel;
+    billed$: Observable<string>;
+    paid$: Observable<string>;
+    pending$: Observable<string>;
+
+    public barChartOptions = {
+        scaleShowVerticalLines: false,
+        responsive: true
+    };
+    public barChartLabels = [];
+    public barChartType = 'bar'  as ChartType;
+    public barChartLegend = true;
+    public barChartData = [];
+
+    public pieChartLabels = ['Pending', 'Paid', 'Billed'];
+    public pieChartData$: Observable<[any, any, any]>;
+    public pieChartType = 'doughnut' as ChartType;
+    options = {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+  constructor(private store: Store,
+              private localStorageService: LocalStorageService,
+              private route: ActivatedRoute,
+              private _formBuilder: FormBuilder,
+              private propertyService: PropertyService,
+              private vacantUnitService: VacantUnitService) {
+      this.formBillingStats = this._formBuilder.group({
+          property_id: [''],
+          period_id: [''],
       });
-
-      seq = 0;
-  };
-  startAnimationForBarChart(chart){
-      let seq2: any, delays2: any, durations2: any;
-
-      seq2 = 0;
-      delays2 = 80;
-      durations2 = 500;
-      chart.on('draw', function(data) {
-        if(data.type === 'bar'){
-            seq2++;
-            data.element.animate({
-              opacity: {
-                begin: seq2 * delays2,
-                dur: durations2,
-                from: 0,
-                to: 1,
-                easing: 'ease'
-              }
-            });
-        }
-      });
-
-      seq2 = 0;
-  };
+  }
   ngOnInit() {
-      this.scopes$ = this.store.pipe(select(selectorScopes));
+      this.scopes$ = this.store.pipe(select(selectorUserScopes));
+      this.store.pipe(select(selectorUserID)).subscribe(id => this.LoggedInUserId = id);
 
-      /* ----------==========     Daily Sales Chart initialization For Documentation    ==========---------- */
-
-      const dataDailySalesChart: any = {
-          labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-          series: [
-              [12, 17, 7, 17, 23, 18, 38]
-          ]
-      };
-
-     const optionsDailySalesChart: any = {
-          lineSmooth: Chartist.Interpolation.cardinal({
-              tension: 0
-          }),
-          low: 0,
-          high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: { top: 0, right: 0, bottom: 0, left: 0},
+      if (this.route.snapshot.data['adminData']) {
+          this.adminSummary = this.route.snapshot.data['adminData'];
       }
 
-      var dailySalesChart = new Chartist.Line('#dailySalesChart', dataDailySalesChart, optionsDailySalesChart);
+      this.periods$ = of(this.adminSummary?.periodical_billing);
+      const firstPeriod = this.adminSummary?.periodical_billing[0];
+      this.billed$ = of(firstPeriod?.amount_billed_as_currency);
+      this.paid$ = of(firstPeriod?.amount_paid_as_currency);
+      this.pending$ = of(firstPeriod?.amount_due_as_currency);
 
-      this.startAnimationForLineChart(dailySalesChart);
+      this.billingForm = this._formBuilder.group({
+          period_id: [firstPeriod?.period_id, [Validators.required]]
+      });
 
+      this.pieChartData$ = of([
+          firstPeriod?.amount_due,
+          firstPeriod?.amount_paid,
+          firstPeriod?.amount_billed,
+      ]);
 
-      /* ----------==========     Completed Tasks Chart initialization    ==========---------- */
-
-      const dataCompletedTasksChart: any = {
-          labels: ['12p', '3p', '6p', '9p', '12p', '3a', '6a', '9a'],
-          series: [
-              [230, 750, 450, 300, 280, 240, 200, 190]
-          ]
-      };
-
-     const optionsCompletedTasksChart: any = {
-          lineSmooth: Chartist.Interpolation.cardinal({
-              tension: 0
-          }),
-          low: 0,
-          high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: { top: 0, right: 0, bottom: 0, left: 0}
-      }
-
-      var completedTasksChart = new Chartist.Line('#completedTasksChart', dataCompletedTasksChart, optionsCompletedTasksChart);
-
-      // start animation for the Completed Tasks Chart - Line Chart
-      this.startAnimationForLineChart(completedTasksChart);
-
-
-
-      /* ----------==========     Emails Subscription Chart initialization    ==========---------- */
-
-      var datawebsiteViewsChart = {
-        labels: ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
-        series: [
-          [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895]
-
-        ]
-      };
-      var optionswebsiteViewsChart = {
-          axisX: {
-              showGrid: false
-          },
-          low: 0,
-          high: 1000,
-          chartPadding: { top: 0, right: 5, bottom: 0, left: 0}
-      };
-      var responsiveOptions: any[] = [
-        ['screen and (max-width: 640px)', {
-          seriesBarDistance: 5,
-          axisX: {
-            labelInterpolationFnc: function (value) {
-              return value[0];
-            }
-          }
-        }]
+      const periodNames = [];
+      const billedData = [];
+      const paidData = [];
+      const pendingData = [];
+      const periodBilling = this.adminSummary?.periodical_billing.reverse();
+      periodBilling.forEach(function (period) {
+          periodNames.push(period?.period_name);
+          billedData.push(period?.amount_billed);
+          paidData.push(period?.amount_paid);
+          pendingData.push(period?.amount_due);
+      });
+      this.barChartLabels = periodNames;
+      this.barChartData = [
+          {data: pendingData, label: 'Pending'},
+          {data: paidData, label: 'Paid'},
+          {data: billedData, label: 'Billed'},
       ];
-      var websiteViewsChart = new Chartist.Bar('#websiteViewsChart', datawebsiteViewsChart, optionswebsiteViewsChart, responsiveOptions);
 
-      //start animation for the Emails Subscription Chart
-      this.startAnimationForBarChart(websiteViewsChart);
+      this.vacantUnitsDataSource = new VacantUnitDataSource(this.vacantUnitService);
+      this.vacantUnitsDataSource.meta$.subscribe((res) => this.meta = res);
+      this.vacantUnitsDataSource.load('', 0, 0, 'id', 'desc');
+
+      // property search
+      this.propertyServerSideFilteringCtrl.valueChanges
+          .pipe(
+              filter(search => !!search),
+              tap(() => this.searching = true),
+              takeUntil(this._onDestroy),
+              debounceTime(2000),
+              distinctUntilChanged(),
+              map(search => {
+                  search = search.toLowerCase();
+                  this.propertiesFiltered$ =  this.propertyService.search(search);
+              }),
+              delay(500)
+          )
+          .subscribe(filteredProperties => {
+                  this.searching = false;
+                  this.filteredServerSideProperties.next(filteredProperties);
+              },
+              error => {
+                  this.searching = false;
+              });
   }
 
+    onPeriodChange(periodID) {
+        const periodBilling  = this.adminSummary?.periodical_billing;
+        const selectedPeriod = periodBilling.find((item: any) => item?.period_id === periodID);
+
+        this.billed$ = of(selectedPeriod?.amount_billed_as_currency);
+        this.paid$ = of(selectedPeriod?.amount_paid_as_currency);
+        this.pending$ = of(selectedPeriod?.amount_due_as_currency);
+
+        this.pieChartData$ = of([
+            selectedPeriod?.amount_due,
+            selectedPeriod?.amount_paid,
+            selectedPeriod?.amount_billed,
+        ]);
+    }
+
+    /**
+     * Empty search box
+     */
+    clearSearch() {
+        this.search.nativeElement.value = '';
+        this.loadData()
+    }
+
+    /**
+     * Handle search and pagination
+     */
+    ngAfterViewInit() {
+        this.paginator.page.pipe(
+            tap(() => this.loadData() )
+        ).subscribe();
+
+        // reset the paginator after sorting
+        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+        merge(this.sort.sortChange, this.paginator.page)
+            .pipe(
+                tap(() => this.loadData())
+            )
+            .subscribe();
+    }
+    /**
+     * Fetch data from data lead
+     */
+    loadData() {
+        this.vacantUnitsDataSource.load(
+            '',
+            (this.paginator.pageIndex + 1),
+            (this.paginator.pageSize),
+            this.sort.active,
+            this.sort.direction
+        );
+    }
 }

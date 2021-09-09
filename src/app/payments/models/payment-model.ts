@@ -2,30 +2,34 @@ import { BaseModel } from '../../shared/models/base-model';
 
 export class PaymentModel extends BaseModel {
     agent_id: string;
-    property_id: string;
-    unit_id: string;
+    lease_id: string;
+    tenant_id: string;
+    payment_method_id: string;
+    currency_id: string;
+    amount: string;
+    payment_date: string;
+    paid_by: string;
 
-    utility_id: string;
+   payment_status: string;
+   cancel_notes: string;
+   cancelled_by: string;
+   approved_by: string;
 
-    base_charge: string;
-    previous_reading: string;
-    current_reading: string;
-    reading_date: string;
-    rate_per_unit: string;
-    units: string;
-    total: string;
+    status: any;
+    is_pending: boolean;
+    is_cancelled: boolean;
+    is_approved: boolean;
 
+    cancel_user: any;
+    approve_user: any;
+    lease: any;
+    property: any;
 
-    invoice_number: string;
-    invoice_total: string;
-    invoice_discount: string;
-    invoice_tax: string;
-    invoice_status: string;
-    invoice_terms: string;
-    invoice_date: string;
-    due_date: string;
-    note: string;
-
+    attachment: string;
+    notes: string;
+    receipt_number: string;
+    payment_method: any;
+    tenant: any;
 
     created_by: string;
     updated_by: string;

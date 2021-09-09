@@ -7,9 +7,10 @@
                     <div class="row">
                         <div class="col-5">
                             <mat-form-field class="search-form-field" color="primary">
-                                <mat-select placeholder="Branch" formControlName="branch_id" #branchSelect (selectionChange)="onBranchChange(branchSelect.value)">
-                                    <mat-option *ngFor="let branch of branches" [value]="branch.id">
-                                        {{branch.name}}
+                                <mat-select placeholder="Property" formControlName="property_id"
+                                            #propertySelect (selectionChange)="onPropertyChange(propertySelect.value)">
+                                    <mat-option *ngFor="let property of properties$ | async" [value]="property.id">
+                                        {{property.property_name}}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
@@ -37,19 +38,9 @@
                             <mat-cell *matCellDef="let row"> {{row.account_number}} </mat-cell>
                         </ng-container>
 
-                        <ng-container matColumnDef="account_class_id">
-                            <mat-header-cell *matHeaderCellDef> Class </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.accountType?.accountClass?.name}} </mat-cell>
-                        </ng-container>
-
                         <ng-container matColumnDef="account_name">
                             <mat-header-cell *matHeaderCellDef mat-sort-header> Account Name </mat-header-cell>
                             <mat-cell *matCellDef="let row"> {{row.account_display_name}} </mat-cell>
-                        </ng-container>
-
-                        <ng-container matColumnDef="account_type_id">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header> Account Type </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.accountType?.name}} </mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="balance">
@@ -60,11 +51,13 @@
                         <ng-container matColumnDef="actions">
                             <mat-header-cell *matHeaderCellDef> Statement  </mat-header-cell>
                             <mat-cell *matCellDef="let row" class="button-row">
-                                    <button [disabled]="loader" mat-icon-button matTooltip="View Account Statement." [matTooltipPosition]="'above'" (click)="viewStatement(row)">
+                                    <button [disabled]="loader" mat-icon-button matTooltip="View Account Statement."
+                                            [matTooltipPosition]="'above'" (click)="viewStatement(row)">
                                         <mat-icon color="primary">visibility</mat-icon>
                                     </button>
-                                    <button [disabled]="loader" mat-icon-button matTooltip="Download Account Statement." [matTooltipPosition]="'above'" (click)="downloadStatement(row)">
-                                        <mat-icon>cloud_download</mat-icon>
+                                    <button [disabled]="loader" mat-icon-button matTooltip="Download Account Statement."
+                                            [matTooltipPosition]="'above'" (click)="viewPdfStatement(row)">
+                                        <mat-icon>picture_as_pdf</mat-icon>
                                     </button>
                             </mat-cell>
                         </ng-container>

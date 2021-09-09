@@ -13,6 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MaterialModule } from '../../shared/material.module';
 import { SharedModule } from '../../shared/shared.module';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { ChartsModule } from 'ng2-charts';
 @NgModule({
   imports: [
     /*  CommonModule,
@@ -26,7 +28,8 @@ import { SharedModule } from '../../shared/shared.module';
     MaterialModule,*/
     SharedModule,
     RouterModule.forChild(AdminLayoutRoutes),
-
+    NgxMatSelectSearchModule,
+    ChartsModule
   ],
   declarations: [
     DashboardComponent

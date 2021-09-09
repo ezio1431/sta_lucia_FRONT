@@ -14,6 +14,7 @@ import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
+import { PropertyService } from '../../properties/data/property.service';
 // import { branch } from '../../auth/auth.selectors';
 
 @Component({
@@ -53,15 +54,15 @@ export class JournalComponent implements OnInit, AfterViewInit {
     dataSourceJournal: GeneralJournalDataSource;
 
     members: any;
-    branches: any;
-    branchId: any;
+    properties$: any;
+    propertyID: any;
 
     form: FormGroup;
 
     constructor(private fb: FormBuilder, private service: AccountingService,
                 private generalJournalService: GeneralJournalService, private store: Store<AppState>,
                 private notification: NotificationService, private dialog: MatDialog,
-                private memberService: NotificationService, private branchService: NotificationService) {
+                private memberService: NotificationService, private propertyService: PropertyService) {
        // this.store.pipe(select(branch)).subscribe(user => this.branchId = user);
     }
 
@@ -78,15 +79,12 @@ export class JournalComponent implements OnInit, AfterViewInit {
         this.dataSourceJournal.meta$.subscribe((res) => this.metaLedger = res);
 
         // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.dataSourceJournal.load('', 0, 0, 'created_at', 'desc', 'branch_id', this.branchId);
+        this.dataSourceJournal.load('', 0, 0, 'created_at', 'desc', 'property_id', this.propertyID);
 
-        /*this.branchService.list(['name'])
-            .subscribe((res) => this.branches = res,
-                () => this.branches = []
-            );*/
+        this.properties$ = this.propertyService.list(['property_name']);
 
         this.form = this.fb.group({
-            branch_id: [this.branchId],
+            property_id: [this.propertyID],
             include_members: ['']
         });
 
@@ -96,8 +94,8 @@ export class JournalComponent implements OnInit, AfterViewInit {
      *
      * @param value
      */
-    onBranchChange(value) {
-        this.branchId = value;
+    onPropertyChange(value) {
+        this.propertyID = value;
         this.loadData();
     }
 
@@ -112,8 +110,8 @@ export class JournalComponent implements OnInit, AfterViewInit {
             (this.paginator.pageSize),
             this.sort.active,
             this.sort.direction,
-            'branch_id',
-            this.branchId
+            'property_id',
+            this.propertyID
         );
     }
 

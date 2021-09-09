@@ -1,36 +1,36 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation-dialog-component';
 
-import { fromEvent, merge } from 'rxjs';
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-import { AddPropertyComponent } from './add/add-property.component';
-import { EditPropertyComponent } from './edit/edit-property.component';
-import { UserSettingModel } from '../model/user-setting.model';
-import { UserSettingDataSource } from '../data/user-setting-data.source';
-import { UserSettingService } from '../data/user-setting.service';
 import { NotificationService } from '../../../shared/notification.service';
-import { RoleSettingService } from '../data/role-setting.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { GeneralSettingService } from '../../general/data/general-setting.service';
+import { select, Store } from '@ngrx/store';
+import { selectSettings } from '../../../core/settings/settings.selectors';
+import { SettingsState, State } from '../../../core/settings/settings.model';
+import { ActivatedRoute } from '@angular/router';
+import { PropertyGeneralSettingModel } from './model/property-general-setting.model';
 
 @Component({
-    selector: 'robi-user-general-setting',
+    selector: 'robi-property-general-setting',
     templateUrl: './property-general-setting.component.html',
     styleUrls: ['./property-general-setting.component.css']
 })
-export class PropertyGeneralSettingComponent implements OnInit, AfterViewInit {
-    displayedColumns = [
-        'branch_id',
-        'role_id',
-        'first_name',
-        'last_name',
-        'email',
-        'actions',
-    ];
-
+export class PropertyGeneralSettingComponent implements OnInit {
+    form: FormGroup;
+    formErrors: any;
     loader = false;
+
+    setting: PropertyGeneralSettingModel;
+    settings$: Observable<SettingsState>;
+
+    settingId: string;
+    invoiceDay: any;
+
 
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
 
@@ -46,14 +46,21 @@ export class PropertyGeneralSettingComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
     // Data for the list table display
-    dataSource: UserSettingDataSource;
 
     roles: any = [];
     employees: any = [];
     branches: any = [];
+    dueON = Array.from({length: (29 - 1)}, (v, k) => k + 1);
 
-    constructor(private service: UserSettingService, private notification: NotificationService,
-                private roleService: RoleSettingService) {
+    constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
+                private generalSettingService: GeneralSettingService, private notification: NotificationService) {
+
+        this.form = this.fb.group({
+            default_commission: [''],
+            commission_type: [''],
+            property_prefix: [''],
+            next_property_number: ['']
+        });
     }
 
     /**
@@ -63,157 +70,66 @@ export class PropertyGeneralSettingComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
 
-        this.dataSource = new UserSettingDataSource(this.service);
+        this.settings$ = this.store.pipe(select(selectSettings));
 
-        // Load pagination data
-        this.dataSource.meta$.subscribe((res) => this.meta = res);
-
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.dataSource.load('', 0, 0, 'updated_at', 'desc');
-
-        this.roleService.list('name')
-            .subscribe((res) => this.roles = res,
-                () => this.roles = []
-            );
+        if (this.route.snapshot.data['propertySetting']) {
+            this.setting = this.route.snapshot.data['propertySetting'].data;
+            this.prePopulateForm(this.setting);
+            this.settingId = this.setting.id;
+            this.invoiceDay = this.setting.invoice_day;
+        }
     }
 
     /**
-     * Add dialog launch
+     *
+     * @param setting
      */
-    addDialog() {
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.data = {
-            roles: this.roles,
-            employees: this.employees,
-            branches: this.branches
-        };
+    prePopulateForm(setting: PropertyGeneralSettingModel) {
+        this.setting = setting;
 
-     /*   const dialogRef = this.dialog.open(AddUserComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    this.loadData();
-                }
-            }
-        );*/
-    }
-
-    /**
-     * Edit dialog launch
-     */
-    editDialog(user: UserSettingModel) {
-
-        const id = user.id;
-
-        const dialogConfig = new MatDialogConfig();
-        dialogConfig.disableClose = true;
-        dialogConfig.autoFocus = true;
-        dialogConfig.data = {user,
-            roles: this.roles,
-            employees: this.employees,
-            branches: this.branches
-        };
-
-       /* const dialogRef = this.dialog.open(EditUserComponent, dialogConfig);
-        dialogRef.afterClosed().subscribe(
-            (val) => {
-                if ((val)) {
-                    this.loadData();
-                }
-            }
-        );*/
-    }
-
-    /**
-     * Fetch data from data source
-     */
-    loadData() {
-        this.dataSource.load(
-            this.search.nativeElement.value,
-            (this.paginator.pageIndex + 1),
-            (this.paginator.pageSize),
-            this.sort.active,
-            this.sort.direction
-        );
-    }
-
-    /**
-     * Handle search and pagination
-     */
-    ngAfterViewInit() {
-
-        fromEvent(this.search.nativeElement, 'keyup')
-            .pipe(
-                debounceTime(1000),
-                distinctUntilChanged(),
-                tap(() => {
-                    this.paginator.pageIndex = 0;
-                    this.loadData();
-                })
-            ).subscribe();
-
-        this.paginator.page.pipe(
-            tap(() => this.loadData() )
-        ).subscribe();
-
-        // reset the paginator after sorting
-        this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
-        merge(this.sort.sortChange, this.paginator.page)
-            .pipe(
-                tap(() => this.loadData())
-            )
-            .subscribe();
-    }
-
-    /**
-     * Open Edit form
-     * @param user
-     */
-    openConfirmationDialog(user: UserSettingModel) {
-
-       /* this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-*/
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(user);
-            }
-            this.dialogRef = null;
+        this.form.patchValue({
+            invoice_day: this.setting.invoice_day
         });
     }
 
+    onSubmit() {}
+
     /**
-     * Remove resource from db
-     * @param user
+     * Update settings
      */
-    delete(user: UserSettingModel) {
+    update() {
+        const body = Object.assign({}, this.setting, this.form.value);
+
+        const formData = new FormData();
+        formData.append('id', body.id);
+
         this.loader = true;
-        this.service.delete(user)
+        this.generalSettingService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! User has been deleted.');
+                    // notify success
+                    this.notification.showNotification('success', 'Success !! Admin Setting has been updated.');
+                    setTimeout(() => {
+                        this.notification.showNotification('success', 'Action !! Login to continue ...');
+                    }, 1000);
                 },
                 (error) => {
                     this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+
+                    if (error.payment === 0) {
+                        return;
+                    }
+                    // An array of all form errors as returned by server
+                    this.formErrors = error;
+
+                    if (this.formErrors) {
+                        // loop through from fields, If has an error, mark as invalid so mat-error can show
+                        for (const prop in this.formErrors) {
+                            if (this.form) {
+                                this.form.controls[prop].setErrors({incorrect: true});
+                            }
+                        }
                     }
                 });
-    }
-
-    /**
-     * Empty search box
-     */
-    clearSearch() {
-        this.search.nativeElement.value = '';
-        this.loadData()
     }
 }

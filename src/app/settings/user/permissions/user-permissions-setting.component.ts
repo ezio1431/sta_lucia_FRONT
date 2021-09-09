@@ -13,7 +13,7 @@ import { EditPermissionComponent } from './edit/edit-permission.component';
 import { NotificationService } from '../../../shared/notification.service';
 
 @Component({
-    selector: 'app-user-permission-setting',
+    selector: 'robi-user-permission-setting',
     templateUrl: './user-permissions-setting.component.html',
     styleUrls: ['./user-permissions-setting.component.css']
 })
@@ -73,6 +73,9 @@ export class UserPermissionsSettingComponent implements OnInit, AfterViewInit {
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
         dialogConfig.data = {permission};
+
+        dialogConfig.width = '550px';
+        dialogConfig.height = '450px';
 
         const dialogRef = this.dialog.open(EditPermissionComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(

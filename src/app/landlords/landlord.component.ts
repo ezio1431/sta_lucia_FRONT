@@ -3,60 +3,45 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { fromEvent, merge, Observable } from 'rxjs';
-import { debounceTime, delay, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialog-component';
 import { AddLandlordComponent } from './add/add-landlord.component';
 import { LandlordModel } from './models/landlord-model';
 import { LandlordDataSource } from './data/landlord-data.source';
 import { NotificationService } from '../shared/notification.service';
-import { LandlordEntityService } from './data/landlord-entity.service';
 import { LandlordService } from './data/landlord.service';
-
+import { AuthenticationService } from '../authentication/authentication.service';
 @Component({
     selector: 'robi-landlords',
     templateUrl: './landlord.component.html',
     styleUrls: ['./landlord.component.scss']
 })
 export class LandlordComponent implements OnInit, AfterViewInit {
-
     displayedColumns = [
         'first_name',
         'last_name',
-        'email'
+        'phone',
+        'email',
+        'actions'
     ];
 
-    /*'actions',*/
-
     loader = false;
-
     dialogRef: MatDialogRef<ConfirmationDialogComponent>;
-
     dataSource: LandlordDataSource;
-
-    // Pagination
+    @ViewChild('search') search: ElementRef;
     @ViewChild(MatPaginator, {static: true }) paginator: MatPaginator;
     length: number;
     pageIndex = 0;
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
     meta: any;
-
-    // Search field
-    @ViewChild('search') search: ElementRef;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
-
-    // Data for the list table display
-    selectedRowIndex = '';
-
-    loading$: Observable<boolean>;
-    meta$: Observable<any>;
-    landlords$: Observable<any>;
-    nextPage = 1;
-    loaded: boolean;
-
-    constructor(private landlordService: LandlordService, private landlordEntityService: LandlordEntityService,
-                private notification: NotificationService, private dialog: MatDialog) {
+    isAdmin$: Observable<boolean>;
+    constructor(private landlordService: LandlordService,
+                private notification: NotificationService,
+                private authenticationService: AuthenticationService,
+                private dialog: MatDialog) {
+        this.isAdmin$ = this.authenticationService.isAdmin();
     }
-
     /**
      * Initialize data lead
      * Set pagination data values
@@ -64,37 +49,8 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
         this.dataSource = new LandlordDataSource(this.landlordService);
-        // Load pagination data
         this.dataSource.meta$.subscribe((res) => this.meta = res);
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-        this.dataSource.load('', 0, 0, 'first_name', 'desc');
-    }
-
-    load(currentPage) {
-        const page = currentPage + 1;
-
-        this.landlordEntityService.getWithQuery({
-            'filter': this.search.nativeElement.value,
-            'page': page.toString(),
-            'limit': '',
-            'sortField': 'updated_at',
-            'sortDirection': 'desc'
-        });
-    }
-
-    /**
-     * Search
-     */
-    filter(currentPage) {
-        const page = currentPage + 1;
-
-            this.landlordEntityService.getWithQuery({
-                'filter': this.search.nativeElement.value,
-                'page': page.toString(),
-                'limit': '',
-                'sortField': 'updated_at',
-                'sortDirection': 'desc'
-            });
+        this.dataSource.load('', 0, 0, 'updated_at', 'desc');
     }
 
     /**
@@ -109,15 +65,6 @@ export class LandlordComponent implements OnInit, AfterViewInit {
             this.sort.direction
         );
     }
-
-    /**
-     * Show or hide the load more button bar
-     * @param presentPage
-     * @param lastPage
-     */
-   showLoadMoreButton(presentPage, lastPage) {
-       return (presentPage + 1) <= lastPage;
-   }
 
     /**
      * Handle search and pagination
@@ -136,10 +83,8 @@ export class LandlordComponent implements OnInit, AfterViewInit {
         this.paginator.page.pipe(
             tap(() => this.loadData() )
         ).subscribe();
-
         // reset the paginator after sorting
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
         merge(this.sort.sortChange, this.paginator.page)
             .pipe(
                 tap(() => this.loadData())
@@ -156,16 +101,15 @@ export class LandlordComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Add dialog launch
+     * @param isAdd
+     * @param landlord
      */
-    addDialog(mode: string, landlord?: LandlordModel) {
+    addDialog(isAdd = true, landlord?: LandlordModel) {
         const dialogConfig = new MatDialogConfig();
         dialogConfig.disableClose = true;
         dialogConfig.autoFocus = true;
 
-        dialogConfig.data = {landlord,
-            mode: mode
-        };
+        dialogConfig.data = {landlord, isAdd};
 
         const dialogRef = this.dialog.open(AddLandlordComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(
@@ -178,53 +122,13 @@ export class LandlordComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * When a landlord is selected for view
-     * @param landlord
-     */
-    onSelected(landlord: LandlordModel): void {
-        this.selectedRowIndex = landlord.id;
-        this.landlordService.changeSelectedLandlord(landlord);
-        this.landlordEntityService.changeSelectedLandlord(landlord);
-    }
-
-
-  /*  onSelected(loan: LoanModel): void {
-        this.selectedRowIndex = loan.id;
-        this.service.changeSelectedLoan(loan);
-    }*/
-
-
-    /**
-     *
-     * @param blob
-     */
-    showFile(blob) {
-        const newBlob = new Blob([blob], {type: 'application/pdf'});
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(newBlob);
-            return;
-        }
-        const data = window.URL.createObjectURL(newBlob);
-        const link = document.createElement('a');
-        link.href = data;
-        link.download = 'statement.pdf';
-        link.click();
-        setTimeout(function() {
-            window.URL.revokeObjectURL(data);
-        }, 100);
-    }
-
-    /**
      * Open Edit form
      * @param landlord
      */
     openConfirmationDialog(landlord: LandlordModel) {
-
         this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true
         });
-
         this.dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.delete(landlord);
@@ -254,5 +158,14 @@ export class LandlordComponent implements OnInit, AfterViewInit {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }
                 });
+    }
+
+    /**
+     * @param landlord
+     */
+    onSelected(landlord: LandlordModel): void {
+        console.log('onSelected');
+        console.log(landlord);
+        this.landlordService.changeSelectedLandlord(landlord);
     }
 }

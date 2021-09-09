@@ -4,41 +4,52 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-header-info">
-                        <h4 class="card-title">New Property</h4>
-                        <p class="card-category"></p>
+                        <h4 class="card-title" *ngIf="isAdd">New Property
+                            <ng-container *ngIf="formError$ | async">
+                                <mat-icon color="warn">error_outline</mat-icon>
+                            </ng-container>
+                        </h4>
+                        <h4 class="card-title" *ngIf="!isAdd">Edit Property
+                            <ng-container *ngIf="formError$ | async">
+                                <mat-icon color="warn">error_outline</mat-icon>
+                            </ng-container>
+                        </h4>
                     </div>
                     <div class="card-body">
 
                         <mat-vertical-stepper [linear]="isLinear" #stepper>
-                            <mat-step [stepControl]="firstFormGroup">
-                                <form [formGroup]="firstFormGroup">
+                            <mat-step [stepControl]="propertyDetailsFormGroup">
+                                <form [formGroup]="propertyDetailsFormGroup">
                                     <ng-template matStepLabel>Property Details</ng-template>
                                     <div class="row col-sm-12">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-12">
+                                            <form [formGroup] = "propertyDetailsFormGroup">
 
-                                            <div class="col-4">
-                                                <input type="file" #profileFileInput class="file-input" accept="image/*"  (change)="onProfilePicSelect($event.target.files)">
-                                                <button mat-button class="mat-stroked-button" (click)="profileFileInput.click()">
-                                                    <i class="material-icons">attachment</i>
-                                                    Photo
-                                                </button>
+                                                <div class="row" *ngIf="!isAdd">
+                                                    <div class="col-sm-6">
+                                                        <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                            <mat-label>Total Units</mat-label>
+                                                            <input matInput formControlName="total_units">
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <button class="mb-4" mat-button color="accent"  [routerLink]="['units']"
+                                                                (click)="onPropertySelected()">
+                                                            <mat-icon>add_circle_outline</mat-icon>
+                                                            Edit Units
+                                                        </button>
+                                                    </div>
+                                                </div>
 
-                                                <img alt="Member Photo" *ngIf="profilePicUrl" [src]="profilePicUrl" style="width: 120px; height: 120px;" class="member-photo">
-                                            </div>
-
-
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <form [formGroup] = "firstFormGroup">
                                                 <div class="row">
                                                     <div class="col-sm-6">
-                                                      <!--  <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                            <mat-label>Landlord Name</mat-label>
-                                                            <input matInput formControlName="landlord_id" placeholder="Landlord Name">
-                                                            <mat-error align="start" *ngIf="formErrors?.landlord_id" class="form__error">{{ formErrors.landlord_id }}</mat-error>
-                                                        </mat-form-field>
--->
-
+                                                        <ng-container *ngIf="!isAdd">
+                                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                                <mat-label>Landlord</mat-label>
+                                                                <input matInput formControlName="landlord_id">
+                                                            </mat-form-field>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="isAdd">
                                                         <mat-form-field color="primary" appearance="outline">
                                                             <mat-label>Landlord</mat-label>
                                                             <mat-select formControlName="landlord_id" #memberSelect>
@@ -48,15 +59,15 @@
                                                                                            noEntriesFoundLabel="No matching Landlord found ...">
                                                                     </ngx-mat-select-search>
                                                                 </mat-option>
-                                                                <mat-option *ngFor="let landlord of filteredServerSideLandlords | async" [value]="landlord.id">
+                                                                <mat-option *ngFor="let landlord of landlordsFiltered$ | async" [value]="landlord.id">
                                                                     {{landlord.first_name}} {{landlord.last_name}}
                                                                 </mat-option>
                                                             </mat-select>
                                                             <mat-error align="start" *ngIf="formErrors?.landlord_id" class="form__error">{{ formErrors.landlord_id }}</mat-error>
                                                         </mat-form-field>
+                                                        </ng-container>
                                                     </div>
                                                     <div class="col-sm-6">
-
                                                         <mat-form-field class="full-width" color="primary" appearance="outline">
                                                             <mat-label>Property Type *</mat-label>
                                                             <mat-select placeholder="Property Type *" formControlName="property_type_id">
@@ -66,9 +77,7 @@
                                                             </mat-select>
                                                             <mat-error align="start" *ngIf="formErrors?.property_type_id" class="form__error">{{ formErrors.property_type_id }}</mat-error>
                                                         </mat-form-field>
-
                                                     </div>
-
                                                 </div>
 
                                                 <div class="row">
@@ -79,7 +88,6 @@
                                                             <mat-error align="start" *ngIf="formErrors?.property_name" class="form__error">{{ formErrors.property_name }}</mat-error>
                                                         </mat-form-field>
                                                     </div>
-
                                                 </div>
 
                                                 <div class="row">
@@ -97,12 +105,9 @@
                                                             <mat-error align="start" *ngIf="formErrors?.location" class="form__error">{{ formErrors.location }}</mat-error>
                                                         </mat-form-field>
                                                     </div>
-
                                                 </div>
 
-
-                                                <!--<div formArrayName="unitFields"
-                                                     *ngFor="let unitField of form.get('unitFields').controls; let i = index;">-->
+                                                <ng-container *ngIf="isAdd">
                                                     <div formArrayName="unitFields"
                                                          *ngFor="let unitField of allUnitFields.controls; let i = index;">
                                                     <div class="row" [formGroupName]="i">
@@ -117,7 +122,6 @@
                                                                     </ng-container>
                                                                 </span>
                                                                 <span matSuffix class="material-icons">menu</span>
-                                                                <!--<mat-hint align="start"><strong> <mat-icon>file_copy</mat-icon>copy</strong> </mat-hint>-->
                                                                 <mat-error align="start" *ngIf="formErrors?.unit_name" class="form__error">{{ formErrors.unit_name }}</mat-error>
                                                             </mat-form-field>
                                                         </div>
@@ -136,8 +140,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                </ng-container>
 
-                                                <div class="row">
+                                                <div class="row mb-4" *ngIf="isAdd">
                                                     <div class="col-6">
                                                         <button mat-button color="accent" (click)="addUnitField()"
                                                                 matTooltip="Add Unit" [matTooltipPosition]="'above'">
@@ -159,8 +164,8 @@
 
                                 </form>
                             </mat-step>
-                            <mat-step [stepControl]="secondFormGroup">
-                                <form [formGroup]="secondFormGroup">
+                            <mat-step [stepControl]="paymentsFormGroup">
+                                <form [formGroup]="paymentsFormGroup">
                                     <ng-template matStepLabel>Payment Settings</ng-template>
 
                                     <div class="row">
@@ -185,72 +190,16 @@
                                         </div>
                                     </div>
 
-
-                                    <!-- Start Late Fee Fields-->
-                              <!--      <div formArrayName="lateFeeFields"
-                                         *ngFor="let lateFeeField of lateFeeFieldsAll.controls; let i = index;">
-                                        <div class="row" [formGroupName]="i">
-                                            <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                                                <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Late Fee Value</mat-label>
-                                                    <input  matInput type="number" min="0" formControlName="late_fee_value" placeholder="Late Fee Value">
-                                                    <mat-error align="start" *ngIf="formErrors?.late_fee_value" class="form__error">{{ formErrors.late_fee_value }}</mat-error>
-                                                </mat-form-field>
-                                            </div>
-
-                                            <div class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6">
-                                                <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Late Fee Type</mat-label>
-                                                    <mat-select placeholder="Late Fee Type" formControlName="late_fee_type">
-                                                        <mat-option *ngFor="let lateFeeType of lateFeeTypes" [value]="lateFeeType.key">
-                                                            {{lateFeeType.value}}
-                                                        </mat-option>
-                                                    </mat-select>
-                                                    <mat-error align="start" *ngIf="formErrors?.late_fee_type" class="form__error">{{ formErrors.late_fee_type }}</mat-error>
-                                                </mat-form-field>
-                                            </div>
-
-                                            <div class="col-2 col-sm-2 col-md-3 col-lg-3 col-xl-3 mt-md-3 mt-lg-3 mt-xl-3">
-                                                <button class="btn btn-link btn-sm btn-just-icon" (click)="lateFeeFieldCopy(i)"
-                                                        mat-icon-button aria-label="Copy to New Field"
-                                                        matTooltip="Copy to New Field" [matTooltipPosition]="'above'">
-                                                    <mat-icon>file_copy</mat-icon>
-                                                </button>
-                                                <button class="btn btn-link btn-sm btn-just-icon" (click)="lateFeeFieldRemove(i)"
-                                                        mat-icon-button color="accent" aria-label="Remove Field"
-                                                        matTooltip="Remove Field" [matTooltipPosition]="'above'">
-                                                    <mat-icon color="warn">close</mat-icon>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-4">
-                                        <div class="col-6">
-                                            <button mat-button color="accent" (click)="lateFeeFieldAdd()"
-                                                    matTooltip="Add Field" [matTooltipPosition]="'above'">
-                                                <mat-icon>add_circle_outline</mat-icon>
-                                                Add Another Late Fee
-                                            </button>
-                                        </div>
-                                    </div>-->
-                                    <!-- End Late Fee Fields-->
-
                                     <!-- Start Payment Method Fields-->
                                     <div formArrayName="paymentMethodFields"
                                          *ngFor="let paymentMethodField of paymentMethodFieldsAll.controls; let i = index;">
                                         <div class="row" [formGroupName]="i">
                                             <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                                                <!--<mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Payment Method Name</mat-label>
-                                                    <input  matInput formControlName="payment_method_name" placeholder="Payment Method Name">
-                                                    <mat-error align="start" *ngIf="formErrors?.payment_method_name" class="form__error">{{ formErrors.payment_method_name }}</mat-error>
-                                                </mat-form-field>-->
-
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
                                                     <mat-label> {{i+1}}. Payment Method Name</mat-label>
                                                     <mat-select placeholder="Payment Method Name" formControlName="payment_method_id">
-                                                        <mat-option *ngFor="let paymentMethod of paymentMethods" [value]="paymentMethod.id">
-                                                            {{paymentMethod.display_name}}
+                                                        <mat-option *ngFor="let paymentMethod of paymentMethods$ | async" [value]="paymentMethod.id">
+                                                            {{paymentMethod.payment_method_display_name}}
                                                         </mat-option>
                                                     </mat-select>
                                                     <mat-error align="start" *ngIf="formErrors?.payment_method_id" class="form__error">{{ formErrors.payment_method_id }}</mat-error>
@@ -289,8 +238,6 @@
                                         </div>
                                     </div>
                                     <!-- End Payment Method Fields-->
-
-
                                     <div>
                                         <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
                                             <mat-icon color="material-icons">arrow_left</mat-icon>
@@ -304,32 +251,24 @@
                                 </form>
                             </mat-step>
 
-                            <mat-step [stepControl]="thirdFormGroup">
-                                <form [formGroup]="thirdFormGroup">
-                                    <ng-template matStepLabel>Fees & Charges</ng-template>
+                            <mat-step [stepControl]="extraChargesFormGroup">
+                                <form [formGroup]="extraChargesFormGroup">
+                                    <ng-template matStepLabel>Extra Charges</ng-template>
 
                                     <!-- Start Extra Charge Fields-->
                                     <div formArrayName="extraChargeFields"
                                          *ngFor="let extraChargeField of extraChargeFieldsAll.controls; let i = index;">
                                         <div class="row" [formGroupName]="i">
                                             <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                                             <!--   <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Extra Charge Name</mat-label>
-                                                    <input  matInput formControlName="extra_charge_name" placeholder="Extra Charge Name">
-                                                    <mat-error align="start" *ngIf="formErrors?.extra_charge_name" class="form__error">{{ formErrors.extra_charge_name }}</mat-error>
-                                                </mat-form-field>-->
-
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
                                                     <mat-label> {{i+1}}. Extra Charge Name</mat-label>
                                                     <mat-select placeholder="Extra Charge Name" formControlName="extra_charge_id">
-                                                        <mat-option *ngFor="let extraCharge of extraCharges" [value]="extraCharge.id">
+                                                        <mat-option *ngFor="let extraCharge of extraCharges$ | async" [value]="extraCharge.id">
                                                             {{extraCharge.extra_charge_display_name}}
                                                         </mat-option>
                                                     </mat-select>
                                                     <mat-error align="start" *ngIf="formErrors?.extra_charge_id" class="form__error">{{ formErrors.extra_charge_id }}</mat-error>
                                                 </mat-form-field>
-
-
                                             </div>
 
                                             <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
@@ -353,13 +292,6 @@
                                             </div>
 
                                             <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
-                                               <!-- <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Frequency</mat-label>
-                                                    <input  matInput formControlName="extra_charge_frequency" placeholder="Frequency">
-                                                    <mat-error align="start" *ngIf="formErrors?.extra_charge_frequency" class="form__error">{{ formErrors.extra_charge_frequency }}</mat-error>
-                                                </mat-form-field>-->
-
-
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
                                                     <mat-label> {{i+1}}. Frequency</mat-label>
                                                     <mat-select placeholder="Frequency" formControlName="extra_charge_frequency">
@@ -409,9 +341,110 @@
                                 </form>
                             </mat-step>
 
+                            <mat-step [stepControl]="lateFeesFormGroup">
+                                <form [formGroup]="lateFeesFormGroup">
+                                    <ng-template matStepLabel>Late Fees</ng-template>
+                                    <div formArrayName="lateFeeFields"
+                                         *ngFor="let lateFeeField of lateFeeFieldsAll.controls; let i = index;">
+                                        <div [formGroupName]="i" class="mb-4">
 
-                            <mat-step [stepControl]="fourthFormGroup">
-                                <form [formGroup]="fourthFormGroup">
+                                            <div class="row">
+                                            <div class="col-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label> {{i+1}}. Late Fee Name</mat-label>
+                                                    <mat-select placeholder="Late Fee Name" formControlName="late_fee_id">
+                                                        <mat-option *ngFor="let lateFee of lateFees$ | async" [value]="lateFee.id">
+                                                            {{lateFee.late_fee_display_name}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                    <mat-error align="start" *ngIf="formErrors?.late_fee_id" class="form__error">{{ formErrors.late_fee_id }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label> {{i+1}}. Late Fee Value</mat-label>
+                                                    <input  matInput type="number" min="0" formControlName="late_fee_value" placeholder="Late Fee Value">
+                                                    <mat-error align="start" *ngIf="formErrors?.late_fee_value" class="form__error">{{ formErrors.late_fee_value }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label> {{i+1}}. Late Fee Type</mat-label>
+                                                    <mat-select placeholder="Late Fee Type" formControlName="late_fee_type">
+                                                        <mat-option *ngFor="let lateFeeType of lateFeeTypes" [value]="lateFeeType.key">
+                                                            {{lateFeeType.value}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                    <mat-error align="start" *ngIf="formErrors?.late_fee_type" class="form__error">{{ formErrors.late_fee_type }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            </div>
+                                            <div class="row">
+
+                                            <div class="col-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label> {{i+1}}. Grace Period (Days)</mat-label>
+                                                    <input  matInput type="number" min="0" formControlName="grace_period" placeholder="Grace Period (Days)">
+                                                    <mat-error align="start" *ngIf="formErrors?.grace_period" class="form__error">{{ formErrors.grace_period }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-4">
+                                                <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                    <mat-label> {{i+1}}. Frequency</mat-label>
+                                                    <mat-select placeholder="Frequency" formControlName="late_fee_frequency">
+                                                        <mat-option *ngFor="let lateFeeFrequency of lateFeeFrequencies" [value]="lateFeeFrequency.key">
+                                                            {{lateFeeFrequency.value}}
+                                                        </mat-option>
+                                                    </mat-select>
+                                                    <mat-error align="start" *ngIf="formErrors?.late_fee_frequency" class="form__error">{{ formErrors.late_fee_frequency }}</mat-error>
+                                                </mat-form-field>
+                                            </div>
+
+                                                <div class="col-2 col-sm-2 col-md-3 col-lg-3 col-xl-3 mt-md-3 mt-lg-3 mt-xl-3">
+                                                    <button class="btn btn-link btn-sm btn-just-icon" (click)="lateFeeFieldCopy(i)"
+                                                            mat-icon-button aria-label="Copy to New Field"
+                                                            matTooltip="Copy to New Field" [matTooltipPosition]="'above'">
+                                                        <mat-icon>file_copy</mat-icon>
+                                                    </button>
+                                                    <button class="btn btn-link btn-sm btn-just-icon" (click)="lateFeeFieldRemove(i)"
+                                                            mat-icon-button color="accent" aria-label="Remove Field"
+                                                            matTooltip="Remove Field" [matTooltipPosition]="'above'">
+                                                        <mat-icon color="warn">close</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-6">
+                                            <button mat-button color="accent" (click)="lateFeeFieldAdd()"
+                                                    matTooltip="Add Field" [matTooltipPosition]="'above'">
+                                                <mat-icon>add_circle_outline</mat-icon>
+                                                Add Another Late Fee
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- End Late Fee Fields-->
+                                    <div>
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                            <mat-icon color="material-icons">arrow_left</mat-icon>
+                                            <span>Back</span>
+                                        </button>
+
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperNext type="button">
+                                            <span>Next</span>
+                                            <mat-icon color="material-icons">arrow_right</mat-icon>
+                                        </button>
+                                    </div>
+                                </form>
+                            </mat-step>
+
+
+                            <mat-step [stepControl]="utilitiesFormGroup">
+                                <form [formGroup]="utilitiesFormGroup">
                                     <ng-template matStepLabel>Utilities</ng-template>
 
                                     <!-- Start Utility Fields-->
@@ -419,58 +452,30 @@
                                          *ngFor="let utilityField of utilityFieldsAll.controls; let i = index;">
                                         <div class="row" [formGroupName]="i">
                                             <div class="col-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
-                                                <!--<mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Utility Name</mat-label>
-                                                    <input  matInput formControlName="utility_name" placeholder="Utility Name">
-                                                    <mat-error align="start" *ngIf="formErrors?.utility_name" class="form__error">{{ formErrors.utility_name }}</mat-error>
-                                                </mat-form-field>-->
-
-
-
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
                                                     <mat-label> {{i+1}}. Utility Name</mat-label>
                                                     <mat-select placeholder="Utility Name" formControlName="utility_id">
-                                                        <mat-option *ngFor="let utility of utilities" [value]="utility.id">
+                                                        <mat-option *ngFor="let utility of utilities$ | async" [value]="utility.id">
                                                             {{utility.utility_display_name}}
                                                         </mat-option>
                                                     </mat-select>
                                                     <mat-error align="start" *ngIf="formErrors?.utility_id" class="form__error">{{ formErrors.utility_id }}</mat-error>
-                                                </mat-form-field>
-
-
-                                            </div>
-
-                                            <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
-                                               <!-- <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Utility Type</mat-label>
-                                                    <input  matInput formControlName="utility_type" placeholder="Utility Type">
-                                                    <mat-error align="start" *ngIf="formErrors?.utility_type" class="form__error">{{ formErrors.utility_type }}</mat-error>
-                                                </mat-form-field>-->
-
-                                                <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Utility Type</mat-label>
-                                                    <mat-select placeholder="Utility Type" formControlName="utility_type">
-                                                        <mat-option *ngFor="let utilityType of utilityTypes" [value]="utilityType.key">
-                                                            {{utilityType.value}}
-                                                        </mat-option>
-                                                    </mat-select>
-                                                    <mat-error align="start" *ngIf="formErrors?.utility_type" class="form__error">{{ formErrors.utility_type }}</mat-error>
                                                 </mat-form-field>
                                             </div>
 
                                             <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
                                                     <mat-label> {{i+1}}. Unit Cost</mat-label>
-                                                    <input  matInput formControlName="unit_cost" placeholder="Unit Cost">
-                                                    <mat-error align="start" *ngIf="formErrors?.unit_cost" class="form__error">{{ formErrors.unit_cost }}</mat-error>
+                                                    <input  matInput formControlName="utility_unit_cost" placeholder="Unit Cost">
+                                                    <mat-error align="start" *ngIf="formErrors?.utility_unit_cost" class="form__error">{{ formErrors.utility_unit_cost }}</mat-error>
                                                 </mat-form-field>
                                             </div>
 
                                             <div class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2">
                                                 <mat-form-field class="full-width" color="primary" appearance="outline">
-                                                    <mat-label> {{i+1}}. Standard Fee</mat-label>
-                                                    <input  matInput formControlName="standard_fee" placeholder="Standard Fee">
-                                                    <mat-error align="start" *ngIf="formErrors?.standard_fee" class="form__error">{{ formErrors.standard_fee }}</mat-error>
+                                                    <mat-label> {{i+1}}. Base Fee</mat-label>
+                                                    <input  matInput type="number" min="0" formControlName="utility_base_fee" placeholder="Base Fee">
+                                                    <mat-error align="start" *ngIf="formErrors?.utility_base_fee" class="form__error">{{ formErrors.utility_base_fee }}</mat-error>
                                                 </mat-form-field>
                                             </div>
 
@@ -509,10 +514,24 @@
                             </mat-step>
                         </mat-vertical-stepper>
 
-                        <div>
-                            <button class="mat-raised-button mat-primary float-right" mat-button type="button" (click)="create()">
-                                <span>Save Property</span>
+                        <div class="d-flex justify-content-center spinner-container mb-2" *ngIf="loader">
+                            <mat-progress-bar
+                                    color="primary"
+                                    mode="query"
+                                    value=50
+                                    bufferValue=75>
+                            </mat-progress-bar>
+                        </div>
 
+                        <div>
+                            <ng-container *ngIf="isAdmin$ | async">
+                                <button *ngIf="!isAdd" [disabled]="loader" mat-button class="mr-2" color="warn"
+                                        (click)="openConfirmationDialog(property)"> <mat-icon>delete</mat-icon>Delete
+                                </button>
+                            </ng-container>
+                            <button class="float-right" mat-raised-button color="primary" (click)="createOrUpdate()"
+                                    [disabled]="!propertyDetailsFormGroup.valid || !paymentsFormGroup.valid">
+                                <span>Save Property</span>
                             </button>
                         </div>
 

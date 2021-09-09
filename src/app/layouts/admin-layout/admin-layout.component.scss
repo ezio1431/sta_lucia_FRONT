@@ -33,6 +33,9 @@
   }*/
 
 
+  .card-header-accent{
+    background: linear-gradient(60deg, mat-color($accent), mat-color($accent));
+  }
 
   .card-header-info .card-icon,
   .card-header-info .card-text,

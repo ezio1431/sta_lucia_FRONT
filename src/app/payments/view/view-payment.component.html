@@ -1,112 +1,95 @@
 <div class="main-content">
-    <div class="container-fluid" *ngIf="landlord$ | async as landlord">
+    <ng-template #no_data>
+        <div class="not-found">
+           <mat-icon>error</mat-icon> Not Found
+        </div>
+    </ng-template>
+
+    <div class="container-fluid" *ngIf="paymentData$ | async as payment; else no_data">
         <div class="row">
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header card-header-info">
-                            <h4 class="card-title">Properties</h4>
+                            <h4 class="card-title">{{payment.receipt_number}}</h4>
                             <p class="card-category"></p>
                         </div>
                         <div class="card-body">
-
-                            <nav mat-tab-nav-bar>
-
-                                <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
-                                   routerLink="/landlords/{{id}}">
-                                    <span class="nav-text">  Info </span></a>
-
-                                <a mat-tab-link routerLinkActive #properties="routerLinkActive" [active]="properties.isActive" [routerLink]="['properties']">
-                                    <span class="nav-text">   Properties </span></a>
-
-                                <a mat-tab-link routerLinkActive #documents="routerLinkActive" [active]="documents.isActive" [routerLink]="['documents']">
-                                    <span class="nav-text">  Documents </span></a>
-                            </nav>
-
-                            <router-outlet></router-outlet>
-
+                            <iframe *ngIf="pdfSrc" width="500" height="600" style="width: 100%"
+                                    [src]="pdfSrc" type="application/pdf">
+                            </iframe>
+                            <div class="d-flex justify-content-center spinner-container"
+                                 *ngIf="loader">
+                                <mat-progress-bar
+                                        color="primary"
+                                        mode="query"
+                                        value=50
+                                        bufferValue=75>
+                                </mat-progress-bar>
+                            </div>
                         </div>
+
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card card-lift--hover shadow border-0 card-profile">
-                        <div class="front">
-                            <div class="cover">
-                                <img class="img" src="../../assets/img/images/rotating_card_thumb3.png"/>
-                            </div>
-                            <div class="card-avatar">
-                                <img [src]="landlord.profile_pic"/>
-                                <!--<img class="img" src="../../../assets/img/images/2.jpg"/>-->
-
-                            </div>
-
-
-                            <div class="content">
-                                <div class="main">
-                                    <h3 class="name">
-                                        {{landlord.first_name}} {{landlord.last_name}}
-                                    </h3>
-                                    <p class="profession">
-                                        <button mat-stroked-button disabled>
-                                            <mat-icon color="accent">phone</mat-icon>
-                                            <span>{{landlord?.phone}}</span>
-                                        </button>
-                                    </p>
-                                    <div class="stats-container">
-                                        <div class="property-stats">
-                                            <p>
-                                                <button mat-icon-button (click)="logoFileInput.click()">
-                                                    <i class="material-icons">attachment</i>photo
-                                                </button>
-                                            </p>
-                                        </div>
-                                        <div class="property-stats">
-                                            <p>
-                                                <button mat-icon-button (click)="addDialog('edit', landlord)">
-                                                    <i class="material-icons">edit</i>edit
-                                                </button>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                </div>
-                            </div>
-                        </div> <!-- end front panel -->
-                    </div>
-
-
-
                         <div class="card">
                             <div class="card-header card-header-info">
                                 <h4 class="card-title">Summary</h4>
-                                <p class="card-category"></p>
+                                <p class="card-category"> Receipt #: {{payment?.receipt_number}}</p>
                             </div>
                             <div class="card-body">
-                                <div class="card-category text-gray"> Properties: 10</div>
-                                <div class="card-category text-gray"> Units: 320</div>
-                                <div class="card-category text-gray"> Charge rate: 10%</div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="card-category text-gray"> Amount </div>
+                                        {{payment?.amount}}
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="card-category text-gray"> Payment Date </div>
+                                        {{payment?.payment_date}}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="card-category text-gray"> Payment Method </div>
+                                        {{payment?.payment_method?.payment_method_display_name}}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="card-category text-gray"> Property </div>
+                                        {{payment?.property?.property_name}}
+                                        ({{payment?.property?.property_code}})
+                                        - {{payment?.property?.location}}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="card-category text-gray"> Lease </div>
+                                        {{payment?.lease?.lease_number}}
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="card-category text-gray"> Unit </div>
+                                        <div>{{payment?.lease?.unit_names}}</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card-category text-gray"> Tenant </div>
+                                        <div class="row col-12">
+                                            {{payment?.tenant?.first_name}} {{payment?.tenant?.middle_name}} {{payment?.tenant?.last_name}}
+                                            <span class="ml-5" *ngIf="payment?.tenant?.contact_phone"><mat-icon inline=true>phone</mat-icon>
+                                                {{payment?.tenant?.contact_phone}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-
-
-                 <!--   <div class="card card-profile">
-                        <div class="card-profile">
-                            <div class="card-avatar" *ngIf="imageToShow">
-                                <img [src]="imageToShow" alt="Profile Picture">
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h6 class="card-category text-gray">{{memberData?.first_name}} {{memberData?.middle_name}} {{memberData?.last_name}}</h6>
-                            <h4 class="card-title"> A/C #. {{memberData?.account?.account_number}}</h4>
-                            <div class="card-description">
-                                <div>Phone: {{memberData?.phone}}</div>
-                                <div>Email: {{memberData?.email}}</div>
-                                Branch: {{memberData?.branch?.name}}
-                            </div>
-                            Joined: {{memberData?.date_became_member_display}}
-                        </div>
-                    </div>-->
                 </div>
         </div>
     </div>

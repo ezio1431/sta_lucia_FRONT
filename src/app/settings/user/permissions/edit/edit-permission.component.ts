@@ -6,7 +6,7 @@ import { PermissionSettingModel } from '../../model/permission-setting-model';
 import { NotificationService } from '../../../../shared/notification.service';
 
 @Component({
-    selector: 'app-edit-permission',
+    selector: 'robi-edit-permission',
     styles: [],
     templateUrl: './edit-permission.component.html'
 })

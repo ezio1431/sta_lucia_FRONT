@@ -9,11 +9,12 @@ declare interface RouteInfo {
     activeOption?: any;
 }
 export const ROUTES: RouteInfo[] = [
-    { path: '/settings', title: 'Appearance',  icon: '', class: '', permission: ['settings-general'], activeOption: true },
-    { path: 'system', title: 'System',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: '/settings', title: 'System',  icon: '', class: '', permission: ['settings-general'], activeOption: true },
     { path: 'property', title: 'Property',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
     { path: 'lease', title: 'Lease',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'payment', title: 'Payment',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'tenant', title: 'Tenant',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'email', title: 'Email & SMS',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'payments', title: 'Payment',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
     { path: 'user', title: 'Users & Roles',  icon: '', class: '', permission: ['settings-users'], activeOption: false }
 ];
 

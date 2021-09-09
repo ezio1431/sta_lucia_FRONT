@@ -1,12 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NotificationService } from '../../../shared/notification.service';
+import { Observable, of } from 'rxjs';
+import { TenantModel } from '../../models/tenant-model';
+import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { TenantEntityService } from '../../data/tenant-entity.service';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { TenantService } from '../../data/tenant.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-    selector: 'robi-view-property-general',
+    selector: 'robi-view-tenant-general',
     templateUrl: './view-tenant-general.component.html',
     styleUrls: ['./view-tenant-general.component.css']
 })
@@ -26,21 +28,27 @@ export class ViewTenantGeneralComponent implements OnInit {
 
     landlord$: Observable<any>;
 
-    constructor(private propertyEntityService: TenantEntityService, private notification: NotificationService) {}
+    tenantID: string;
+    tenantData$: Observable<TenantModel>;
+    constructor(private fb: FormBuilder,
+                private dialog: MatDialog,
+                private notification: NotificationService,
+                private tenantService: TenantService,
+                private router: Router, private route: ActivatedRoute) {
+    }
 
     ngOnInit() {
-      //  this.landlord$ = this.propertyEntityService.selectedLandlordChanges$;
-
-        this.propertyEntityService.selectedOption$.subscribe(property =>
-            this.landlord$ = this.propertyEntityService.entities$
-                .pipe(
-                    map(entities => entities.find(entity => entity.id === property.id))
-                )
-        );
-
-      /*  this.landlord$ = this.propertyEntityService.entities$
-            .pipe(
-                map(entities => entities.find(property => property.id === this.id))
-            );*/
+        this.tenantID = this.route.snapshot.paramMap.get('id');
+        this.tenantService.selectedTenantChanges$.subscribe(data => {
+            if (data) {
+                this.tenantData$ = of(data);
+            }
+            if (!data) {
+                this.tenantService.getById(this.tenantID).subscribe(tenant => {
+                    this.tenantData$ = of(tenant);
+                    this.tenantService.changeSelectedTenant(tenant);
+                });
+            }
+        });
     }
 }

@@ -1,9 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { tap } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
 import { AuthenticationService } from '../../authentication/authentication.service';
 import { AuthActions } from '../../authentication/action-types';
+import {
+    selectorCompanyName,
+    selectorIsAgent,
+    selectorIsLandlord,
+    selectorIsTenant,
+    selectorUserScopes
+} from '../../authentication/authentication.selectors';
 
 declare const $: any;
 declare interface RouteInfo {
@@ -13,19 +20,39 @@ declare interface RouteInfo {
     class: string;
     permission?: any;
 }
-export const ROUTES: RouteInfo[] = [
-    { path: '/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['dashboard-view'] },
-    { path: '/landlord', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['landlord'] },
-    { path: '/landlords', title: 'robi.sidebar.landlords',  icon: 'people_outline', class: '', permission: ['dashboard-view'] },
-    { path: '/properties', title: 'robi.sidebar.properties',  icon: 'business', class: '', permission: ['dashboard-view'] },
-    { path: '/tenants', title: 'robi.sidebar.tenants',  icon: 'group_add', class: '', permission: ['dashboard-view'] },
-    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'format_list_numbered', class: '', permission: ['dashboard-view'] },
-    { path: '/utility_bills', title: 'robi.sidebar.utility-bills',  icon: 'ev_station', class: '', permission: ['dashboard-view'] },
-    { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'post_add', class: '', permission: ['dashboard-view'] },
-    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['dashboard-view'] },
-    { path: '/tasks', title: 'Tasks',  icon: 'format_paint', class: '', permission: ['dashboard-view'] },
-    { path: '/settings', title: 'robi.sidebar.setting',  icon: 'settings', class: '', permission: ['dashboard-view'] },
-    { path: '/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['dashboard-view'] }
+export const ADMIN_ROUTES: RouteInfo[] = [
+    { path: '/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['test1'] },
+    { path: '/landlords', title: 'robi.sidebar.landlords',  icon: 'people_outline', class: '', permission: ['test1'] },
+    { path: '/properties', title: 'robi.sidebar.properties',  icon: 'business', class: '', permission: ['test1', 'am-landlord'] },
+    { path: '/tenants', title: 'robi.sidebar.tenants',  icon: 'group_add', class: '', permission: ['test1'] },
+    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['test1'] },
+    { path: '/readings', title: 'robi.sidebar.utilities',  icon: 'pool', class: '', permission: ['test1'] },
+    { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '', permission: ['test1'] },
+    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['test1'] },
+   // { path: '/tasks', title: 'Maintenance Tasks',  icon: 'format_paint', class: '', permission: ['test1'] },
+    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '', permission: ['test1'] },
+    { path: '/settings', title: 'robi.sidebar.setting',  icon: 'settings', class: '', permission: ['test1'] },
+    { path: '/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['test1'] },
+    { path: '/reports', title: 'Reports',  icon: 'account_tree', class: '', permission: ['test1'] }
+];
+
+export const LANDLORD_ROUTES: RouteInfo[] = [
+    { path: '/landlord/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-landlord'] },
+  //  { path: '/landlord/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-landlord'] },
+    { path: '/properties', title: 'robi.sidebar.properties',  icon: 'business', class: '', permission: ['am-landlord', 'test1'] },
+    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-landlord'] },
+    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-landlord'] },
+    { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '', permission: ['am-landlord'] },
+    { path: '/landlord/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-landlord'] },
+];
+
+export const TENANT_ROUTES: RouteInfo[] = [
+    { path: '/tenant/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-tenant'] },
+    { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-tenant'] },
+   // { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '', permission: ['am-tenant'] },
+    { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-tenant'] },
+    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '', permission: ['am-tenant'] },
+    { path: '/tenant/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-tenant'] },
 ];
 
 @Component({
@@ -34,13 +61,28 @@ export const ROUTES: RouteInfo[] = [
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
-  menuItems: any[];
+  menuItemsAdmin: any[];
+  menuItemsLandlord: any[];
+  menuItemsTenant: any[];
     loading = false;
 
-  constructor(private store: Store<AppState>, private auth: AuthenticationService) { }
+    scopes$: any;
+    isLandlord$: any;
+    isTenant$: any;
+    isAgent$: any;
+    companyName: string;
+  constructor(private store: Store<AppState>, private auth: AuthenticationService) {
+      this.scopes$ = this.store.pipe(select(selectorUserScopes));
+      this.store.pipe(select(selectorCompanyName)).subscribe(name => this.companyName = name);
+      this.isAgent$ = this.store.pipe(select(selectorIsAgent));
+      this.isLandlord$ = this.store.pipe(select(selectorIsLandlord));
+      this.isTenant$ = this.store.pipe(select(selectorIsTenant));
+  }
 
   ngOnInit() {
-    this.menuItems = ROUTES.filter(menuItem => menuItem);
+    this.menuItemsAdmin = ADMIN_ROUTES.filter(menuItem => menuItem);
+    this.menuItemsLandlord = LANDLORD_ROUTES.filter(menuItem => menuItem);
+    this.menuItemsTenant = TENANT_ROUTES.filter(menuItem => menuItem);
   }
 
   isMobileMenu() {

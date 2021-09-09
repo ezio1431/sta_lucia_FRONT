@@ -1,13 +1,11 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, OnInit, Output, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Inject, OnInit, Output, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatStepper } from '@angular/material/stepper';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import * as moment from 'moment';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { InvoiceService } from '../../data/invoice.service';
-import { CheckboxItem } from '../../../settings/property/roles/edit/check-box-item';
+import { CheckboxItem } from './check-box-item';
 
 @Component({
     selector: 'robi-add-member',

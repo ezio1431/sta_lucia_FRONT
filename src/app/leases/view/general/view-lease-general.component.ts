@@ -1,46 +1,30 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NotificationService } from '../../../shared/notification.service';
-import { MatDialog } from '@angular/material/dialog';
-import { LeaseEntityService } from '../../data/lease-entity.service';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { LeaseService } from '../../data/lease.service';
+import { LeaseModel } from '../../models/lease-model';
 
 @Component({
-    selector: 'robi-view-property-general',
+    selector: 'robi-view-lease-general',
     templateUrl: './view-lease-general.component.html',
     styleUrls: ['./view-lease-general.component.css']
 })
 export class ViewLeaseGeneralComponent implements OnInit {
 
-    memberData: any;
-    memberId = '';
-    memberData$: any;
+    lease$: Observable<LeaseModel>;
 
-    profilePicUrl: string;
-    profilePicFileToUpload: File = null;
-
-    imageToShow: any;
-
-    loader = false;
-    memberShipForm = false;
-
-    landlord$: Observable<any>;
-
-    constructor(private propertyEntityService: LeaseEntityService, private notification: NotificationService) {}
+    id: string;
+    leaseData: any;
+    constructor(private leaseService: LeaseService, private route: ActivatedRoute) {}
 
     ngOnInit() {
-      //  this.landlord$ = this.propertyEntityService.selectedLandlordChanges$;
-
-        this.propertyEntityService.selectedOption$.subscribe(property =>
-            this.landlord$ = this.propertyEntityService.entities$
-                .pipe(
-                    map(entities => entities.find(entity => entity.id === property.id))
-                )
-        );
-
-      /*  this.landlord$ = this.propertyEntityService.entities$
-            .pipe(
-                map(entities => entities.find(property => property.id === this.id))
-            );*/
+        this.lease$ = this.leaseService.selectedLeaseChanges$;
+        this.id = this.route.snapshot.paramMap.get('id');
+        this.leaseService.selectedLeaseChanges$.subscribe(data => {
+            this.leaseData = data;
+        });
+        if (this.leaseData == null) {
+            this.lease$ = this.leaseService.getById(this.id);
+        }
     }
 }

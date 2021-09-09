@@ -1,10 +1,14 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
-import { ROUTES } from '../sidebar/sidebar.component';
-import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
+import { ADMIN_ROUTES } from '../sidebar/sidebar.component';
+import {Location} from '@angular/common';
 import { Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import { selectorUserFirstAndLastNames } from '../../authentication/authentication.selectors';
+import { AuthenticationService } from '../../authentication/authentication.service';
+import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'robi-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -15,13 +19,20 @@ export class NavbarComponent implements OnInit {
     private toggleButton: any;
     private sidebarVisible: boolean;
 
-    constructor(location: Location,  private element: ElementRef, private router: Router) {
-      this.location = location;
-          this.sidebarVisible = false;
+    userNames$: any;
+    isAdmin$: Observable<boolean>;
+    constructor(location: Location,  private element: ElementRef,
+                private authenticationService: AuthenticationService,
+                private router: Router, private store: Store) {
+        this.isAdmin$ = this.authenticationService.isAdmin();
+        this.location = location;
+        this.sidebarVisible = false;
     }
 
-    ngOnInit(){
-      this.listTitles = ROUTES.filter(listTitle => listTitle);
+    ngOnInit() {
+        this.userNames$ = this.store.pipe(select(selectorUserFirstAndLastNames));
+
+        this.listTitles = ADMIN_ROUTES.filter(listTitle => listTitle);
       const navbar: HTMLElement = this.element.nativeElement;
       this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0];
       this.router.events.subscribe((event) => {

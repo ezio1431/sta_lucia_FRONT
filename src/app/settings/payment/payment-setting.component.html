@@ -2,22 +2,15 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <p class="card-category">Lease / Tenant Settings</p>
+                <p class="card-category">Payment Settings</p>
             </div>
-
             <div class="card-body">
-
                 <nav mat-tab-nav-bar>
-                    <a mat-tab-link routerLinkActive #payment_method="routerLinkActive" [active]="payment_method.isActive"
-                       [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/payment']">
-                        <span class="nav-text"> Payment Methods</span></a>
-
-                    <a mat-tab-link routerLinkActive #payment_frequency="routerLinkActive" [active]="payment_frequency.isActive"
-                       [routerLink]="['payment_frequency']">
-                        <span class="nav-text"> Payment Frequencies</span></a>
+                    <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive"
+                       [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/payments']">
+                        <span class="nav-text"> Payment Method</span></a>
                 </nav>
                 <router-outlet></router-outlet>
-
             </div>
         </div>
     </div>
