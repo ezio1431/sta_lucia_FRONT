@@ -24,7 +24,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: './layouts/admin-layout/admin-layout.module#AdminLayoutModule',
+        loadChildren: () => import('./layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule),
         resolve : {adminData: AdminDashResolverService},
         canActivate: [AuthGuardAdmin]
       },
