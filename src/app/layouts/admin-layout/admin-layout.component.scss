@@ -1,3 +1,4 @@
+@use '~@angular/material' as mat;
 @import '~@angular/material/theming';
 
 // mixin name will be used in main style.scss
@@ -15,14 +16,14 @@
 
   .sidebar li.active > a {
     /*color: mat-color($foreground, text);*/
-    background-color: mat-color($primary);
-    box-shadow: 0 4px 20px 0px mat-color($accent, 100), 0 7px 10px -5px mat-color($accent, 100);
+    background-color: mat.get-color-from-palette($primary);
+    box-shadow: 0 4px 20px 0px mat.get-color-from-palette($accent, 100), 0 7px 10px -5px mat.get-color-from-palette($accent, 100);
 
   }
 
   .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-    background-color: mat-color($primary);
-    box-shadow: 0 4px 20px 0px mat-color($accent, 100), 0 7px 10px -5px mat-color($accent, 100);
+    background-color: mat.get-color-from-palette($primary);
+    box-shadow: 0 4px 20px 0px mat.get-color-from-palette($accent, 100), 0 7px 10px -5px mat.get-color-from-palette($accent, 100);
 
    /* 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(244, 67, 54, 0.4)*/
   }
@@ -34,7 +35,7 @@
 
 
   .card-header-accent{
-    background: linear-gradient(60deg, mat-color($accent), mat-color($accent));
+    background: linear-gradient(60deg, mat.get-color-from-palette($accent), mat.get-color-from-palette($accent));
   }
 
   .card-header-info .card-icon,
@@ -43,8 +44,8 @@
   &.bg-info,
   &.card-rotate.bg-info .front,
   &.card-rotate.bg-info .back{
-    background: linear-gradient(60deg, mat-color($primary), mat-color($primary));
-    box-shadow: 0 4px 20px 0px mat-color($accent, 100), 0 7px 10px -5px mat-color($accent, 100);
+    background: linear-gradient(60deg, mat.get-color-from-palette($primary), mat.get-color-from-palette($primary));
+    box-shadow: 0 4px 20px 0px mat.get-color-from-palette($accent, 100), 0 7px 10px -5px mat.get-color-from-palette($accent, 100);
 
     /*
     box-shadow: 0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(156, 39, 176, 0.4);
@@ -52,7 +53,7 @@
   }
 
   .text-color-primary{
-    color:  mat-color($primary);
+    color:  mat.get-color-from-palette($primary);
   }
 
 /*  .mat-button-toggle {
@@ -61,8 +62,8 @@
   }*/
 
   .mat-button-toggle-checked {
-    background-color: mat-color($accent);
-    color: mat-color($accent, default-contrast);
+    background-color: mat.get-color-from-palette($accent);
+    color: mat.get-color-from-palette($accent, default-contrast);
   }
 
 /*  .mat-row:hover {
@@ -72,7 +73,7 @@
 
   .highlight{
     /* background: red;  green */
-    background: mat-color($accent, A200);
+    background: mat.get-color-from-palette($accent, A200);
   }
 
 
@@ -106,39 +107,39 @@
     mat-toolbar {
       button {
         &.active {
-          color: mat-color($accent, default-contrast);
-          background-color: mat-color($accent);
+          color: mat.get-color-from-palette($accent, default-contrast);
+          background-color: mat.get-color-from-palette($accent);
         }
       }
 
       .link {
-        color: mat-color($primary, default-contrast);
+        color: mat.get-color-from-palette($primary, default-contrast);
       }
     }
 
     mat-sidenav {
       .mat-list-item {
         &.active {
-          color: mat-color($accent, default-contrast);
-          background-color: mat-color($accent) !important;
+          color: mat.get-color-from-palette($accent, default-contrast);
+          background-color: mat.get-color-from-palette($accent) !important;
 
           &:hover {
-            background-color: mat-color($accent, darker) !important;
+            background-color: mat.get-color-from-palette($accent, darker) !important;
           }
         }
       }
     }
 
     .footer {
-      color: mat-color($primary, lighter);
-      background-color: mat-color($primary, darker);
+      color: mat.get-color-from-palette($primary, lighter);
+      background-color: mat.get-color-from-palette($primary, darker);
 
       .links,
       .signature {
         a {
-          color: mat-color($primary, lighter);
+          color: mat.get-color-from-palette($primary, lighter);
           &:hover {
-            color: mat-color($accent);
+            color: mat.get-color-from-palette($accent);
           }
         }
       }

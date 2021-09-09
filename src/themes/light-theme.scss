@@ -1,8 +1,9 @@
-$robi-light-primary: mat-palette($mat-grey, 200, 500, 300);
-$robi-light-accent: mat-palette($mat-brown, 200);
-$robi-light-warn: mat-palette($mat-deep-orange, 200);
+@use '~@angular/material' as mat;
+$robi-light-primary: mat.define-palette(mat.$grey-palette, 200, 500, 300);
+$robi-light-accent: mat.define-palette(mat.$brown-palette, 200);
+$robi-light-warn: mat.define-palette(mat.$deep-orange-palette, 200);
 
-$robi-light-theme: mat-light-theme(
+$robi-light-theme: mat.define-light-theme(
   $robi-light-primary,
   $robi-light-accent,
   $robi-light-warn

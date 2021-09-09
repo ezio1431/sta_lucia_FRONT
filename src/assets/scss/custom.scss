@@ -1,6 +1,7 @@
 // robi theming
+@use '~@angular/material' as mat;
 @import '~@angular/material/theming';
-@include mat-core();
+@include mat.core();
 
 @import '../../themes/default-theme';
 @import '../../themes/light-theme';
@@ -37,61 +38,61 @@
 }*/
 
 .default-theme {
-  @include angular-material-theme($robi-theme);
+  @include mat.all-component-themes($robi-theme);
   @include custom-components-theme($robi-theme);
   /*@include custom-components-theme($robi-theme);*/
 }
 
 .light-theme {
-  @include angular-material-theme($robi-light-theme);
+  @include mat.all-component-themes($robi-light-theme);
   @include custom-components-theme($robi-light-theme);
   /*@include custom-components-theme($robi-light-theme);*/
 }
 
 .black-theme {
-  @include angular-material-theme($robi-black-theme);
+  @include mat.all-component-themes($robi-black-theme);
   @include custom-components-theme($robi-black-theme);
   /*@include custom-components-theme($robi-black-theme);*/
 }
 
 .nature-theme {
-  @include angular-material-theme($robi-nature-theme);
+  @include mat.all-component-themes($robi-nature-theme);
   @include custom-components-theme($robi-nature-theme);
   /*@include custom-components-theme($robi-nature-theme);*/
 }
 
 .orange-theme {
-  @include angular-material-theme($robi-orange-theme);
+  @include mat.all-component-themes($robi-orange-theme);
   @include custom-components-theme($robi-orange-theme);
 }
 
 .red-theme {
-  @include angular-material-theme($robi-red-theme);
+  @include mat.all-component-themes($robi-red-theme);
   @include custom-components-theme($robi-red-theme);
 }
 
 .purple-theme {
-  @include angular-material-theme($robi-purple-theme);
+  @include mat.all-component-themes($robi-purple-theme);
   @include custom-components-theme($robi-purple-theme);
 }
 
 .green-theme {
-  @include angular-material-theme($robi-green-theme);
+  @include mat.all-component-themes($robi-green-theme);
   @include custom-components-theme($robi-green-theme);
 }
 
 .brown-theme {
-  @include angular-material-theme($robi-brown-theme);
+  @include mat.all-component-themes($robi-brown-theme);
   @include custom-components-theme($robi-brown-theme);
 }
 
 .grey-theme {
-  @include angular-material-theme($robi-grey-theme);
+  @include mat.all-component-themes($robi-grey-theme);
   @include custom-components-theme($robi-grey-theme);
 }
 
 .pink-theme {
-  @include angular-material-theme($robi-pink-theme);
+  @include mat.all-component-themes($robi-pink-theme);
   @include custom-components-theme($robi-pink-theme);
 }
 
