@@ -79,7 +79,8 @@ export class AddUnitComponent implements OnInit, AfterViewInit  {
 
             this.form = this.fb.group({
                 unit_mode: [this.selectedUnitType],
-                unit_type_id: [this.unitValue?.unit_type_id],
+                unit_type_id: [this.unitValue?.unit_type_id, [Validators.required,
+                    Validators.minLength(1)]],
                 unit_name: [this.unitValue?.unit_name, [Validators.required,
                     Validators.minLength(1)]],
                 unit_floor: [this.unitValue?.unit_floor],

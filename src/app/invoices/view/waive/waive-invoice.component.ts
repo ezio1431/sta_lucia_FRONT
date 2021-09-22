@@ -38,6 +38,7 @@ export class WaiveInvoiceComponent implements OnInit  {
                 private router: Router,
                 private dialogRef: MatDialogRef<WaiveInvoiceComponent>) {
         this.invoice = row.invoice;
+        this.invoiceNumber = row?.invoice?.invoice_number;
     }
 
     ngOnInit() {
@@ -71,7 +72,6 @@ export class WaiveInvoiceComponent implements OnInit  {
 
         this.waiverService.create(body)
             .subscribe((data) => {
-                console.log(data);
                     this.loader = false;
                     this.onSaveComplete();
                     this.notification.showNotification('success', 'Success !! Waiver was a success.');

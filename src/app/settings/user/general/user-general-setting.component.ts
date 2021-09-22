@@ -86,11 +86,6 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
 
         const dialogRef = this.dialog.open(AddUserComponent, dialogConfig);
 
-       /* const dialogRef = this.dialog.open(AddUserComponent, {
-            width: '550px',
-            height: '500px',
-        });*/
-
         dialogRef.afterClosed().subscribe(
             (val) => {
                 if ((val)) {
@@ -174,8 +169,7 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
                 (error) => {
                     this.loader = false;
                     if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
+                        this.notification.showNotification('danger', error?.error?.message);
                     } else {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }

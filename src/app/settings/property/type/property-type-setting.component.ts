@@ -160,9 +160,8 @@ export class PropertyTypeSettingComponent implements OnInit, AfterViewInit {
                 },
                 (error) => {
                     this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
+                    if (error.error['message']) {
+                        this.notification.showNotification('danger', error.error['message']);
                     } else {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }

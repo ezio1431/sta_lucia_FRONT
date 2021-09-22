@@ -39,7 +39,8 @@ export class EditEmailGeneralComponent implements OnInit  {
         this.smsTemplates = row.smsTemplates;
 
         this.form = fb.group({
-            display_name: [this.communicationSetting.display_name],
+			display_name: [{value: this.communicationSetting.display_name, disabled: true}, [Validators.required,
+                Validators.minLength(3)]],
             send_email: [this.communicationSetting.send_email],
             send_sms: [this.communicationSetting.send_sms]
         });

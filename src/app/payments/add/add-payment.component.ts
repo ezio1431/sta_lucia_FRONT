@@ -157,7 +157,6 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
      * @param lease
      */
     onLeaseItemChange(lease: LeaseModel) {
-        console.log(lease);
         this.leaseID = lease?.id;
         this.propertyID = lease?.property_id;
         this.leaseNumber = lease?.lease_number;

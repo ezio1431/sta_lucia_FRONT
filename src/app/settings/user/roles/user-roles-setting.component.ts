@@ -129,7 +129,11 @@ export class UserRolesSettingComponent implements OnInit, AfterViewInit {
         dialogRef.afterClosed().subscribe(
             (val) => {
                 if ((val)) {
-                    this.loadData();
+                    if (val === 'deleting') {
+                        this.openConfirmationDialog(role);
+                    } else {
+                        this.loadData();
+                    }
                 }
             }
         );
@@ -208,9 +212,8 @@ export class UserRolesSettingComponent implements OnInit, AfterViewInit {
                 },
                 (error) => {
                     this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
+                    if (error.error['message']) {
+                        this.notification.showNotification('danger', error.error['message']);
                     } else {
                         this.notification.showNotification('danger', 'Delete Error !! ');
                     }

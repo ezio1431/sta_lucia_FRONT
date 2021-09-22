@@ -2,11 +2,13 @@
     <div class="container-fluid">
 
         <div class="row">
-            <div class="fab-container" *ngIf="isAdmin$ | async">
-                <button mat-fab class="fab-toggler" [routerLink]="['create']">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
+            <ng-container *robiPermission="['create-lease']">
+                <div class="fab-container" *ngIf="isAdmin$ | async">
+                    <button mat-fab class="fab-toggler" [routerLink]="['create']">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+            </ng-container>
 
             <div class="col-md-12">
                 <div class="card">
@@ -15,12 +17,14 @@
                     </div>
                     <div class="card-body">
                         <div class="row search-form-section">
-                            <div class="col-5" *ngIf="isAdmin$ | async">
-                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
-                                        [routerLink]="['create']">
-                                    <mat-icon>add</mat-icon>Add Lease
-                                </button>
-                            </div>
+                            <ng-container *robiPermission="['create-lease']">
+                                <div class="col-5" *ngIf="isAdmin$ | async">
+                                    <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
+                                            [routerLink]="['create']">
+                                        <mat-icon>add</mat-icon>Add Lease
+                                    </button>
+                                </div>
+                            </ng-container>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">
                                 <mat-form-field class="search-form-field">
                                     <input matInput #search placeholder="{{ 'robi.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
@@ -49,7 +53,7 @@
                                 </ng-container>
 
                                 <ng-container matColumnDef="unit_names">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef> Unit </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.unit_names}} </mat-cell>
                                 </ng-container>
 
@@ -96,6 +100,7 @@
                                 <ng-container matColumnDef="actions">
                                     <mat-header-cell *matHeaderCellDef></mat-header-cell>
                                     <mat-cell *matCellDef="let row" class="button-row">
+                                        <ng-container *robiPermission="['edit-lease', 'delete-lease']">
                                         <ng-container *ngIf="isAdmin$ | async">
                                             <button *ngIf="row?.terminated_on == null" mat-raised-button type="button" matTooltip="Edit Lease"
                                                     [matTooltipPosition]="'above'" class="btn btn-link btn-sm btn-just-icon"
@@ -103,6 +108,7 @@
                                                 <i class="material-icons">edit</i>
                                             </button>
                                          </ng-container>
+                                        </ng-container>
                                     </mat-cell>
                                 </ng-container>
 

@@ -137,10 +137,7 @@ export class StatementComponent implements OnInit  {
         this.accountingService.getDepositAccountStatement({id: id, pdf: pdf})
             .subscribe((res) => {
                     this.loader = false;
-                    // console.log(res);
-                   // this.dataSource = res.data.statement;
                     this.dataSource = res.statement;
-                   // this.account = res.data;
                     this.account = res;
                 },
                 () => {
@@ -171,11 +168,8 @@ export class StatementComponent implements OnInit  {
 
         this.accountingService.getLeaseAccountStatement({id: id, pdf: pdf})
             .subscribe((res) => {
-                console.log(res);
                     this.loader = false;
-                  //  this.dataSource = res.data.statement;
                     this.dataSource = res.statement;
-                  //  this.account = res.data;
                     this.account = res;
                 },
                 () => {

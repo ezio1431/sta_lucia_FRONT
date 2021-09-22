@@ -16,6 +16,9 @@ import {
     actionSettingsChangeLanguage, actionSettingsChangeStickyHeader,
     actionSettingsChangeTheme
 } from '../../core/settings/settings.actions';
+import { AuthActions, AuthenticationActions } from '../../authentication/action-types';
+import { selectorAuthenticatedUser, selectorCompanyName } from '../../authentication/authentication.selectors';
+import { User } from '../../authentication/model/user.model';
 
 @Component({
     selector: 'robi-general-setting',
@@ -45,6 +48,7 @@ export class GeneralSettingComponent implements OnInit {
     amountThousandSeparators: any;
     amountDecimalSeparators: any;
     amountDecimals: any;
+    authenticatedUser: User;
 
     routeAnimationsElements = ROUTE_ANIMATIONS_ELEMENTS;
     settings$: Observable<SettingsState>;
@@ -114,6 +118,14 @@ export class GeneralSettingComponent implements OnInit {
             this.amountDecimalSeparators = this.setting.amount_decimal_separators;
             this.amountDecimals = this.setting.amount_decimals;
         }
+
+        // update the store
+        /*this.store.pipe(select(selectorAuthenticatedUser)).subscribe(user => {
+            const mimi = {...user};
+            mimi.g_settings = this.setting;
+            this.authenticatedUser = mimi;
+        });
+        this.store.dispatch(AuthenticationActions.actionSettings({user: this.authenticatedUser}));*/
      }
 
 
@@ -281,6 +293,14 @@ export class GeneralSettingComponent implements OnInit {
     update() {
 
         const body = Object.assign({}, this.setting, this.form.value);
+
+        // update the store
+       this.store.pipe(select(selectorAuthenticatedUser)).subscribe(user => {
+           const mimi = {...user};
+           mimi.g_settings = body;
+           this.authenticatedUser = mimi;
+       });
+       this.store.dispatch(AuthActions.actionLogin({user: this.authenticatedUser}));
 
         const formData = new FormData();
         formData.append('logo', this.logoToUpload);

@@ -45,7 +45,7 @@ export class AddLandlordComponent implements OnInit  {
             middle_name: [''],
             last_name: ['', [Validators.required,
                 Validators.minLength(2)]],
-            nationality: [''],
+            country: [''],
             id_number: [''],
             passport_number: [''],
             phone: [''],
@@ -89,7 +89,7 @@ export class AddLandlordComponent implements OnInit  {
             first_name: landlord?.first_name,
             middle_name: landlord?.middle_name,
             last_name: landlord?.last_name,
-            nationality: landlord?.nationality,
+            country: landlord?.country,
             id_number: landlord?.id_number,
             passport_number: landlord?.passport_number,
             phone: landlord?.phone,
@@ -122,7 +122,7 @@ export class AddLandlordComponent implements OnInit  {
         }
         this.loader = true;
 
-        this.landlordService.create(formData)
+        this.landlordService.create(body)
             .subscribe((data) => {
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! New Landlord created.');

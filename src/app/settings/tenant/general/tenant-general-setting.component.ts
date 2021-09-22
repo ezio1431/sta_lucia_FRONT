@@ -6,6 +6,7 @@ import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation
 import { NotificationService } from '../../../shared/notification.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GeneralSettingService } from '../../general/data/general-setting.service';
+import { TenantGeneralService } from './data/tenant-general.service';
 import { Store } from '@ngrx/store';
 import { State } from '../../../core/settings/settings.model';
 import { ActivatedRoute } from '@angular/router';
@@ -33,7 +34,7 @@ export class TenantGeneralSettingComponent implements OnInit {
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
     constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
-                private generalSettingService: GeneralSettingService, private notification: NotificationService) {
+                private tenantSettingService: TenantGeneralService, private notification: NotificationService) {
         this.form = this.fb.group({
             tenant_number_prefix: ['', [Validators.required]]
         });
@@ -72,7 +73,7 @@ export class TenantGeneralSettingComponent implements OnInit {
         formData.append('id', body.id);
 
         this.loader = true;
-        this.generalSettingService.update(body)
+        this.tenantSettingService.update(body)
             .subscribe((data) => {
                     this.loader = false;
                     this.notification.showNotification('success', 'Success !! Setting has been updated.');

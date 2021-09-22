@@ -261,7 +261,6 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
      * @param row
      */
     downloadStatement(row: any) {
-        console.log('download invoice');
         this.loader = true;
         this.invoiceService.downloadInvoice({id: row.id, pdf: true})
             .subscribe((res) => {

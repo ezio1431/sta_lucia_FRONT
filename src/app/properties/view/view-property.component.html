@@ -16,7 +16,7 @@
                                         - {{property?.location}}</p>
                                 </div>
                                 <div class="col-4 text-right" *ngIf="isAdmin$ | async">
-                                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                                    <button mat-icon-button [matMenuTriggerFor]="menu" *robiPermission="['edit-property', 'delete-property']">
                                         <mat-icon>more_vert</mat-icon>
                                     </button>
                                     <mat-menu #menu="matMenu">

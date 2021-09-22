@@ -61,14 +61,14 @@
                       </div>
 
                       <div class="row">
-                          <div class="col-6">
-                              <div class="col-6">
+					   <div class="col-6">
                                   <mat-form-field class="full-width" color="primary" appearance="outline">
                                       <mat-label>City</mat-label>
                                       <input matInput formControlName="city" placeholder="City">
                                       <mat-error align="start" *ngIf="formErrors?.city" class="form__error">{{ formErrors.city }}</mat-error>
                                   </mat-form-field>
                               </div>
+                          <div class="col-6">
                               <mat-form-field class="full-width" color="primary" appearance="outline">
                                   <mat-label>State</mat-label>
                                   <input matInput formControlName="state" placeholder="State">

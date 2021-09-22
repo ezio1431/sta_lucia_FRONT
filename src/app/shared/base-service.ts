@@ -18,11 +18,26 @@ export class BaseService<T extends BaseModel> {
 
         this.apiUrl = this.protocol + parsedUrl.hostname + this.version;
 
+        console.log('parsedUrl');
+        console.log(parsedUrl);
+        console.log(parsedUrl.href);
+
+        const href = parsedUrl.href;
+        const productionHost = href.substring(0, href.indexOf('#'));
+        console.log(productionHost);
+
+
+
         if ((parsedUrl.protocol) === 'https:') {
             this.apiUrl = 'https://' + parsedUrl.hostname + this.version;
         } else {
             this.apiUrl = 'http://' + parsedUrl.hostname + this.version;
         }
+
+        if (environment.production) {
+            this.apiUrl = productionHost + this.version;
+        }
+
         this.resourceUrl = this.apiUrl + `/` + this.endpoint;
     }
 

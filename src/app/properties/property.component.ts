@@ -10,9 +10,6 @@ import { PropertyModel } from './models/property-model';
 import { PropertyDataSource } from './data/property-data.source';
 import { NotificationService } from '../shared/notification.service';
 import { PropertyService } from './data/property.service';
-import { select, Store } from '@ngrx/store';
-import { selectorIsAgent, selectorIsLandlord, selectorIsTenant, selectorUserID } from '../authentication/authentication.selectors';
-import { AppState } from '../reducers';
 import { LandlordService } from '../landlords/data/landlord.service';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
@@ -31,7 +28,6 @@ export class PropertyComponent implements OnInit, AfterViewInit {
         'property_name',
         'location',
         'total_units',
-        'property_status',
         'actions'
     ];
 

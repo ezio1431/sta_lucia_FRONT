@@ -66,9 +66,8 @@ export class AddTenantComponent implements OnInit  {
 
             phone: [''],
             email: [''],
-            nationality: [''],
-
-            city_state: [''],
+            country: [''],
+            city: [''],
             postal_code: [''],
             postal_address: [''],
             physical_address: [''],
@@ -142,9 +141,8 @@ export class AddTenantComponent implements OnInit  {
 
             phone: tenant?.phone,
             email: tenant?.email,
-            nationality: tenant?.nationality,
-
-            city_state: tenant?.city_state,
+            country: tenant?.country,
+            city: tenant?.city,
             postal_code: tenant?.postal_code,
             postal_address: tenant?.postal_address,
             physical_address: tenant?.physical_address,

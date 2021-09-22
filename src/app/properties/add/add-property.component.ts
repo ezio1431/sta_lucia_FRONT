@@ -26,7 +26,6 @@ import { LATE_FEE_TYPES } from '../../shared/enums/late-fee-types.enum';
 import { PropertyExtraDataService } from '../data/property-extra-data.service';
 import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
 import { AuthenticationService } from '../../authentication/authentication.service';
-import { LeaseModel } from '../../leases/models/lease-model';
 
 @Component({
     selector: 'robi-add-property',
@@ -34,7 +33,6 @@ import { LeaseModel } from '../../leases/models/lease-model';
     templateUrl: './add-property.component.html'
 })
 export class AddPropertyComponent implements OnInit, OnDestroy  {
-
     form: FormGroup;
     unitFields: FormArray;
     paymentMethodFields: FormArray;
@@ -248,20 +246,7 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
             this.utilities$ = of(res?.utilities);
             this.extraCharges$ = of(res?.extra_charges);
           //  this.amenities$ = of(res?.amenities);
-            this.utilities$ = of(res?.utilities);
         });
-
-        // Extra Charges list
-     //  this.extraCharges$ = this.extraChargeService.list(['extra_charge_name', 'extra_charge_display_name']);
-
-        // late Fees list
-     //   this.lateFees$ = this.lateFeeService.list(['late_fee_name', 'late_fee_display_name']);
-
-        // Property Types list
-    //    this.propertyTypes$ = this.propertyTypeService.list(['name', 'display_name']);
-
-        // Payment Method list
-    //   this.paymentMethods$ = this.paymentMethodService.list(['payment_method_name', 'payment_method_display_name']);
 
         // Amenities list
         this.amenities$ = this.amenityService.list(['amenity_name ', 'amenity_display_name ']);
@@ -271,11 +256,11 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
         });
 
         // Utility list
-        this.utilities$ = this.utilityService.list(['utility_name ', 'utility_display_name ']);
+     /*   this.utilities$ = this.utilityService.list(['utility_name ', 'utility_display_name ']);
         this.utilities$.subscribe(utilities => {
             this.allUtilitiesOptions = utilities.map(
                 x => new CheckboxItem(x.id, x.utility_display_name));
-        });
+        });*/
 
         // listen for search field value changes
         this.landlordServerSideFilteringCtrl.valueChanges

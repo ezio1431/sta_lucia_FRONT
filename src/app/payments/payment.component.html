@@ -1,11 +1,13 @@
 <div class="main-content">
     <div class="container-fluid">
         <div class="row">
-            <div class="fab-container" *ngIf="isAdmin$ | async">
-                <button mat-fab class="fab-toggler" (click)="addDialog()">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
+            <ng-container *robiPermission="['create-payment']">
+                <div class="fab-container" *ngIf="isAdmin$ | async">
+                    <button mat-fab class="fab-toggler" (click)="addDialog()">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+            </ng-container>
 
             <div class="col-md-12">
                 <div class="card">
@@ -14,13 +16,15 @@
                     </div>
                     <div class="card-body">
                         <div class="row search-form-section">
-                            <div class="col-5" *ngIf="isAdmin$ | async">
-                                <button [disabled]="(dataSource?.loading$ | async)"
-                                        mat-button matPrefix mat-stroked-button aria-label="add new"
-                                        (click)="addDialog()">
-                                    <mat-icon>add</mat-icon>Add Payment
-                                </button>
-                            </div>
+                            <ng-container *robiPermission="['create-payment']">
+                                <div class="col-5" *ngIf="isAdmin$ | async">
+                                    <button [disabled]="(dataSource?.loading$ | async)"
+                                            mat-button matPrefix mat-stroked-button aria-label="add new"
+                                            (click)="addDialog()">
+                                        <mat-icon>add</mat-icon>Add Payment
+                                    </button>
+                                </div>
+                            </ng-container>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">
                                 <mat-form-field class="search-form-field">
                                     <input matInput #search placeholder="{{ 'robi.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
@@ -95,19 +99,23 @@
                                                 <mat-icon color="primary">picture_as_pdf</mat-icon>
                                                 <span>Receipt</span>
                                             </button>
-                                            <ng-container *ngIf="isAdmin$ | async">
-                                                <button *ngIf="row.is_pending" mat-menu-item matTooltip="Approve Payment." [matTooltipPosition]="'above'"
-                                                        (click)="approvePayment(row)">
-                                                    <mat-icon class="text-success" color="">check_circle</mat-icon>
-                                                    <span>Approve</span>
-                                                </button>
+                                            <ng-container *robiPermission="['approve-payment']">
+                                                <ng-container *ngIf="isAdmin$ | async">
+                                                    <button *ngIf="row.is_pending" mat-menu-item matTooltip="Approve Payment." [matTooltipPosition]="'above'"
+                                                            (click)="approvePayment(row)">
+                                                        <mat-icon class="text-success" color="">check_circle</mat-icon>
+                                                        <span>Approve</span>
+                                                    </button>
+                                                </ng-container>
                                             </ng-container>
-                                            <ng-container *ngIf="isAdmin$ | async">
-                                                <button *ngIf="row.is_pending" mat-menu-item matTooltip="Cancel Payment." [matTooltipPosition]="'above'"
-                                                        (click)="cancelPayment(row)">
-                                                    <mat-icon color="warn">highlight_off</mat-icon>
-                                                    <span>Cancel</span>
-                                                </button>
+                                            <ng-container *robiPermission="['cancel-payment']">
+                                                <ng-container *ngIf="isAdmin$ | async">
+                                                    <button *ngIf="row.is_pending" mat-menu-item matTooltip="Cancel Payment." [matTooltipPosition]="'above'"
+                                                            (click)="cancelPayment(row)">
+                                                        <mat-icon color="warn">highlight_off</mat-icon>
+                                                        <span>Cancel</span>
+                                                    </button>
+                                                </ng-container>
                                             </ng-container>
                                         </mat-menu>
                                     </mat-cell>

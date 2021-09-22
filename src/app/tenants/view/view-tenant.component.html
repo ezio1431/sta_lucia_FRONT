@@ -14,7 +14,7 @@
                                     <h4 class="card-title">Tenant Details</h4>
                                     <p class="card-category">{{tenant?.first_name}} {{tenant?.last_name}}</p>
                                 </div>
-                                <div class="col-4 text-right">
+                                <div class="col-4 text-right" *robiPermission="['edit-tenant', 'delete-tenant']">
                                     <button mat-icon-button [matMenuTriggerFor]="menu">
                                         <mat-icon>more_vert</mat-icon>
                                     </button>

@@ -9,7 +9,7 @@ import { Observable, of } from 'rxjs';
 import { selectEffectiveTheme } from '../../core/settings/settings.selectors';
 import { AuthenticationActions } from '../action-types';
 import { selectorIsLoggedIn, selectorScopes } from '../auth.selectors';
-import { selectorUserScopes } from '../authentication.selectors';
+import { selectorCompanyName, selectorUserScopes } from '../authentication.selectors';
 
 @Component({templateUrl: 'login.component.html'})
 export class LoginComponent implements OnInit {
@@ -23,13 +23,14 @@ export class LoginComponent implements OnInit {
     theme$: Observable<string>;
 
     loginScopes: any;
-
+    companyName: string;
     constructor(private fb: FormBuilder, private store: Store, private route: ActivatedRoute,
                 private router: Router, private authenticationService: AuthenticationService) {
         this.loginForm = fb.group({
             email: ['', [Validators.required, Validators.email]],
             password: ['', Validators.required]
         });
+        this.store.pipe(select(selectorCompanyName)).subscribe(name => this.companyName = name);
     }
 
     ngOnInit() {
@@ -64,8 +65,8 @@ export class LoginComponent implements OnInit {
             .pipe(tap(
                 user => {
                     this.loader = false;
-                    console.log('AuthActions.actionLogin({user}');
-                    console.log(user);
+                 //   console.log('AuthActions.actionLogin({user}');
+                  //  console.log(user);
 
                     this.store.dispatch(AuthenticationActions.actionLogin({user}));
 
@@ -89,7 +90,7 @@ export class LoginComponent implements OnInit {
             .subscribe(
                 () => {},
                 (error) => {
-                    console.log(error);
+                   // console.log(error);
                     if (error.error.message) {
                         this.loginError = error.error.message;
                     } else {

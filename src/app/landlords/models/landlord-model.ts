@@ -5,7 +5,7 @@ export class LandlordModel extends BaseModel {
     agent: {};
     assets: string;
     city: string;
-    nationality: string;
+    country: string;
     county: string;
     created_at: string;
     created_by: string;

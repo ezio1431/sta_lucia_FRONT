@@ -25,7 +25,7 @@
     <div class="row col-lg-12" formArrayName="permissions">
         <mat-error align="start" *ngIf="formErrors?.permissions" class="form__error">{{ formErrors.permissions }}</mat-error>
 
-            <div *ngFor="let item of items.controls; index as i" class="col-md-3">
+            <div *ngFor="let item of items.controls; index as i" class="col-6">
                 <mat-checkbox
                         [formControlName]="i">
                     {{options[i].label}}
@@ -45,6 +45,9 @@
 </div>
 
 <mat-dialog-actions align="center">
+    <button [disabled]="loader" mat-button class="mr-2" color="warn"
+            (click)="deleting()"> <mat-icon>delete</mat-icon>Delete
+    </button>
     <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">Cancel</button>
     <button mat-raised-button  color="primary" (click)="update()" [disabled]="!editForm.valid || loader">Save</button>
 </mat-dialog-actions>

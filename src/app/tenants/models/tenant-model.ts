@@ -6,7 +6,7 @@ export class TenantModel extends BaseModel {
     business_description: string;
     business_industry: string;
     business_name: string;
-    city_state: string;
+    city: string;
     confirmation_code: string;
     confirmed: boolean;
     phone: string;
@@ -34,7 +34,7 @@ export class TenantModel extends BaseModel {
     id_passport_number: string;
     leases: [];
     marital_status: string;
-    nationality: string;
+    country: string;
     id_number: string;
     next_of_kin_name: string;
     next_of_kin_phone: string;

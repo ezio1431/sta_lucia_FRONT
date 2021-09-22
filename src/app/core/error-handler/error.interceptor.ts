@@ -18,20 +18,14 @@ export class ErrorInterceptor implements HttpInterceptor {
             }
             if (err.status === 401) {
                 this.store.dispatch(AuthActions.actionLogout());
-                // location.reload(true);
             }
-        /*    if (err.status === 429) {
-              //  console.log('Interceptor 429: ', err);
-                // auto logout if 429 response returned from api
-                this.store.dispatch(new Logout());
-                this.notification.showNotification('warning', 'You have made too many server requests in the last minute.' +
+            if (err.status === 429) {
+                this.notification.showNotification('warning', 'Too many server requests in the last minute.' +
                     ' Wait a moment before retying.');
-            }*/
-        /*    if (err.status === 403) {
-                 //   console.log('Interceptor 403: ', err);
-                    this.store.dispatch(new Logout());
+            }
+            if (err.status === 403) {
                 this.notification.showNotification('warning', 'You do not have permission to access this resource..');
-            }*/
+            }
             if (err.status === 500) {
                     return throwError(err);
             }

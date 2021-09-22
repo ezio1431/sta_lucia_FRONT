@@ -59,18 +59,11 @@ export const defaultDataServiceConfig: DefaultDataServiceConfig = {
       provide: STEPPER_GLOBAL_OPTIONS,
       useValue: { showError: true }
     },
-
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HttpUrlGenerator, useClass: AppHttpUrlGenerator },
-
     {provide: MAT_DATE_LOCALE, useValue: 'en-GB'},
-    { provide: DefaultDataServiceConfig, useValue: defaultDataServiceConfig },
-   /* { provide: PersistenceResultHandler, useClass: PagePersistenceResultHandler },*/
-/*
-    { provide: EntityCollectionReducerMethodsFactory, useClass: EntityCollectionPageReducerMethodsFactory }
-*/
+    { provide: DefaultDataServiceConfig, useValue: defaultDataServiceConfig }
   ],
   bootstrap: [AppComponent]
 })

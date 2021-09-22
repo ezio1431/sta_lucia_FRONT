@@ -4,6 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { NotificationService } from '../shared/notification.service';
 import { UserProfileModel } from './model/user-profile.model';
 import { UserProfileService } from './data/user-profile-service';
+import { AuthActions } from '../authentication/action-types';
+import { Store } from '@ngrx/store';
+import { AppState } from '../reducers';
 
 @Component({
   selector: 'robi-user-profile',
@@ -16,7 +19,7 @@ export class UserProfileComponent implements OnInit {
   loader = false;
 
   profile: UserProfileModel;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute,
+  constructor(private store: Store<AppState>, private fb: FormBuilder, private route: ActivatedRoute,
               private userProfileService: UserProfileService, private notification: NotificationService) {
     this.form = this.fb.group({
       role: [{value: '', disabled: true}],
@@ -78,6 +81,7 @@ export class UserProfileComponent implements OnInit {
         .subscribe((data) => {
               this.loader = false;
               this.notification.showNotification('success', 'Success !! User Profile has been updated.');
+              this.store.dispatch(AuthActions.actionLogout());
             },
             (error) => {
               this.loader = false;
@@ -89,6 +93,7 @@ export class UserProfileComponent implements OnInit {
               if (this.formErrors) {
                 for (const prop in this.formErrors) {
                   if (this.form) {
+                    this.form.controls[prop]?.markAsTouched();
                     this.form.controls[prop].setErrors({incorrect: true});
                   }
                 }

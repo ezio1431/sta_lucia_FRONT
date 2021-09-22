@@ -10,7 +10,7 @@
                                     <p class="card-category">{{lease?.lease_number}}</p>
                                 </div>
                                 <div class="col-4 text-right" *ngIf="isAdmin$ | async">
-                                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                                    <button mat-icon-button [matMenuTriggerFor]="menu" *robiPermission="['edit-lease', 'delete-lease']">
                                         <mat-icon>more_vert</mat-icon>
                                     </button>
                                     <mat-menu #menu="matMenu">
@@ -59,11 +59,11 @@
                             </div>
                         </div>
                     <div class="card" *ngIf="isAdmin$ | async">
-                        <button *ngIf="lease?.terminated_on == null" mat-raised-button  color="warn" (click)="terminateLease(lease)">
-                            Terminate Lease ({{lease?.lease_number}})
-                        </button>
-
-
+                        <ng-container *robiPermission="['terminate-lease']">
+                            <button *ngIf="lease?.terminated_on == null" mat-raised-button  color="warn" (click)="terminateLease(lease)">
+                                Terminate Lease ({{lease?.lease_number}})
+                            </button>
+                        </ng-container>
                         <ng-container *ngIf="lease?.terminated_on != null">
                             <div class="card-header-warning">
                                 <h4 class="card-title">Terminated</h4>

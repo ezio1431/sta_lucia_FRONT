@@ -25,7 +25,6 @@ export class TenantComponent implements OnInit, AfterViewInit {
         'last_name',
         'gender',
         'phone',
-        'status',
         'actions'
     ];
 

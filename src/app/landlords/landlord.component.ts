@@ -164,8 +164,6 @@ export class LandlordComponent implements OnInit, AfterViewInit {
      * @param landlord
      */
     onSelected(landlord: LandlordModel): void {
-        console.log('onSelected');
-        console.log(landlord);
         this.landlordService.changeSelectedLandlord(landlord);
     }
 }

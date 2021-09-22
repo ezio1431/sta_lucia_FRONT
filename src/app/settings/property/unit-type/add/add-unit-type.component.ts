@@ -73,20 +73,10 @@ export class AddUnitTypeComponent implements OnInit  {
                 this.notification.showNotification('success', 'Success !! UnitType created.');
             },
             (error) => {
-                this.errorInForm.next(true);
-
                 this.loader = false;
-                if (error.member === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-
+                this.errorInForm.next(true);
+                this.formErrors = error;
                 if (this.formErrors) {
-
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
                     for (const prop in this.formErrors) {
                         if (this.form) {
                             this.form.controls[prop]?.markAsTouched();
@@ -94,7 +84,6 @@ export class AddUnitTypeComponent implements OnInit  {
                         }
                     }
                 }
-
             });
     }
 
@@ -120,18 +109,8 @@ export class AddUnitTypeComponent implements OnInit  {
             (error) => {
                 this.loader = false;
                 this.errorInForm.next(true);
-                // this.formError$.subscribe(subscriber => {subscriber.next(true)});
-
-                if (error.utility === 0) {
-                    // notify error
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-                //  this.formErrors = error.error.error.errors;
-
+                this.formErrors = error;
                 if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
                     for (const prop in this.formErrors) {
                         if (this.form) {
                             this.form.controls[prop]?.markAsTouched();

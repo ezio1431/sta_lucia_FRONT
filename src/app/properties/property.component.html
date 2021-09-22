@@ -3,11 +3,13 @@
 
         <div class="row">
 
-            <div class="fab-container" *ngIf="isAdmin$ | async">
-                <button mat-fab class="fab-toggler" [routerLink]="['create']">
-                    <mat-icon>add</mat-icon>
-                </button>
-            </div>
+            <ng-container *robiPermission="['create-property']">
+                <div class="fab-container" *ngIf="isAdmin$ | async">
+                    <button mat-fab class="fab-toggler" [routerLink]="['create']">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+            </ng-container>
 
             <div class="col-md-12">
                 <div class="card">
@@ -16,12 +18,14 @@
                     </div>
                     <div class="card-body">
                         <div class="row search-form-section">
-                            <div class="col-5" *ngIf="isAdmin$ | async">
-                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
-                                        [routerLink]="['create']">
-                                    <mat-icon>add</mat-icon>Add Property
-                                </button>
-                            </div>
+                            <ng-container *robiPermission="['create-property']">
+                                <div class="col-5" *ngIf="isAdmin$ | async">
+                                    <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
+                                            [routerLink]="['create']">
+                                        <mat-icon>add</mat-icon>Add Property
+                                    </button>
+                                </div>
+                            </ng-container>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">
                                 <mat-form-field class="search-form-field">
                                     <input matInput #search placeholder="{{ 'robi.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
@@ -59,13 +63,8 @@
                                 </ng-container>
 
                                 <ng-container matColumnDef="total_units">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Units </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef> Units </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.total_units}} </mat-cell>
-                                </ng-container>
-
-                                <ng-container matColumnDef="property_status">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Status </mat-header-cell>
-                                    <mat-cell *matCellDef="let row"> {{row.property_status}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="actions">
@@ -76,11 +75,13 @@
                                             <i class="material-icons">expand_more</i>
                                         </button>
 
+                                        <ng-container *robiPermission="['edit-property', 'delete-property']">
                                         <button *ngIf="isAdmin$ | async" mat-raised-button type="button" matTooltip="Edit Property" [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon"
                                                 routerLink="{{row.id}}/edit" (click)="onSelected(row)">
                                             <i class="material-icons">edit</i>
                                         </button>
+                                        </ng-container>
                                     </mat-cell>
                                 </ng-container>
 

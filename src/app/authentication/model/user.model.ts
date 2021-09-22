@@ -9,4 +9,5 @@ export interface User extends BaseModel {
     expires_in: any;
     scope: [];
     settings: GeneralSettingModel;
+    g_settings: GeneralSettingModel;
 }

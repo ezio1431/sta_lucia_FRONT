@@ -19,7 +19,6 @@ export class HasPermissionDirective implements OnInit {
     }
 
     ngOnInit() {
-
         this.store.pipe(select(selectorUserScopes)).subscribe(scopes => {
             this.userScopes = scopes;
             this.updateView();

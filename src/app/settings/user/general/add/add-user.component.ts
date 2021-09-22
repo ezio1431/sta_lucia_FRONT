@@ -5,6 +5,9 @@ import { UserSettingModel } from '../../model/user-setting.model';
 import { UserSettingService } from '../../data/user-setting.service';
 import { NotificationService } from '../../../../shared/notification.service';
 import { BehaviorSubject } from 'rxjs';
+import { AuthActions } from '../../../../authentication/action-types';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../../../reducers';
 
 @Component({
     selector: 'robi-add-user',
@@ -31,6 +34,7 @@ export class AddUserComponent implements OnInit  {
 
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
+                private store: Store<AppState>,
                 private fb: FormBuilder,
                 private userService: UserSettingService,
                 private notification: NotificationService,
@@ -79,30 +83,17 @@ export class AddUserComponent implements OnInit  {
      */
     create() {
         this.errorInForm.next(false);
-
         const body = Object.assign({}, this.user, this.form.value);
-
         this.loader = true;
-
         this.userService.create(body).subscribe((data) => {
                 this.onSaveComplete();
                 this.notification.showNotification('success', 'Success !! User created.');
             },
             (error) => {
                 this.errorInForm.next(true);
-
                 this.loader = false;
-                if (error.member === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
-                    return;
-                }
-                // An array of all form errors as returned by server
-                // this.formErrors = error?.error;
                 this.formErrors = error;
-
                 if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
                     for (const prop in this.formErrors) {
                         if (this.form) {
                             this.form.controls[prop]?.markAsTouched();
@@ -110,7 +101,6 @@ export class AddUserComponent implements OnInit  {
                         }
                     }
                 }
-
             });
     }
 
@@ -119,29 +109,19 @@ export class AddUserComponent implements OnInit  {
      */
     update() {
         const body = Object.assign({}, this.user, this.form.value);
-
         this.loader = true;
         this.errorInForm.next(false);
-
         this.userService.update(body).subscribe((data) => {
                 this.loader = false;
                 this.dialogRef.close(this.form.value);
-                // notify success
                 this.notification.showNotification('success', 'Success !! User has been updated.');
+                this.store.dispatch(AuthActions.actionLogout());
             },
             (error) => {
                 this.loader = false;
                 this.errorInForm.next(true);
-                // this.formError$.subscribe(subscriber => {subscriber.next(true)});
-                if (error.utility === 0) {
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-                //  this.formErrors = error.error.error.errors;
-
+                this.formErrors = error;
                 if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
                     for (const prop in this.formErrors) {
                         if (this.form) {
                             this.form.controls[prop]?.markAsTouched();

@@ -70,12 +70,7 @@ export class VacateComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
         this.dataSource = new VacateDataSource(this.vacateNoticeService);
-        // Load pagination data
         this.dataSource.meta$.subscribe((res) => this.meta = res);
-        // We load initial data here to avoid affecting life cycle hooks if we load all data on after view init
-      //  this.dataSource.load('', 0, 0, 'vacating_date', 'desc');
-
-        // load Notices
         switch (this.activeUser?.userType) {
             case USER_SCOPES.ADMIN: {
                 this.dataSource.load('', 0, 0, 'updated_at', 'desc');

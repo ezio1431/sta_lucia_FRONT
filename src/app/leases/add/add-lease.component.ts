@@ -450,10 +450,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.propertyID = property?.id;
         this.landlordID = property?.landlord_id;
         this.units = property?.vacant_units;
-        this.extraCharges$ = of(property?.extra_charges);
-        this.lateFees$ = of(property?.late_fees);
-        this.utilityCharges$ = of(property?.utility_costs);
-        this.paymentMethods$ = of(property?.payment_methods);
 
         // load the initial tenant list
         this.filteredUnitsMulti.next(this.units.slice());
@@ -465,21 +461,33 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                 this.filterUnitsMulti();
             });
 
-        this.extraCharges$.subscribe(charges => {
-            this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
-        });
+        if (Array.isArray(property?.extra_charges) && property?.extra_charges?.length !== 0) {
+               this.extraCharges$ = of(property?.extra_charges);
+                this.extraCharges$.subscribe(charges => {
+                    this.extraChargesFormGroup.setControl('extraCharges', this.extraChargeFieldReplaceAll());
+                });
+        }
 
-        this.lateFees$.subscribe(fees => {
-            this.lateFeesFormGroup.setControl('lateFeeFields', this.lateFeeFieldReplaceAll());
-        });
+        if (Array.isArray(property?.late_fees) && property?.late_fees?.length !== 0) {
+            this.lateFees$ = of(property?.late_fees);
+            this.lateFees$.subscribe(fees => {
+                this.lateFeesFormGroup.setControl('lateFeeFields', this.lateFeeFieldReplaceAll());
+            });
+        }
 
-        this.utilityCharges$.subscribe(utilities => {
+        if (Array.isArray(property?.utility_costs) && property?.utility_costs?.length !== 0) {
+            this.utilityCharges$ = of(property?.utility_costs);
+            this.utilityCharges$.subscribe(utilities => {
                 this.utilityChargesFormGroup.setControl('utilityCharges', this.utilityChargeReplaceAll());
-        });
+            });
+        }
 
-        this.paymentMethods$.subscribe(paymentMethods => {
+        if (Array.isArray(property?.payment_methods) && property?.payment_methods?.length !== 0) {
+            this.paymentMethods$ = of(property?.payment_methods);
+            this.paymentMethods$.subscribe(paymentMethods => {
                 this.paymentMethodsFormGroup.setControl('paymentMethodFields', this.paymentMethodFieldReplaceAll());
-        });
+            });
+        }
     }
 
     /*Start extra charge section*/
@@ -798,9 +806,6 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.unitFields = this.depositsFormGroup.get('utilityDeposits') as FormArray;
         this.unitFields.removeAt(i);
         const item = this.unitValues.splice(i, 1);
-
-        console.log('Removed = ', item);
-        console.log('After remove: ', this.unitValues);
     }
 
     /**

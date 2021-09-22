@@ -147,7 +147,6 @@ export class ViewInvoiceComponent implements OnInit, AfterViewInit  {
      * Add dialog launch
      */
     waiveInvoice(invoice: InvoiceModel) {
-        console.log('waiveInvoice', invoice);
         this.invoiceID = invoice?.id;
         this.invoiceNumber = invoice?.invoice_number;
         const dialogConfig = new MatDialogConfig();

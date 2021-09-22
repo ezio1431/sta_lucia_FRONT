@@ -14,7 +14,7 @@
                                     <h4 class="card-title">Vacate Notice Details</h4>
                                     <p class="card-category">{{notice?.lease?.lease_number}}</p>
                                 </div>
-                                <div class="col-4 text-right">
+                                <div class="col-4 text-right" *robiPermission="['edit-notice', 'delete-notice']">
                                     <button mat-icon-button [matMenuTriggerFor]="menu">
                                         <mat-icon>more_vert</mat-icon>
                                     </button>

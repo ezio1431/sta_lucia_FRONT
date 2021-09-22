@@ -8,7 +8,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row search-form-section">
-                            <div class="col-5">
+                            <div class="col-5" *robiPermission="['create-notice', 'am-tenant']">
                                 <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
                                         (click)="addDialog()">
                                     <mat-icon>add</mat-icon>Add Vacation Notice
@@ -16,7 +16,7 @@
                             </div>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">
                                 <mat-form-field class="search-form-field">
-                                    <input matInput #search placeholder="{{ 'robi.vacate.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
+                                    <input matInput #search placeholder="Filter" autocomplete="off" [disabled]="meta?.total===0">
                                     <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
                                         <mat-icon>close</mat-icon></button>
                                 </mat-form-field>
@@ -71,7 +71,7 @@
                                             <i class="material-icons">expand_more</i>
                                         </button>
 
-                                        <button mat-raised-button type="button" matTooltip="Edit Notice"
+                                        <button *robiPermission="['edit-notice', 'am-tenant']" mat-raised-button type="button" matTooltip="Edit Notice"
                                                 [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon"  (click)="addDialog(false, row)">
                                             <i class="material-icons">edit</i>

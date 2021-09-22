@@ -1,19 +1,11 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
-import { AccountingDataSource } from '../data/accounting-data.source';
+import { MatDialog } from '@angular/material/dialog';
 import { AccountingService } from '../data/accounting.service';
 import { GeneralJournalService } from '../data/general-journal.service';
 import { NotificationService } from '../../shared/notification.service';
-import { AccountingModel } from '../models/accounting-model';
-import { StatementComponent } from '../statement/statement.component';
-import { fromEvent, merge, Observable, ReplaySubject, Subject } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
-import { AppState } from '../../reducers';
 import { PropertyService } from '../../properties/data/property.service';
 import { DomSanitizer } from '@angular/platform-browser';
 

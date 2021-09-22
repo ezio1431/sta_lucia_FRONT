@@ -117,14 +117,10 @@ export class EmailConfigSettingComponent implements OnInit {
         formData.append('id', body.id);
 
         this.loader = true;
-        this.emailConfigService.update(body)
+        this.emailConfigService.create(body)
             .subscribe((data) => {
                     this.loader = false;
-                    // notify success
                     this.notification.showNotification('success', 'Success !! Email Config Setting has been updated.');
-                    setTimeout(() => {
-                        this.notification.showNotification('success', 'Action !! Login to continue ...');
-                    }, 1000);
                 },
                 (error) => {
                     this.loader = false;
@@ -132,13 +128,13 @@ export class EmailConfigSettingComponent implements OnInit {
                     if (error.payment === 0) {
                         return;
                     }
-                    // An array of all form errors as returned by server
                     this.formErrors = error;
 
                     if (this.formErrors) {
                         // loop through from fields, If has an error, mark as invalid so mat-error can show
                         for (const prop in this.formErrors) {
                             if (this.form) {
+								this.form.controls[prop]?.markAsTouched();
                                 this.form.controls[prop].setErrors({incorrect: true});
                             }
                         }

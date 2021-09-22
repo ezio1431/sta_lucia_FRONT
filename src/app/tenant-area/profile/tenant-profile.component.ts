@@ -4,6 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { TenantProfileModel } from './model/tenant-profile.model';
 import { TenantProfileService } from './data/tenant-profile-service';
 import { NotificationService } from '../../shared/notification.service';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../reducers';
+import { AuthActions } from '../../authentication/action-types';
 
 @Component({
   selector: 'robi-user-profile',
@@ -16,7 +19,7 @@ export class TenantProfileComponent implements OnInit {
   loader = false;
 
   profile: TenantProfileModel;
-  constructor(private fb: FormBuilder, private route: ActivatedRoute,
+  constructor(private store: Store<AppState>, private fb: FormBuilder, private route: ActivatedRoute,
               private tenantProfileService: TenantProfileService,
               private notification: NotificationService) {
     this.form = this.fb.group({
@@ -80,6 +83,7 @@ export class TenantProfileComponent implements OnInit {
               this.loader = false;
               // notify success
               this.notification.showNotification('success', 'Success !! Profile has been updated.');
+              this.store.dispatch(AuthActions.actionLogout());
             },
             (error) => {
               this.loader = false;
@@ -94,6 +98,7 @@ export class TenantProfileComponent implements OnInit {
                 // loop through from fields, If has an error, mark as invalid so mat-error can show
                 for (const prop in this.formErrors) {
                   if (this.form) {
+					  this.form.controls[prop]?.markAsTouched();
                     this.form.controls[prop].setErrors({incorrect: true});
                   }
                 }

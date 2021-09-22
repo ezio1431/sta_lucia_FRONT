@@ -6,6 +6,11 @@ export const actionLogin = createAction(
     props<{user: User}>()
 );
 
+export const actionSettings = createAction(
+   '[Login Page] Settings Action',
+    props<{user: User}>()
+);
+
 export const actionLogout = createAction(
     '[Side Menu] Logout Action'
 );

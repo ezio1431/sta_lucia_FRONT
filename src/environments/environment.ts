@@ -5,7 +5,7 @@
 
 export const environment = {
   production: false,
-  appName: 'Signal Rentals - Property management, rentals, booking',
+  appName: 'Property Management.',
   envName: 'DEV',
   test: false,
   i18nPrefix: '',

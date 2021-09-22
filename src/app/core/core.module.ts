@@ -91,7 +91,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     environment.production
       ? []
       : StoreDevtoolsModule.instrument({
-          name: 'Angular NgRx Material Starter'
+          name: 'Signal Rentals'
         }),
 
     // 3rd party

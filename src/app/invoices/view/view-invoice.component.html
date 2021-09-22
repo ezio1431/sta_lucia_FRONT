@@ -150,11 +150,16 @@
                         <div class="card-body"></div>
                     </div>
 
-                    <div class="card" *ngIf="isAdmin$ | async">
-                        <button mat-raised-button  color="warn" (click)="waiveInvoice(invoice)">
-                            Waive Invoice ({{invoice?.invoice_number}})
-                        </button>
-                    </div>
+
+                    <ng-container *ngIf="invoice?.summary?.amount_due_number > 0">
+                    <ng-container *robiPermission="['waive-invoice']">
+                        <div class="card" *ngIf="isAdmin$ | async">
+                            <button mat-raised-button  color="warn" (click)="waiveInvoice(invoice)">
+                                Waive Invoice ({{invoice?.invoice_number}})
+                            </button>
+                        </div>
+                    </ng-container>
+                    </ng-container>
                 </div>
         </div>
     </div>
