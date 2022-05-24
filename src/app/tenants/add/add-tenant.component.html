@@ -329,9 +329,75 @@
                                             <mat-icon color="material-icons">arrow_left</mat-icon>
                                             <span>Back</span>
                                         </button>
+                                        <button class="mat-raised-button" color="accent" mat-button matStepperNext type="button">
+                                            <span>Next</span>
+                                            <mat-icon color="material-icons">arrow_right</mat-icon>
+                                        </button>
                                     </div>
                                 </form>
                             </mat-step>
+
+                            <mat-step [stepControl]="businessFormGroup">
+                                <form [formGroup]="businessFormGroup">
+                                    <ng-template matStepLabel>Business Details</ng-template>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Business Name</mat-label>
+                                                <input matInput formControlName="business_name" placeholder="Business Name">
+                                                <mat-error align="start" *ngIf="formErrors?.business_name" class="form__error">{{ formErrors.business_name }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>License Number</mat-label>
+                                                <input matInput formControlName="license_number" placeholder="License Number">
+                                                <mat-error align="start" *ngIf="formErrors?.license_number" class="form__error">{{ formErrors.license_number }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Tax ID</mat-label>
+                                                <input matInput formControlName="tax_id" placeholder="Tax ID">
+                                                <mat-error align="start" *ngIf="formErrors?.tax_id" class="form__error">{{ formErrors.tax_id }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Business Address</mat-label>
+                                                <input matInput formControlName="business_address" placeholder="Business Address">
+                                                <mat-error align="start" *ngIf="formErrors?.business_address" class="form__error">{{ formErrors.business_address }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Business Industry</mat-label>
+                                                <input matInput formControlName="business_industry" placeholder="Business Industry">
+                                                <mat-error align="start" *ngIf="formErrors?.business_industry" class="form__error">{{ formErrors.business_industry }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                                            <mat-form-field class="full-width" color="primary" appearance="outline">
+                                                <mat-label>Business Description</mat-label>
+                                                <input matInput formControlName="business_description" placeholder="Business Description">
+                                                <mat-error align="start" *ngIf="formErrors?.business_description" class="form__error">{{ formErrors.business_description }}</mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <button class="mat-raised-button mr-2" color="accent" mat-button matStepperPrevious type="button">
+                                            <mat-icon color="material-icons">arrow_left</mat-icon>
+                                            <span>Back</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </mat-step>
+
                         </mat-vertical-stepper>
 
                         <div class="d-flex justify-content-center spinner-container mb-2" *ngIf="loader">

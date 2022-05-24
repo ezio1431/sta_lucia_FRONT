@@ -33,6 +33,7 @@ export class AddTenantComponent implements OnInit  {
 
     personalFormGroup: FormGroup;
     employmentFormGroup: FormGroup;
+    businessFormGroup: FormGroup;
     nextOfKinFormGroup: FormGroup;
 
     tenantTypes$: Observable<any>;
@@ -96,6 +97,15 @@ export class AddTenantComponent implements OnInit  {
             employment_postal_address: [''],
             employment_physical_address: ['']
         });
+
+        this.businessFormGroup = this._formBuilder.group({
+            business_name: [''],
+            license_number: [''],
+            tax_id: [''],
+            business_address: [''],
+            business_industry: [''],
+            business_description: ['']
+        });
     }
 
     ngOnInit() {
@@ -126,6 +136,7 @@ export class AddTenantComponent implements OnInit  {
         this.populatePersonalData(tenant);
         this.populateNextOfKinData(tenant);
         this.populateEmploymentData(tenant);
+        this.populateBusinessData(tenant);
     }
 
     populatePersonalData(tenant) {
@@ -174,12 +185,24 @@ export class AddTenantComponent implements OnInit  {
         });
     }
 
+    populateBusinessData(tenant) {
+        this.businessFormGroup.patchValue({
+            business_name: tenant?.business_name,
+            license_number: tenant?.license_number,
+            tax_id: tenant?.tax_id,
+            business_address: tenant?.business_address,
+            business_industry: tenant?.business_industry,
+            business_description: tenant?.business_description,
+        });
+    }
+
     /**
      * Create member
      */
     create() {
         this.errorInForm.next(false);
-        const tenantFields = {...this.personalFormGroup.value, ...this.nextOfKinFormGroup.value, ...this.employmentFormGroup.value};
+        const tenantFields = {...this.personalFormGroup.value,
+            ...this.nextOfKinFormGroup.value, ...this.employmentFormGroup.value, ...this.businessFormGroup.value};
         this.loader = true;
         this.tenantService.create(tenantFields)
             .subscribe((res) => {
@@ -212,6 +235,10 @@ export class AddTenantComponent implements OnInit  {
                                 this.employmentFormGroup.controls[prop]?.markAsTouched();
                                 this.employmentFormGroup.controls[prop].setErrors({incorrect: true});
                             }
+                            if (this.businessFormGroup.controls[prop]) {
+                                this.businessFormGroup.controls[prop]?.markAsTouched();
+                                this.businessFormGroup.controls[prop].setErrors({incorrect: true});
+                            }
                         }
                     }
 
@@ -219,7 +246,8 @@ export class AddTenantComponent implements OnInit  {
     }
 
     update() {
-        const tenantFields = {...this.personalFormGroup.value, ...this.nextOfKinFormGroup.value, ...this.employmentFormGroup.value};
+        const tenantFields = {...this.personalFormGroup.value,
+            ...this.nextOfKinFormGroup.value, ...this.employmentFormGroup.value, ...this.businessFormGroup.value};
      //   tenantFields.id = this.tenantID;
         const body = Object.assign({}, this.tenant, tenantFields);
         this.loader = true;

@@ -2,10 +2,6 @@ import { BaseModel } from '../../shared/models/base-model';
 
 export class TenantModel extends BaseModel {
     agent_id: string;
-    business_address: string;
-    business_description: string;
-    business_industry: string;
-    business_name: string;
     city: string;
     confirmation_code: string;
     confirmed: boolean;
@@ -50,6 +46,13 @@ export class TenantModel extends BaseModel {
     rent_payment_contact_postal_address: string;
     tenant_number: string;
     tenant_type_id: string;
+
+    business_name: string;
+    license_number: string;
+    tax_id: string;
+    business_address: string;
+    business_industry: string;
+    business_description: string;
 
     tenant_type: any;
     updated_by: string;
