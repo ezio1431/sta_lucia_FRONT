@@ -16,6 +16,10 @@
                     <a mat-tab-link routerLinkActive #lease_type="routerLinkActive" [active]="lease_type.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['lease_type']">
                         <span class="nav-text"> Lease Types</span></a>
+
+                    <a mat-tab-link routerLinkActive #extra_charge="routerLinkActive" [active]="extra_charge.isActive"
+                       [routerLinkActiveOptions]="{exact: true}" [routerLink]="['extra_charge']">
+                        <span class="nav-text"> Extra Charges</span></a>
                 </nav>
 
 

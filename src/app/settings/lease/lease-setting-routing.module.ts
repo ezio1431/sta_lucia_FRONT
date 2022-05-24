@@ -15,6 +15,11 @@ export const ROUTES: Routes = [
                 path: 'lease_type',
                 loadChildren: () => import('app/settings/lease/lease-type/lease-type-setting.module')
                     .then(m => m.LeaseTypeSettingModule)
+            },
+            {
+                path: 'extra_charge',
+                loadChildren: () => import('app/settings/lease/extra-charge/extra-charge-setting.module')
+                    .then(m => m.ExtraChargeSettingModule)
             }
         ]
     }
