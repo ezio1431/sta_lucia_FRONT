@@ -8,8 +8,8 @@ import { NotificationService } from '../../shared/notification.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LeaseModel } from '../../leases/models/lease-model';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-landlord',
@@ -35,6 +35,7 @@ export class AddLandlordComponent implements OnInit  {
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
                 private landlordService: LandlordService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private authenticationService: AuthenticationService,
                 private router: Router, private route: ActivatedRoute) {
@@ -125,14 +126,13 @@ export class AddLandlordComponent implements OnInit  {
         this.landlordService.create(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! New Landlord created.');
+                    this.notification.showNotification('success', this.translateService.instant('landlords.create.success'));
                     this.onSaveComplete();
                 },
                 (error) => {
                     this.loader = false;
                     if (error.landlord === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     this.formErrors = error;
@@ -159,7 +159,7 @@ export class AddLandlordComponent implements OnInit  {
         this.landlordService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Landlord has been updated.');
+                    this.notification.showNotification('success', this.translateService.instant('landlords.update.success'));
                     this.onSaveComplete();
                 },
                 (error) => {
@@ -198,14 +198,14 @@ export class AddLandlordComponent implements OnInit  {
             .subscribe((data) => {
                     this.loader = false;
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Landlord has been deleted.');
+                    this.notification.showNotification('success', this.translateService.instant('landlords.delete.success'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

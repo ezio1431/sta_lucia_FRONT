@@ -12,19 +12,19 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-header-info">
-                        <h4 class="card-title">{{ 'robi.landlords.title' | translate }}</h4>
+                        <h4 class="card-title">{{ 'landlords.list.title' | translate }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="row search-form-section">
                             <div class="col-5" *robiPermission="['create-landlord']">
                                 <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
                                         [routerLink]="['create']">
-                                    <mat-icon>add</mat-icon>Add Landlord
+                                    <mat-icon>add</mat-icon>{{ 'landlords.add.title' | translate }}
                                 </button>
                             </div>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">
                                 <mat-form-field class="search-form-field">
-                                    <input matInput #search placeholder="{{ 'robi.landlords.filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
+                                    <input matInput #search placeholder="{{ 'filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
                                     <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
                                         <mat-icon>close</mat-icon></button>
                                 </mat-form-field>
@@ -36,7 +36,7 @@
                                        matSortDisableClear>
 
                                 <ng-container matColumnDef="first_name">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> First Name </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'landlords.field.first_name' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row">
                                         <button mat-flat-button routerLink="{{row.id}}" (click)="onSelected(row)">
                                             <span class="link">{{row.first_name}}</span>
@@ -45,30 +45,30 @@
                                 </ng-container>
 
                                 <ng-container matColumnDef="last_name">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Last Name </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'landlords.field.last_name' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.last_name}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="phone">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Phone </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'landlords.field.phone' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.phone}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="email">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Email </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'landlords.field.email' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.email}} </mat-cell>
                                 </ng-container>
 
-
                                 <ng-container matColumnDef="actions">
-                                    <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef>{{ 'actions' | translate }}</mat-header-cell>
                                     <mat-cell *matCellDef="let row" class="button-row">
-                                        <button mat-raised-button type="button" matTooltip="View Landlord" [matTooltipPosition]="'above'"
+                                        <button mat-raised-button type="button" matTooltip="{{ 'landlords.add.view_landlord' | translate }}" [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon" routerLink="{{row.id}}" (click)="onSelected(row)">
                                             <i class="material-icons">expand_more</i>
                                         </button>
 
-                                        <button *robiPermission="['edit-landlord', 'delete-landlord']" mat-raised-button type="button" matTooltip="Edit Landlord" [matTooltipPosition]="'above'"
+                                        <button *robiPermission="['edit-landlord', 'delete-landlord']" mat-raised-button type="button"
+                                                matTooltip="{{ 'landlords.edit.title' | translate }}" [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon" routerLink="{{row.id}}/edit" (click)="onSelected(row)">
                                             <i class="material-icons">edit</i>
                                         </button>
@@ -78,7 +78,7 @@
                                 <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                                 <mat-row *matRowDef="let row; columns: displayedColumns;"> </mat-row>
                             </mat-table>
-                            <span *ngIf="meta?.total===0">No Data</span>
+                            <span *ngIf="meta?.total===0">{{ 'no_data' | translate }}</span>
 
                             <div class="d-flex justify-content-center spinner-container"
                                  *ngIf="(dataSource?.loading$ | async) || loader">

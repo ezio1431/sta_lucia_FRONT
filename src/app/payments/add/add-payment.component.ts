@@ -117,6 +117,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
             payment_date: [moment(), Validators.required],
             notes: [''],
             paid_by: [''],
+            being_payment_for: [''],
             reference_number: [''],
 
             bank_fields: this.fb.group({

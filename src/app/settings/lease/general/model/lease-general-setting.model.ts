@@ -6,7 +6,8 @@ export class LeaseGeneralSettingModel extends BaseModel {
     lease_number_prefix: string;
     next_lease_number: string;
     invoice_number_prefix: string;
-    invoice_footer: string;
+    invoice_disclaimer: string;
+    receipt_notes: string;
     invoice_terms: string;
     show_payment_method_on_invoice: string;
     next_period_billing: boolean;

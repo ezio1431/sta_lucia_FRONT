@@ -5,12 +5,12 @@
 
                 <div class="card">
                     <div class="card-header card-header-info">
-                        <h4 class="card-title" *ngIf="isAdd">New Landlord
+                        <h4 class="card-title" *ngIf="isAdd">{{ 'landlords.create.title' | translate }}
                             <ng-container *ngIf="formError$ | async">
                                 <mat-icon color="warn">error_outline</mat-icon>
                             </ng-container>
                         </h4>
-                        <h4 class="card-title" *ngIf="!isAdd">Edit Landlord
+                        <h4 class="card-title" *ngIf="!isAdd">{{ 'landlords.edit.title' | translate }}
                             <ng-container *ngIf="formError$ | async">
                                 <mat-icon color="warn">error_outline</mat-icon>
                             </ng-container>
@@ -23,15 +23,15 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>First Name</mat-label>
-                                        <input matInput formControlName="first_name" placeholder="First Name">
+                                        <mat-label>{{ 'landlords.field.first_name' | translate }}</mat-label>
+                                        <input matInput formControlName="first_name" placeholder="{{ 'landlords.field.first_name' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.first_name" class="form__error">{{ formErrors.first_name }}</mat-error>
                                     </mat-form-field>
                                 </div>
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Middle Name</mat-label>
-                                        <input matInput formControlName="middle_name" placeholder="Middle Name">
+                                        <mat-label>{{ 'landlords.field.middle_name' | translate }}</mat-label>
+                                        <input matInput formControlName="middle_name" placeholder="{{ 'landlords.field.middle_name' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.middle_name" class="form__error">{{ formErrors.middle_name }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -40,16 +40,16 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Last Name</mat-label>
-                                        <input matInput formControlName="last_name" placeholder="Last Name">
+                                        <mat-label>{{ 'landlords.field.last_name' | translate }}</mat-label>
+                                        <input matInput formControlName="last_name" placeholder="{{ 'landlords.field.last_name' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.last_name" class="form__error">{{ formErrors.last_name }}</mat-error>
                                     </mat-form-field>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Phone</mat-label>
-                                        <input matInput formControlName="phone" placeholder="Phone">
+                                        <mat-label>{{ 'landlords.field.phone' | translate }}</mat-label>
+                                        <input matInput formControlName="phone" placeholder="{{ 'landlords.field.phone' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.phone" class="form__error">{{ formErrors.phone }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -58,17 +58,17 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Email</mat-label>
-                                        <input matInput formControlName="email" placeholder="Email">
+                                        <mat-label>{{ 'landlords.field.email' | translate }}</mat-label>
+                                        <input matInput formControlName="email" placeholder="{{ 'landlords.field.email' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.email" class="form__error">{{ formErrors.email }}</mat-error>
                                     </mat-form-field>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <mat-form-field  class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Registration Date</mat-label>
+                                        <mat-label>{{ 'landlords.field.registration_date' | translate }}</mat-label>
                                         <input matInput (click)="registration_date.open()" [matDatepicker]="registration_date"
-                                               formControlName="registration_date" placeholder="Registration Date">
+                                               formControlName="registration_date" placeholder="{{ 'landlords.field.registration_date' | translate }}">
                                         <mat-datepicker-toggle matSuffix [for]="registration_date"></mat-datepicker-toggle>
                                         <mat-datepicker touchUi #registration_date></mat-datepicker>
                                         <mat-error align="start" *ngIf="formErrors?.registration_date" class="form__error">{{ formErrors.registration_date }}</mat-error>
@@ -79,16 +79,16 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Country</mat-label>
-                                        <input matInput formControlName="country" placeholder="Country">
+                                        <mat-label>{{ 'landlords.field.country' | translate }}</mat-label>
+                                        <input matInput formControlName="country" placeholder="{{ 'landlords.field.country' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.country" class="form__error">{{ formErrors.country }}</mat-error>
                                     </mat-form-field>
                                 </div>
 
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>National ID or Passport</mat-label>
-                                        <input matInput formControlName="id_number" placeholder="National ID or Passport">
+                                        <mat-label>{{ 'landlords.field.national_id_or_passport' | translate }}</mat-label>
+                                        <input matInput formControlName="id_number" placeholder="{{ 'landlords.field.national_id_or_passport' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.id_number" class="form__error">{{ formErrors.id_number }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -98,15 +98,15 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>State</mat-label>
-                                        <input matInput formControlName="state" placeholder="County / State">
+                                        <mat-label>{{ 'landlords.field.state' | translate }}</mat-label>
+                                        <input matInput formControlName="state" placeholder="{{ 'landlords.field.state' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.state" class="form__error">{{ formErrors.state }}</mat-error>
                                     </mat-form-field>
                                 </div>
                                 <div class="col-sm-6">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>City</mat-label>
-                                        <input matInput formControlName="city" placeholder="Zip Code">
+                                        <mat-label>{{ 'landlords.field.city' | translate }}</mat-label>
+                                        <input matInput formControlName="city" placeholder="{{ 'landlords.field.city' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.city" class="form__error">{{ formErrors.city }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -115,8 +115,8 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Postal Address</mat-label>
-                                        <input matInput formControlName="postal_address" placeholder="Postal Address">
+                                        <mat-label>{{ 'landlords.field.postal_address' | translate }}</mat-label>
+                                        <input matInput formControlName="postal_address" placeholder="{{ 'landlords.field.postal_address' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.postal_address" class="form__error">{{ formErrors.postal_address }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -124,8 +124,8 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Physical Address</mat-label>
-                                        <input matInput formControlName="physical_address" placeholder="Physical Address">
+                                        <mat-label>{{ 'landlords.field.physical_address' | translate }}</mat-label>
+                                        <input matInput formControlName="physical_address" placeholder="{{ 'landlords.field.physical_address' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.physical_address" class="form__error">{{ formErrors.physical_address }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -134,8 +134,8 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Residential Address</mat-label>
-                                        <input matInput formControlName="residential_address" placeholder="Residential Address">
+                                        <mat-label>{{ 'landlords.field.residential_address' | translate }}</mat-label>
+                                        <input matInput formControlName="residential_address" placeholder="{{ 'landlords.field.residential_address' | translate }}">
                                         <mat-error align="start" *ngIf="formErrors?.residential_address" class="form__error">{{ formErrors.residential_address }}</mat-error>
                                     </mat-form-field>
                                 </div>
@@ -144,20 +144,19 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <mat-form-field class="full-width" color="primary" appearance="outline">
-                                            <mat-label>Password</mat-label>
-                                            <input matInput formControlName="password" type="password" placeholder="Password">
+                                            <mat-label>{{ 'landlords.field.password' | translate }}</mat-label>
+                                            <input matInput formControlName="password" type="password" placeholder="{{ 'landlords.field.password' | translate }}">
                                             <mat-error align="start" *ngIf="formErrors?.password" class="form__error">{{ formErrors.password }}</mat-error>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-md-6">
                                         <mat-form-field class="full-width" color="primary" appearance="outline">
-                                            <mat-label>Confirm Password</mat-label>
-                                            <input matInput formControlName="password_confirmation" type="password" placeholder="Confirm Password">
+                                            <mat-label>{{ 'landlords.field.confirm_password' | translate }}</mat-label>
+                                            <input matInput formControlName="password_confirmation" type="password" placeholder="{{ 'landlords.field.confirm_password' | translate }}">
                                             <mat-error align="start" *ngIf="formErrors?.password_confirmation" class="form__error">{{ formErrors.password_confirmation }}</mat-error>
                                         </mat-form-field>
                                     </div>
                                 </div>
-
                             </form>
 
                             <div class="d-flex justify-content-center spinner-container mb-2" *ngIf="loader">
@@ -172,14 +171,14 @@
                             <ng-container *robiPermission="['delete-landlord']">
                                 <ng-container *ngIf="isAdmin$ | async">
                                     <button *ngIf="!isAdd" [disabled]="loader" mat-button class="mr-2" color="warn"
-                                            (click)="openConfirmationDialog(landlord)"> <mat-icon>delete</mat-icon>Delete
+                                            (click)="openConfirmationDialog(landlord)"> <mat-icon>delete</mat-icon>{{ 'delete' | translate }}
                                     </button>
                                 </ng-container>
                             </ng-container>
 
                             <button *robiPermission="['create-landlord']" class="float-right" mat-raised-button color="primary" (click)="createOrUpdate()"
                                     [disabled]="!form.valid || loader">
-                                <span>Save Landlord</span>
+                                <span>{{ 'landlords.save_landlord' | translate }}</span>
                             </button>
                         </div>
                 </div>

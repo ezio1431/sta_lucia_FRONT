@@ -15,6 +15,7 @@ import { MatSort } from '@angular/material/sort';
 import { AdminSummaryModel } from './model/admin-summary-model';
 import { ActivatedRoute } from '@angular/router';
 import { ChartType } from 'chart.js';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'robi-dashboard',
@@ -91,6 +92,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   constructor(private store: Store,
               private localStorageService: LocalStorageService,
               private route: ActivatedRoute,
+              private translateService: TranslateService,
               private _formBuilder: FormBuilder,
               private propertyService: PropertyService,
               private vacantUnitService: VacantUnitService) {
@@ -98,6 +100,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           property_id: [''],
           period_id: [''],
       });
+      this.pieChartLabels = [
+          this.translateService.instant('dashboard.pending'),
+          this.translateService.instant('dashboard.paid'),
+          this.translateService.instant('dashboard.billed'),
+      ];
   }
   ngOnInit() {
       this.scopes$ = this.store.pipe(select(selectorUserScopes));
@@ -136,9 +143,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       });
       this.barChartLabels = periodNames;
       this.barChartData = [
-          {data: pendingData, label: 'Pending'},
-          {data: paidData, label: 'Paid'},
-          {data: billedData, label: 'Billed'},
+          {data: pendingData, label: this.translateService.instant('dashboard.pending')},
+          {data: paidData, label: this.translateService.instant('dashboard.paid')},
+          {data: billedData, label: this.translateService.instant('dashboard.billed')},
       ];
 
       this.vacantUnitsDataSource = new VacantUnitDataSource(this.vacantUnitService);

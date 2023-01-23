@@ -4,6 +4,7 @@
 
 </mat-dialog-content>
 <mat-dialog-actions align="center">
-    <button class="mat-raised-button mat-primary  mr-2" (click)="dialogRef.close(true)">Confirm</button>
-    <button class="mat-raised-button" (click)="dialogRef.close(false)">Close</button>
+    <button class="mat-raised-button mat-primary  mr-2" (click)="dialogRef.close(true)">
+        {{ 'confirm' | translate }}</button>
+    <button class="mat-raised-button" (click)="dialogRef.close(false)">{{ 'close' | translate }}</button>
 </mat-dialog-actions>

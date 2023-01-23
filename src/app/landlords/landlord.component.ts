@@ -11,6 +11,7 @@ import { LandlordDataSource } from './data/landlord-data.source';
 import { NotificationService } from '../shared/notification.service';
 import { LandlordService } from './data/landlord.service';
 import { AuthenticationService } from '../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
     selector: 'robi-landlords',
     templateUrl: './landlord.component.html',
@@ -38,6 +39,7 @@ export class LandlordComponent implements OnInit, AfterViewInit {
     isAdmin$: Observable<boolean>;
     constructor(private landlordService: LandlordService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private authenticationService: AuthenticationService,
                 private dialog: MatDialog) {
         this.isAdmin$ = this.authenticationService.isAdmin();
@@ -147,15 +149,14 @@ export class LandlordComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Landlord has been deleted.');
+                    this.notification.showNotification('success', this.translateService.instant('landlords.delete.success_message'));
                 },
                 (error) => {
                     this.loader = false;
                     if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

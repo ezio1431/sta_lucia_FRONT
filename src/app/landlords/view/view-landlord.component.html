@@ -1,7 +1,7 @@
 <div class="main-content">
     <ng-template #no_data>
         <div class="not-found">
-            <mat-icon>error</mat-icon> Not Found
+            <mat-icon>error</mat-icon> {{ 'not_found' | translate }}
         </div>
     </ng-template>
     <div class="container-fluid" *ngIf="landlordData$ | async as landlord; else no_data">
@@ -11,7 +11,7 @@
                         <div class="card-header card-header-info">
                             <div class="row">
                                 <div class="col-8">
-                                    <h4 class="card-title">Landlord Details</h4>
+                                    <h4 class="card-title">{{ 'landlords.details.title' | translate }}</h4>
                                     <p class="card-category">{{landlord?.first_name}} {{landlord?.last_name}}</p>
                                 </div>
                                 <div class="col-4 text-right">
@@ -22,7 +22,7 @@
                                         <button mat-menu-item matTooltip="Edit Landlord." [matTooltipPosition]="'above'"
                                                 routerLink="edit" (click)="onSelected(landlord)">
                                             <mat-icon>edit</mat-icon>
-                                            <span>Edit Landlord</span>
+                                            <span>{{ 'landlords.edit.title' | translate }}</span>
                                         </button>
                                     </mat-menu>
                                 </div>
@@ -32,9 +32,9 @@
                             <nav mat-tab-nav-bar>
                                 <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
                                    routerLink="/landlords/{{landlordID}}">
-                                    <span class="nav-text">  Info </span></a>
+                                    <span class="nav-text">  {{ 'info' | translate }} </span></a>
                                 <a mat-tab-link routerLinkActive #properties="routerLinkActive" [active]="properties.isActive" [routerLink]="['properties']">
-                                    <span class="nav-text">   Properties </span></a>
+                                    <span class="nav-text">  {{ 'properties.list.title' | translate }} </span></a>
                             </nav>
                             <router-outlet></router-outlet>
                         </div>
@@ -43,13 +43,12 @@
                 <div class="col-md-4">
                         <div class="card">
                             <div class="card-header card-header-info">
-                                <h4 class="card-title">Summary</h4>
+                                <h4 class="card-title">{{ 'summary' | translate }}</h4>
                                 <p class="card-category"></p>
                             </div>
                             <div class="card-body">
-                                <div class="card-category text-gray"> Properties: 10</div>
-                                <div class="card-category text-gray"> Units: 320</div>
-                                <div class="card-category text-gray"> Charge rate: 10%</div>
+                                <div class="card-category text-gray">{{ 'properties.list.title' | translate }} : {{landlord?.property_total}}</div>
+                                <div class="card-category text-gray"> {{ 'properties.field.units' | translate }}: {{landlord?.unit_total}}</div>
                             </div>
                         </div>
                 </div>

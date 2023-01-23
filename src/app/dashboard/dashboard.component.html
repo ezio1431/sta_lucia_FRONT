@@ -7,7 +7,7 @@
                       <p class="card-title">{{adminSummary?.pending_amount}}</p>
                   </div>
                   <div class="card-footer">
-                      <div class="stats">Pending Amount</div>
+                      <div class="stats">{{'dashboard.pending_amount' | translate}}</div>
                   </div>
               </div>
           </div>
@@ -17,7 +17,7 @@
                       <p class="card-title">{{adminSummary?.total_properties}} / {{adminSummary?.total_units}}</p>
                   </div>
                   <div class="card-footer">
-                      <div class="stats">Properties / Units</div>
+                      <div class="stats">{{'dashboard.properties_units' | translate}}</div>
                   </div>
               </div>
           </div>
@@ -27,7 +27,7 @@
                       <p class="card-title">{{adminSummary?.total_leases}}</p>
                   </div>
                   <div class="card-footer">
-                      <div class="stats"> Leases</div>
+                      <div class="stats">{{'dashboard.leases' | translate}}</div>
                   </div>
               </div>
           </div>
@@ -37,7 +37,7 @@
                       <p class="card-title">{{adminSummary?.total_tenants}}</p>
                   </div>
                   <div class="card-footer">
-                      <div class="stats">Tenants</div>
+                      <div class="stats">{{'dashboard.tenants' | translate}}</div>
                   </div>
               </div>
           </div>
@@ -46,7 +46,7 @@
           <div class="col-lg-6 col-md-12">
               <div class="card">
                   <div class="card-header card-header-accent">
-                      Period Billing
+                      {{'dashboard.period_billing' | translate}}
                   </div>
                   <div class="card-body">
                       <div class="row">
@@ -66,21 +66,21 @@
                           <div class="col-lg-4 col-md-6 col-sm-6">
                               <div class="card card-stats">
                                   <div class="card-footer">
-                                      <div class="stats">Billed: {{billed$ | async}}</div>
+                                      <div class="stats">{{'dashboard.billed' | translate}}: {{billed$ | async}}</div>
                                   </div>
                               </div>
                           </div>
                           <div class="col-lg-4 col-md-6 col-sm-6">
                               <div class="card card-stats">
                                   <div class="card-footer">
-                                      <div class="stats">Paid: {{paid$ | async}}</div>
+                                      <div class="stats">{{'dashboard.paid' | translate}}: {{paid$ | async}}</div>
                                   </div>
                               </div>
                           </div>
                           <div class="col-lg-4 col-md-6 col-sm-6">
                               <div class="card card-stats">
                                   <div class="card-footer">
-                                      <div class="stats">Pending: {{pending$ | async}}</div>
+                                      <div class="stats">{{'dashboard.pending' | translate}}: {{pending$ | async}}</div>
                                   </div>
                               </div>
                           </div>
@@ -90,7 +90,7 @@
                       <div class="row col-lg-12">
                           <div class="col-lg-12">
                               <mat-form-field color="primary" appearance="outline">
-                                  <mat-label>Period</mat-label>
+                                  <mat-label>{{'dashboard.period' | translate}}</mat-label>
                                   <mat-select formControlName="period_id" #periodSelect
                                               (selectionChange)="onPeriodChange(periodSelect.value)">
                                       <mat-option *ngFor="let period of periods$ | async" [value]="period.period_id">
@@ -107,7 +107,7 @@
           <div class="col-lg-6 col-md-12">
               <div class="card">
                   <div class="card-header card-header-accent">
-                      Period Payments
+                      {{'dashboard.period_payments' | translate}}
                   </div>
               <div class="card-body">
                   <div style="display: block">
@@ -129,8 +129,8 @@
           <div class="col-lg-12 col-md-12">
               <div class="card">
                   <div class="card-header card-header-accent">
-                      <h4 class="card-title">Vacant Units</h4>
-                      <p class="card-category">Total: {{meta?.total}}</p>
+                      <h4 class="card-title">{{'dashboard.vacant_units' | translate}}</h4>
+                      <p class="card-category">{{'total' | translate}}: {{meta?.total}}</p>
                   </div>
                   <div class="card-body table-responsive">
 
@@ -139,34 +139,34 @@
                                  matSortDisableClear>
 
                           <ng-container matColumnDef="unit_mode">
-                              <mat-header-cell *matHeaderCellDef mat-sort-header> Mode </mat-header-cell>
+                              <mat-header-cell *matHeaderCellDef mat-sort-header> {{'dashboard.mode' | translate}} </mat-header-cell>
                               <mat-cell *matCellDef="let row"> {{row.unit_mode | titlecase}} </mat-cell>
                           </ng-container>
 
                           <ng-container matColumnDef="unit_type_id">
-                              <mat-header-cell *matHeaderCellDef mat-sort-header> Type </mat-header-cell>
+                              <mat-header-cell *matHeaderCellDef mat-sort-header> {{'dashboard.type' | translate}} </mat-header-cell>
                               <mat-cell *matCellDef="let row"> {{row.unit_type?.unit_type_display_name}} </mat-cell>
                           </ng-container>
 
                           <ng-container matColumnDef="unit_name">
-                              <mat-header-cell *matHeaderCellDef mat-sort-header> Unit </mat-header-cell>
+                              <mat-header-cell *matHeaderCellDef mat-sort-header>{{'dashboard.unit' | translate}} </mat-header-cell>
                               <mat-cell *matCellDef="let row"> {{row.unit_name | titlecase }} </mat-cell>
                           </ng-container>
 
                           <ng-container matColumnDef="property_id">
-                              <mat-header-cell *matHeaderCellDef mat-sort-header> Property </mat-header-cell>
+                              <mat-header-cell *matHeaderCellDef mat-sort-header>{{'dashboard.property' | translate}} </mat-header-cell>
                               <mat-cell *matCellDef="let row"> {{row.property?.property_name}} - ({{row.property?.property_code}})</mat-cell>
                           </ng-container>
 
                           <ng-container matColumnDef="location">
-                              <mat-header-cell *matHeaderCellDef> Location </mat-header-cell>
+                              <mat-header-cell *matHeaderCellDef> {{'dashboard.location' | translate}} </mat-header-cell>
                               <mat-cell *matCellDef="let row"> {{row.property?.location}} </mat-cell>
                           </ng-container>
 
                           <mat-header-row *matHeaderRowDef="vacantUnitColumns"></mat-header-row>
                           <mat-row *matRowDef="let row; columns: vacantUnitColumns;"> </mat-row>
                       </mat-table>
-                      <span *ngIf="(vacantUnitsDataSource.meta$ | async)['total'] ===0">No Data</span>
+                      <span *ngIf="(vacantUnitsDataSource.meta$ | async)['total'] ===0">{{'no_data' | translate}}</span>
 
                       <div class="d-flex justify-content-center spinner-container"
                            *ngIf="(vacantUnitsDataSource?.loading$ | async) || loader">

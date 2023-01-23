@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="navbar-wrapper">
             <ng-container class="navbar-brand" *ngIf="userNames$ | async as names">
-                Welcome, {{names}}
+                {{'welcome' | translate}}, {{names}}
             </ng-container>
         </div>
         <button mat-raised-button class="navbar-toggler" type="button" (click)="sidebarToggle()">
