@@ -241,7 +241,12 @@
   "vacates.create.title": "New Vacation Notice",
   "vacates.details.title": "Vacate Notice Details",
   "vacates.field.tenant": "Tenant",
+  "vacates.field.find_tenant": "Find Tenant...",
+  "vacates.field.no_tenant": "No matching Tenant found ...",
+  "vacates.field.id_pass": "ID / Pass",
   "vacates.field.lease": "Lease",
+  "vacates.field.property": "Property",
+  "vacates.field.unit": "Unit",
   "vacates.field.vacating_date": "Vacating Date",
   "vacates.field.vacating_reason": "Vacating Reason",
 

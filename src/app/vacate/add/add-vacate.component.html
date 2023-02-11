@@ -1,34 +1,34 @@
-<h5 mat-dialog-title *ngIf="isAdd">New Vacation Notice
+<h5 mat-dialog-title *ngIf="isAdd">{{ 'vacates.create.title' | translate }}
     <ng-container *ngIf="formError$ | async">
         <mat-icon color="warn">error_outline</mat-icon>
     </ng-container>
 </h5>
-<h5 mat-dialog-title *ngIf="!isAdd">Edit Vacation Notice
+<h5 mat-dialog-title *ngIf="!isAdd">{{ 'vacates.edit.title' | translate }}
     <ng-container *ngIf="formError$ | async">
         <mat-icon color="warn">error_outline</mat-icon>
     </ng-container>
 </h5>
 
-
-<mat-dialog-content class="mat-dialog-data" [formGroup]="form"  (ngSubmit)="create()">
-
+<mat-dialog-content class="mat-dialog-data" [formGroup]="form" (ngSubmit)="create()">
     <div class="row" *ngIf="isAdmin$ | async">
         <div class="col-sm-12">
             <mat-form-field color="primary" appearance="outline">
-                <mat-label>Tenant</mat-label>
-                <mat-select placeholder="Tenant*" formControlName="tenant" #tenantSelect
+                <mat-label>{{ 'vacates.field.tenant' | translate }}</mat-label>
+                <mat-select placeholder="{{ 'vacates.field.tenant' | translate }}" formControlName="tenant"
+                            #tenantSelect
                             (selectionChange)="onTenantItemChange(tenantSelect.value)">
                     <mat-option>
                         <ngx-mat-select-search [formControl]="tenantServerSideFilteringCtrl" [searching]="searching"
-                                               placeholderLabel="Find Tenant..."
-                                               noEntriesFoundLabel="No matching Tenant found ...">
+                                               placeholderLabel="{{ 'vacates.field.find_tenant' | translate }}"
+                                               noEntriesFoundLabel="{{ 'vacates.field.no_tenant' | translate }}">
                         </ngx-mat-select-search>
                     </mat-option>
                     <mat-option *ngFor="let tenant of tenantsFiltered$ | async" [value]="tenant">
                         {{tenant?.first_name}} {{tenant?.middle_name}} {{tenant?.last_name}}
                     </mat-option>
                 </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.tenant" class="form__error">{{ formErrors.tenant }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.tenant"
+                           class="form__error">{{ formErrors.tenant }}</mat-error>
                 <mat-hint class="text-info" align="start" *ngIf="tenant$ | async as tenant">
                     <div>
                        <span>
@@ -37,7 +37,7 @@
                        </span>
 
                         <span class="ml-5">
-                        ID / Pass : {{tenant?.id_passport_number}}
+                        {{ 'vacates.field.id_pass' | translate }} : {{tenant?.id_passport_number}}
                        </span>
 
                         <span class="ml-5">
@@ -49,31 +49,18 @@
         </div>
     </div>
 
- <!--   <div class="row">
+    <div class="row mb-4">
         <div class="col-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Lease</mat-label>
-                <mat-select placeholder="Lease" formControlName="lease_id" #leaseSelect
+                <mat-label>{{ 'vacates.field.lease' | translate }}</mat-label>
+                <mat-select formControlName="lease_id" #leaseSelect
                             (selectionChange)="onLeaseItemChange(leaseSelect.value)">
                     <mat-option *ngFor="let lease of (leases$ | async)" [value]="lease.id">
                         {{lease?.lease_number}}
                     </mat-option>
                 </mat-select>
-            </mat-form-field>
-        </div>
-    </div>-->
-
-    <div class="row mb-4">
-        <div class="col-6">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Lease</mat-label>
-                <mat-select formControlName="lease_id" #leaseSelect
-                            (selectionChange)="onLeaseItemChange(leaseSelect.value)">
-                        <mat-option *ngFor="let lease of (leases$ | async)" [value]="lease.id">
-                            {{lease?.lease_number}}
-                        </mat-option>
-                </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.lease" class="form__error">{{ formErrors.lease }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.lease"
+                           class="form__error">{{ formErrors.lease }}</mat-error>
                 <mat-hint class="text-info" align="start" *ngIf="lease$ | async as lease">
                     <div>
                        <span class="mr-1">
@@ -94,13 +81,14 @@
             </mat-form-field>
         </div>
         <div class="col-6">
-            <mat-form-field  class="full-width" color="primary" appearance="outline">
-                <mat-label>Vacating Date</mat-label>
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>{{ 'vacates.field.vacating_date' | translate }}</mat-label>
                 <input matInput (click)="vacating_date.open()" [matDatepicker]="vacating_date"
-                       formControlName="vacating_date" placeholder="Vacating Date">
+                       formControlName="vacating_date" placeholder="{{ 'vacates.field.vacating_date' | translate }}">
                 <mat-datepicker-toggle matSuffix [for]="vacating_date"></mat-datepicker-toggle>
                 <mat-datepicker touchUi #vacating_date></mat-datepicker>
-                <mat-error align="start" *ngIf="formErrors?.vacating_date" class="form__error">{{ formErrors.vacating_date }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.vacating_date"
+                           class="form__error">{{ formErrors.vacating_date }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -108,10 +96,13 @@
     <div class="row">
         <div class="col-sm-12">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Vacating Reason</mat-label>
-                <textarea  formControlName="vacating_reason" matInput #vacating_reason placeholder="Vacating Reason" maxlength="150" rows="2"></textarea>
+                <mat-label>{{ 'vacates.field.vacating_reason' | translate }}</mat-label>
+                <textarea formControlName="vacating_reason" matInput #vacating_reason
+                          placeholder="{{ 'vacates.field.vacating_reason' | translate }}" maxlength="150"
+                          rows="2"></textarea>
                 <mat-hint align="end">{{vacating_reason.value.length}} / 150</mat-hint>
-                <mat-error align="start" *ngIf="formErrors?.vacating_reason" class="form__error">{{ formErrors.vacating_reason }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.vacating_reason"
+                           class="form__error">{{ formErrors.vacating_reason }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -130,11 +121,14 @@
 <mat-dialog-actions align="center">
 
     <ng-container *ngIf="isAdmin$ | async">
-        <button class="float-left mr-2" *ngIf="!isAdd" [disabled]="loader" mat-button color="warn" [mat-dialog-close]="true"
-                (click)="deleting()">Delete
+        <button class="float-left mr-2" *ngIf="!isAdd" [disabled]="loader" mat-button color="warn"
+                [mat-dialog-close]="true"
+                (click)="deleting()">{{ 'delete' | translate }}
         </button>
     </ng-container>
 
-    <button [disabled]="loader" mat-button class="mr-2" color="primary" [mat-dialog-close]="true" (click)="close()">Close</button>
-    <button mat-raised-button color="primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="primary" [mat-dialog-close]="true"
+            (click)="close()">{{ 'close' | translate }}</button>
+    <button mat-raised-button color="primary" (click)="createOrUpdate()"
+            [disabled]="!form.valid || loader">{{ 'save' | translate }}</button>
 </mat-dialog-actions>

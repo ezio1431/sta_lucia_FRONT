@@ -4,19 +4,19 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header card-header-info">
-                        <h4 class="card-title">{{ 'robi.vacate.title' | translate }}</h4>
+                        <h4 class="card-title">{{ 'vacates.list.title' | translate }}</h4>
                     </div>
                     <div class="card-body">
                         <div class="row search-form-section">
                             <div class="col-5" *robiPermission="['create-notice', 'am-tenant']">
-                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
+                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button
                                         (click)="addDialog()">
-                                    <mat-icon>add</mat-icon>Add Vacation Notice
+                                    <mat-icon>add</mat-icon>{{ 'vacates.add.title' | translate }}
                                 </button>
                             </div>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">
                                 <mat-form-field class="search-form-field">
-                                    <input matInput #search placeholder="Filter" autocomplete="off" [disabled]="meta?.total===0">
+                                    <input matInput #search placeholder="{{ 'filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
                                     <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
                                         <mat-icon>close</mat-icon></button>
                                 </mat-form-field>
@@ -28,7 +28,7 @@
                                        matSortDisableClear>
 
                                 <ng-container matColumnDef="vacating_date">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header> Vacating Date </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'vacates.field.vacating_date' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row">
                                         <button mat-flat-button routerLink="{{row.id}}" (click)="onSelected(row)">
                                             <span class="link">{{row.vacating_date_display}}</span>
@@ -37,41 +37,38 @@
                                 </ng-container>
 
                                 <ng-container matColumnDef="tenant_id">
-                                    <mat-header-cell *matHeaderCellDef> Tenant </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef> {{ 'vacates.field.tenant' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.tenant?.first_name}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="lease">
-                                    <mat-header-cell *matHeaderCellDef> Lease </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef> {{ 'vacates.field.lease' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.lease?.lease_number}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="property_id">
-                                    <mat-header-cell *matHeaderCellDef> Property </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef> {{ 'vacates.field.property' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row"> {{row.property?.property_name}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="unit">
-                                    <mat-header-cell *matHeaderCellDef> Unit </mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef> {{ 'vacates.field.unit' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row">
-
                                         <ng-container *ngFor="let unit of row?.lease?.units; let i = index;">
                                             <div>{{unit?.unit_name}}</div>
                                         </ng-container>
-
                                     </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="actions">
-                                    <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef>{{ 'actions' | translate }}</mat-header-cell>
                                     <mat-cell *matCellDef="let row" class="button-row">
-                                        <button mat-raised-button type="button" matTooltip="View Notice" [matTooltipPosition]="'above'"
+                                        <button mat-raised-button type="button" [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon" routerLink="{{row.id}}"
                                                 (click)="onSelected(row)">
                                             <i class="material-icons">expand_more</i>
                                         </button>
-
-                                        <button *robiPermission="['edit-notice', 'am-tenant']" mat-raised-button type="button" matTooltip="Edit Notice"
+                                        <button *robiPermission="['edit-notice', 'am-tenant']" mat-raised-button type="button"
                                                 [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon"  (click)="addDialog(false, row)">
                                             <i class="material-icons">edit</i>
@@ -82,7 +79,7 @@
                                 <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                                 <mat-row *matRowDef="let row; columns: displayedColumns;"> </mat-row>
                             </mat-table>
-                            <span *ngIf="meta?.total===0">No Data</span>
+                            <span *ngIf="meta?.total===0">{{ 'no_data' | translate }}</span>
 
                             <div class="d-flex justify-content-center spinner-container"
                                  *ngIf="(dataSource?.loading$ | async) || loader">

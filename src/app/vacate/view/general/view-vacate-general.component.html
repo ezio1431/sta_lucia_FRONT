@@ -5,19 +5,19 @@
 
                 <div class="row">
                     <div class="col-sm-6">
-                        <p class="card-title">Vacating Date :
+                        <p class="card-title">{{ 'vacates.field.vacating_date' | translate }} :
                             <span class="card-category">{{(noticeData$|async)?.vacating_date_display}}</span>
                         </p>
                     </div>
                 </div>
                 <div class="row">
                 <div class="col-sm-4">
-                    <p class="card-title">Lease :
+                    <p class="card-title">{{ 'vacates.field.lease' | translate }} :
                         <span class="card-category">{{(noticeData$|async)?.lease?.lease_number}}</span>
                     </p>
                 </div>
                 <div class="col-sm-4">
-                    <p class="card-title">Property :
+                    <p class="card-title">{{ 'vacates.field.property' | translate }} :
                         <span class="card-category">
                             {{(noticeData$|async)?.property?.property_name}}
                             ({{(noticeData$|async)?.property?.property_code}}) -  ({{(noticeData$|async)?.property?.location}})
@@ -25,14 +25,14 @@
                     </p>
                 </div>
                 <div class="col-sm-4">
-                    <p class="card-title">Unit :
+                    <p class="card-title">{{ 'vacates.field.unit' | translate }} :
                         <span class="card-category">{{(noticeData$|async)?.lease?.unit_names}}</span>
                     </p>
                 </div>
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <p class="card-title">Vacating Reason</p>
+                    <p class="card-title">{{ 'vacates.field.vacating_reason' | translate }}</p>
                     <p class="card-category">{{(noticeData$|async)?.vacating_reason}}</p>
                 </div>
             </div>
