@@ -1,7 +1,7 @@
 <div class="main-content">
     <ng-template #no_data>
         <div class="not-found">
-           <mat-icon>error</mat-icon> Not Found
+           <mat-icon>error</mat-icon> {{ 'not_found' | translate }}
         </div>
     </ng-template>
 
@@ -33,33 +33,33 @@
                 <div class="col-md-4">
                         <div class="card">
                             <div class="card-header card-header-info">
-                                <h4 class="card-title">Summary</h4>
-                                <p class="card-category"> Receipt #: {{payment?.receipt_number}}</p>
+                                <h4 class="card-title">{{ 'payment.fields.summary' | translate }}</h4>
+                                <p class="card-category"> {{ 'payment.fields.reference_number' | translate }}: {{payment?.receipt_number}}</p>
                             </div>
                             <div class="card-body">
 
                                 <div class="row">
                                     <div class="col-6">
-                                        <div class="card-category text-gray"> Amount </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.amount' | translate }} </div>
                                         {{payment?.amount}}
                                     </div>
 
                                     <div class="col-6">
-                                        <div class="card-category text-gray"> Payment Date </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.payment_date' | translate }} </div>
                                         {{payment?.payment_date}}
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-6">
-                                        <div class="card-category text-gray"> Payment Method </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.payment_method' | translate }} </div>
                                         {{payment?.payment_method?.payment_method_display_name}}
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-6">
-                                        <div class="card-category text-gray"> Property </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.property' | translate }} </div>
                                         {{payment?.property?.property_name}}
                                         ({{payment?.property?.property_code}})
                                         - {{payment?.property?.location}}
@@ -68,18 +68,18 @@
 
                                 <div class="row">
                                     <div class="col-6">
-                                        <div class="card-category text-gray"> Lease </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.lease' | translate }} </div>
                                         {{payment?.lease?.lease_number}}
                                     </div>
                                     <div class="col-6">
-                                        <div class="card-category text-gray"> Unit </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.unit' | translate }} </div>
                                         <div>{{payment?.lease?.unit_names}}</div>
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-12">
-                                        <div class="card-category text-gray"> Tenant </div>
+                                        <div class="card-category text-gray"> {{ 'payment.fields.tenant' | translate }} </div>
                                         <div class="row col-12">
                                             {{payment?.tenant?.first_name}} {{payment?.tenant?.middle_name}} {{payment?.tenant?.last_name}}
                                             <span class="ml-5" *ngIf="payment?.tenant?.contact_phone"><mat-icon inline=true>phone</mat-icon>

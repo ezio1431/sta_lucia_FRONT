@@ -81,7 +81,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
     }
 
     ngOnInit() {
-        this.paymentMethods$ = this.paymentMethodService.list(['payment_method_name', 'payment_method_display_name']);
+        this.paymentMethods$ = this.paymentMethodService.list(['payment_method_name']);
 
         this.tenantServerSideFilteringCtrl.valueChanges
             .pipe(

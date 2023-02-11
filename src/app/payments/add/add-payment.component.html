@@ -1,25 +1,25 @@
-<h5 mat-dialog-title>Add Payment</h5>
+<h5 mat-dialog-title>{{ 'payment.add.title' | translate }}</h5>
 
-<mat-dialog-content class="mat-dialog-data" [formGroup]="form"  (ngSubmit)="create()">
+<mat-dialog-content class="mat-dialog-data" [formGroup]="form" (ngSubmit)="create()">
 
     <div class="row mb-4">
         <div class="col-12">
             <mat-form-field color="primary" appearance="outline">
-                <mat-label>Tenant*</mat-label>
+                <mat-label>{{ 'payment.fields.tenant' | translate }}</mat-label>
                 <mat-select placeholder="Tenant*" formControlName="tenant" #tenantSelect
                             (selectionChange)="onTenantItemChange(tenantSelect.value)">
-                    <!-- place ngx-mat-select-search inside mat-option to allow opening without initial selection -->
                     <mat-option>
                         <ngx-mat-select-search [formControl]="tenantServerSideFilteringCtrl" [searching]="searching"
-                                               placeholderLabel="Find Tenant..."
-                                               noEntriesFoundLabel="No matching Tenant found ...">
+                                               placeholderLabel="{{ 'payment.fields.find_tenant' | translate }}"
+                                               noEntriesFoundLabel="{{ 'payment.fields.no_tenant' | translate }}">
                         </ngx-mat-select-search>
                     </mat-option>
                     <mat-option *ngFor="let tenant of tenantsFiltered$ | async" [value]="tenant">
                         {{tenant.first_name}} {{tenant.middle_name}} {{tenant.last_name}}
                     </mat-option>
                 </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.tenant" class="form__error">{{ formErrors.tenant }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.tenant"
+                           class="form__error">{{ formErrors.tenant }}</mat-error>
 
 
                 <mat-hint class="text-info" align="start" *ngIf="tenant$ | async as tenant">
@@ -30,7 +30,7 @@
                        </span>
 
                         <span class="ml-5">
-                        ID / Pass : {{tenant?.id_passport_number}}
+                        {{ 'payment.fields.id_pass' | translate }} : {{tenant?.id_passport_number}}
                        </span>
 
                         <span class="ml-5">
@@ -40,7 +40,6 @@
                 </mat-hint>
 
 
-
             </mat-form-field>
         </div>
     </div>
@@ -48,31 +47,32 @@
     <div class="row mb-4">
         <div class="col-12">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Lease</mat-label>
-                <mat-select placeholder="Lease" formControlName="lease" #leaseSelect
+                <mat-label>{{ 'payment.fields.lease' | translate }}</mat-label>
+                <mat-select placeholder="{{ 'payment.fields.lease' | translate }}" formControlName="lease" #leaseSelect
                             (selectionChange)="onLeaseItemChange(leaseSelect.value)">
                     <mat-option *ngFor="let lease of (tenantActiveLeases$ | async )" [value]="lease">
                         {{lease?.lease_number}}
                     </mat-option>
                 </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.lease" class="form__error">{{ formErrors.lease }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.lease"
+                           class="form__error">{{ formErrors.lease }}</mat-error>
                 <mat-hint class="text-info" align="start" *ngIf="lease$ | async as lease">
-                   <div>
+                    <div>
                        <span>
                         {{lease?.property?.property_name}} {{lease?.property?.location}}
                        </span>
 
-                       <span class="ml-5">
-                            Unit :
+                        <span class="ml-5">
+                            {{ 'payment.fields.unit' | translate }} :
                             <ng-container *ngFor="let unit of lease?.units; let i = index;">
                                 <span>{{unit.unit_name }}</span>
                             </ng-container>
                        </span>
 
-                       <span class="ml-5">
-                           Type : {{lease?.lease_type?.lease_type_display_name}}
+                        <span class="ml-5">
+                           {{ 'payment.fields.type' | translate }} : {{lease?.lease_type?.lease_type_display_name}}
                        </span>
-                   </div>
+                    </div>
                 </mat-hint>
             </mat-form-field>
         </div>
@@ -81,36 +81,37 @@
     <div class="row">
         <div class="col-4">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Amount</mat-label>
-                <input matInput type="number" min="0" formControlName="amount" placeholder="Amount">
-                <!-- <mat-hint class="text-success" align="start">
-                     <span *ngIf="accountBalance$ | async as balance"> Account Balance: {{balance}}</span>
-                 </mat-hint>-->
-                <mat-hint class="text-success" align="start">
-                    <span *ngIf="loanAccountBalance$ | async as balance"> Loan Balance: {{balance}}</span>
-                </mat-hint>
-                <mat-error align="start" *ngIf="formErrors?.amount" class="form__error">{{ formErrors.amount }}</mat-error>
+                <mat-label>{{ 'payment.fields.amount' | translate }}</mat-label>
+                <input matInput type="number" min="0" formControlName="amount"
+                       placeholder="{{ 'payment.fields.amount' | translate }}">
+                <mat-error align="start" *ngIf="formErrors?.amount"
+                           class="form__error">{{ formErrors.amount }}</mat-error>
             </mat-form-field>
         </div>
         <div class="col-4">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Payment Method</mat-label>
-                <mat-select placeholder="Payment Method" formControlName="payment_method_id"
-                            #paymentMethodSelect (selectionChange)="onPaymentMethodItemChange(paymentMethodSelect.value)">
+                <mat-label>{{ 'payment.fields.payment_method' | translate }}</mat-label>
+                <mat-select placeholder="{{ 'payment.fields.payment_method' | translate }}"
+                            formControlName="payment_method_id"
+                            #paymentMethodSelect
+                            (selectionChange)="onPaymentMethodItemChange(paymentMethodSelect.value)">
                     <mat-option *ngFor="let paymentMethod of paymentMethods$ | async" [value]="paymentMethod.id">
-                        {{paymentMethod.payment_method_display_name}}
+                        {{paymentMethod.payment_method_name}}
                     </mat-option>
                 </mat-select>
-                <mat-error align="start" *ngIf="formErrors?.payment_method_id" class="form__error">{{ formErrors.payment_method_id }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.payment_method_id"
+                           class="form__error">{{ formErrors.payment_method_id }}</mat-error>
             </mat-form-field>
         </div>
         <div class="col-4">
-            <mat-form-field  class="full-width" color="primary" appearance="outline">
-                <mat-label>Payment Date</mat-label>
-                <input matInput (click)="payment_date.open()" readonly [matDatepicker]="payment_date" formControlName="payment_date" placeholder="Payment Date">
+            <mat-form-field class="full-width" color="primary" appearance="outline">
+                <mat-label>{{ 'payment.fields.payment_date' | translate }}</mat-label>
+                <input matInput (click)="payment_date.open()" readonly [matDatepicker]="payment_date"
+                       formControlName="payment_date" placeholder="{{ 'payment.fields.payment_date' | translate }}">
                 <mat-datepicker-toggle matSuffix [for]="payment_date"></mat-datepicker-toggle>
                 <mat-datepicker touchUi #payment_date></mat-datepicker>
-                <mat-error align="start" *ngIf="formErrors?.payment_date" class="form__error">{{ formErrors.payment_date }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.payment_date"
+                           class="form__error">{{ formErrors.payment_date }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -118,16 +119,19 @@
     <div class="row">
         <div class="col-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Paid By</mat-label>
-                <input matInput formControlName="paid_by" placeholder="Paid By">
-                <mat-error align="start" *ngIf="formErrors?.paid_by" class="form__error">{{ formErrors.paid_by }}</mat-error>
+                <mat-label>{{ 'payment.fields.paid_by' | translate }}</mat-label>
+                <input matInput formControlName="paid_by" placeholder="{{ 'payment.fields.paid_by' | translate }}">
+                <mat-error align="start" *ngIf="formErrors?.paid_by"
+                           class="form__error">{{ formErrors.paid_by }}</mat-error>
             </mat-form-field>
         </div>
         <div class="col-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Reference Number</mat-label>
-                <input matInput formControlName="reference_number" placeholder="Reference Number">
-                <mat-error align="start" *ngIf="formErrors?.reference_number" class="form__error">{{ formErrors.reference_number }}</mat-error>
+                <mat-label>{{ 'payment.fields.reference_number' | translate }}</mat-label>
+                <input matInput formControlName="reference_number"
+                       placeholder="{{ 'payment.fields.reference_number' | translate }}">
+                <mat-error align="start" *ngIf="formErrors?.reference_number"
+                           class="form__error">{{ formErrors.reference_number }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -135,9 +139,11 @@
     <div class="row">
         <div class="col-12">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Being Payment For</mat-label>
-                <input matInput formControlName="being_payment_for" placeholder="Being Payment For">
-                <mat-error align="start" *ngIf="formErrors?.being_payment_for" class="form__error">{{ formErrors.being_payment_for }}</mat-error>
+                <mat-label>{{ 'payment.fields.being_payment_for' | translate }}</mat-label>
+                <input matInput formControlName="being_payment_for"
+                       placeholder="{{ 'payment.fields.being_payment_for' | translate }}">
+                <mat-error align="start" *ngIf="formErrors?.being_payment_for"
+                           class="form__error">{{ formErrors.being_payment_for }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -147,38 +153,44 @@
             <div class="row">
                 <div class="col-6">
                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                        <mat-label>Cheque Number</mat-label>
-                        <input matInput formControlName="cheque_number" placeholder="Cheque Number">
-                        <mat-error align="start" *ngIf="formErrors?.cheque_number" class="form__error">{{ formErrors.cheque_number }}</mat-error>
+                        <mat-label>{{ 'payment.fields.cheque_number' | translate }}</mat-label>
+                        <input matInput formControlName="cheque_number"
+                               placeholder="{{ 'payment.fields.cheque_number' | translate }}">
+                        <mat-error align="start" *ngIf="formErrors?.cheque_number"
+                                   class="form__error">{{ formErrors.cheque_number }}</mat-error>
                     </mat-form-field>
                 </div>
                 <div class="col-6">
-                    <mat-form-field  class="full-width" color="primary" appearance="outline">
-                        <mat-label>Cheque Date</mat-label>
-                        <input matInput readonly [matDatepicker]="cheque_date" formControlName="cheque_date" placeholder="Cheque Date">
+                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                        <mat-label>{{ 'payment.fields.cheque_date' | translate }}</mat-label>
+                        <input matInput readonly [matDatepicker]="cheque_date" formControlName="cheque_date"
+                               placeholder="{{ 'payment.fields.cheque_date' | translate }}">
                         <mat-datepicker-toggle matSuffix [for]="cheque_date"></mat-datepicker-toggle>
                         <mat-datepicker #cheque_date></mat-datepicker>
-                        <mat-error align="start" *ngIf="formErrors?.cheque_date" class="form__error">{{ formErrors.cheque_date }}</mat-error>
+                        <mat-error align="start" *ngIf="formErrors?.cheque_date"
+                                   class="form__error">{{ formErrors.cheque_date }}</mat-error>
                     </mat-form-field>
                 </div>
             </div>
             <div class="row">
                 <div class="col-6">
                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                        <mat-label>Bank Name</mat-label>
-                        <mat-select placeholder="Bank Name" formControlName="bank_name">
+                        <mat-label>{{ 'payment.fields.bank_name' | translate }}</mat-label>
+                        <mat-select placeholder="{{ 'payment.fields.bank_name' | translate }}" formControlName="bank_name">
                             <mat-option *ngFor="let bank of banks" [value]="bank.name">
                                 {{bank.name}}
                             </mat-option>
                         </mat-select>
-                        <mat-error align="start" *ngIf="formErrors?.bank_name" class="form__error">{{ formErrors.bank_name }}</mat-error>
+                        <mat-error align="start" *ngIf="formErrors?.bank_name"
+                                   class="form__error">{{ formErrors.bank_name }}</mat-error>
                     </mat-form-field>
                 </div>
                 <div class="col-6">
                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                        <mat-label>Bank Branch</mat-label>
-                        <input matInput formControlName="bank_branch" placeholder="Bank Branch">
-                        <mat-error align="start" *ngIf="formErrors?.bank_branch" class="form__error">{{ formErrors.bank_branch }}</mat-error>
+                        <mat-label>{{ 'payment.fields.bank_branch' | translate }}</mat-label>
+                        <input matInput formControlName="bank_branch" placeholder="{{ 'payment.fields.bank_branch' | translate }}">
+                        <mat-error align="start" *ngIf="formErrors?.bank_branch"
+                                   class="form__error">{{ formErrors.bank_branch }}</mat-error>
                     </mat-form-field>
                 </div>
             </div>
@@ -186,8 +198,8 @@
     </div>
 
     <mat-form-field class="full-width" color="primary" appearance="outline">
-        <mat-label>Extra Notes</mat-label>
-        <textarea  formControlName="notes" matInput #notes placeholder="Extra Notes" maxlength="150" rows="3"></textarea>
+        <mat-label>{{ 'payment.fields.extra_notes' | translate }}</mat-label>
+        <textarea formControlName="notes" matInput #notes placeholder="{{ 'payment.fields.extra_notes' | translate }}" maxlength="150" rows="3"></textarea>
         <mat-hint align="end">{{notes.value.length}} / 150</mat-hint>
         <mat-error align="start" *ngIf="formErrors?.notes" class="form__error">{{ formErrors.notes }}</mat-error>
     </mat-form-field>
@@ -204,6 +216,10 @@
 </div>
 
 <mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">Cancel</button>
-    <button mat-raised-button color="primary" (click)="create()" [disabled]="!form.valid || loader">Save</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">
+        {{ 'cancel' | translate }}
+    </button>
+    <button mat-raised-button color="primary" (click)="create()" [disabled]="!form.valid || loader">
+        {{ 'save' | translate }}
+    </button>
 </mat-dialog-actions>
