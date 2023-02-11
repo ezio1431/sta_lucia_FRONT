@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-center spinner-container" *ngIf="loader">
-    downloading statement ...
+    {{ 'reports.downloading_statement' | translate }}
 </div>
 
 <iframe *ngIf="pdfSrc" width="500" height="600" style="width: 100%"

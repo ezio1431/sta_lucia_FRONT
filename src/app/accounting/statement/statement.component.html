@@ -1,16 +1,16 @@
 <div class="d-flex justify-content-center spinner-container" *ngIf="loader">
-    Statement ...
+    {{ 'reports.general_ledger.fields.statement' | translate }}
     <mat-spinner [diameter]="40"></mat-spinner>
 </div>
 
 <div class="card-header align-center small-font" *ngIf="!loader">
     <div>
-        <span> Account Statement </span>
+        <span> {{ 'reports.statement.account_statement' | translate }} </span>
     </div>
     <div class="row col-12">
         <div class="col-12">
-            <div class="row">A/C Name: {{account?.account_display_name}}</div>
-            <div class="row">A/C Number: {{account?.account_number}}</div>
+            <div class="row">{{ 'reports.statement.a_c_name' | translate }} {{account?.account_display_name}}</div>
+            <div class="row">{{ 'reports.statement.a_c_number' | translate }} {{account?.account_number}}</div>
         </div>
     </div>
 </div>
@@ -22,31 +22,31 @@
 
           <!-- Due Date Column -->
           <ng-container matColumnDef="date">
-              <mat-header-cell class="date" *matHeaderCellDef> Date </mat-header-cell>
+              <mat-header-cell class="date" *matHeaderCellDef> {{ 'reports.statement.date' | translate }} </mat-header-cell>
               <mat-cell class="date" *matCellDef="let row"> {{row.created_at}} </mat-cell>
           </ng-container>
 
         <!-- Payment Column -->
         <ng-container matColumnDef="narration">
-            <mat-header-cell class="narration" *matHeaderCellDef> Narration </mat-header-cell>
+            <mat-header-cell class="narration" *matHeaderCellDef> {{ 'reports.statement.narration' | translate }} </mat-header-cell>
             <mat-cell class="narration" *matCellDef="let row"> {{row.narration}} </mat-cell>
         </ng-container>
 
         <!-- Interest Column -->
         <ng-container matColumnDef="debit">
-            <mat-header-cell *matHeaderCellDef class="money-cell"> Debit </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef class="money-cell"> {{ 'reports.statement.debit' | translate }} </mat-header-cell>
             <mat-cell class="money-cell" *matCellDef="let row"> {{(row.is_dr ? row.display_amount : '0.00')}} </mat-cell>
         </ng-container>
 
         <!-- Principal Column -->
         <ng-container matColumnDef="credit">
-            <mat-header-cell class="money-cell" *matHeaderCellDef> Credit </mat-header-cell>
+            <mat-header-cell class="money-cell" *matHeaderCellDef> {{ 'reports.statement.credit' | translate }} </mat-header-cell>
             <mat-cell class="money-cell" *matCellDef="let row"> {{(row.is_cr ? row.display_amount : '0.00')}} </mat-cell>
         </ng-container>
 
         <!-- Balance Column -->
         <ng-container matColumnDef="balance">
-            <mat-header-cell class="money-cell" *matHeaderCellDef> Balance </mat-header-cell>
+            <mat-header-cell class="money-cell" *matHeaderCellDef> {{ 'reports.statement.balance' | translate }} </mat-header-cell>
             <mat-cell class="money-cell" *matCellDef="let row"> {{row.balance}} </mat-cell>
         </ng-container>
 
@@ -55,7 +55,7 @@
 
 
       </mat-table>
-        <span *ngIf="dataSource.length === 0">No Activity</span>
+        <span *ngIf="dataSource.length === 0">{{ 'reports.statement.no_activity' | translate }}</span>
 
     </div>
 
@@ -64,12 +64,5 @@
 <mat-dialog-actions align="center">
     <button mat-button class="mat-raised-button button-separate" [mat-dialog-close]="true">Close</button>
     <ng-container *ngIf="!loader" align="right">
-
-      <!--  <button *ngIf="dataSource.length > 0" mat-raised-button matTooltip="Download Account Statement."
-                [matTooltipPosition]="'above'" (click)="downloadPdf()">
-            <mat-icon>picture_as_pdf</mat-icon>
-             Download
-        </button>-->
-
     </ng-container>
 </mat-dialog-actions>

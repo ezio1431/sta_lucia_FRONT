@@ -36,7 +36,6 @@ import { AppErrorHandler } from './error-handler/app-error-handler.service';
 import { CustomSerializer } from './router/custom-serializer';
 import { LocalStorageService } from './local-storage/local-storage.service';
 import { HttpErrorInterceptor } from './http-interceptors/http-error.interceptor';
-import { GoogleAnalyticsEffects } from './google-analytics/google-analytics.effects';
 import { NotificationService } from './notifications/notification.service';
 import { SettingsEffects } from './settings/settings.effects';
 import {
@@ -45,8 +44,6 @@ import {
   selectSettingsStickyHeader
 } from './settings/settings.selectors';
 import { SharedModule } from '../shared/shared.module';
-
-
 
 export {
   TitleService,
@@ -86,7 +83,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     EffectsModule.forRoot([
     //  AuthEffects,
       SettingsEffects,
-      // GoogleAnalyticsEffects
     ]),
     environment.production
       ? []

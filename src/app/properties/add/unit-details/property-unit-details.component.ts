@@ -230,12 +230,6 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
         this.dialogRef.close({ event: 'close', data: data });
     }
 
-    holdUnitDetails() {
-
-    }
-
-
-
     /**
      *
      * @param event
@@ -335,103 +329,6 @@ export class PropertyUnitDetailsComponent implements OnInit, AfterViewInit  {
             reader.readAsDataURL(this.membershipFormToUpload);
         }
     }
-
-    /**
-     * Create member
-     */
-  /*  create() {
-        this.errorInForm.next(false);
-
-        const body = Object.assign({}, this.landlord, this.form.value);
-
-        const formData = new FormData();
-        if (this.profilePicFileToUpload != null) {
-            formData.append('passport_photo', this.profilePicFileToUpload);
-        }
-        if (this.membershipFormToUpload != null) {
-            formData.append('membership_form', this.membershipFormToUpload);
-        }
-
-        for (const key in body) {
-            if (body.hasOwnProperty(key)) {
-                formData.append(key, body[key]);
-            }
-        }
-        this.loader = true;
-
-        this.landlordEntityService.add(body).subscribe((data) => {
-                this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Landlord created.');
-            },
-            (error) => {
-                this.errorInForm.next(true);
-
-                this.loader = false;
-                if (error.member === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-
-                if (this.formErrors) {
-
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
-                    for (const prop in this.formErrors) {
-                        if (this.form) {
-                            this.form.controls[prop]?.markAsTouched();
-                            this.form.controls[prop]?.setErrors({incorrect: true});
-                        }
-                    }
-                }
-
-            });
-    }*/
-
-    /**
-     *
-     */
-   /* update() {
-        const body = Object.assign({}, this.landlord, this.form.value);
-        delete body.membership_form;
-
-        this.loader = true;
-        this.errorInForm.next(false);
-
-        this.landlordEntityService.update(body).subscribe((data) => {
-                this.loader = false;
-
-                this.dialogRef.close(this.form.value);
-
-                // notify success
-                this.notification.showNotification('success', 'Success !! Landlord has been updated.');
-
-            },
-            (error) => {
-                this.loader = false;
-                this.errorInForm.next(true);
-               // this.formError$.subscribe(subscriber => {subscriber.next(true)});
-
-                if (error.landlord === 0) {
-                    // notify error
-                    return;
-                }
-                // An array of all form errors as returned by server
-                this.formErrors = error?.error;
-              //  this.formErrors = error.error.error.errors;
-
-                if (this.formErrors) {
-                    // loop through from fields, If has an error, mark as invalid so mat-error can show
-                    for (const prop in this.formErrors) {
-                        if (this.form) {
-                            this.form.controls[prop]?.markAsTouched();
-                            this.form.controls[prop]?.setErrors({incorrect: true});
-                        }
-                    }
-                }
-            });
-    }*/
 
     /**
      * Create or Update Data

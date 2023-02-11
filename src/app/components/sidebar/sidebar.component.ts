@@ -44,7 +44,7 @@ export const ADMIN_ROUTES: RouteInfo[] = [
     { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '',
         permission: ['view-payment', 'create-payment'] },
 
-    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '',
+    { path: '/notices', title: 'robi.vacate.title',  icon: 'lock_open', class: '',
         permission: ['view-notice', 'create-notice', 'edit-notice', 'delete-notice'] },
 
     { path: '/settings', title: 'robi.sidebar.setting',  icon: 'settings', class: '',
@@ -53,7 +53,7 @@ export const ADMIN_ROUTES: RouteInfo[] = [
     { path: '/profile', title: 'sidebar.profile',  icon: 'person', class: '',
         permission: ['view-profile'] },
 
-    { path: '/reports', title: 'Reports',  icon: 'account_tree', class: '',
+    { path: '/reports', title: 'reports.list.title',  icon: 'account_tree', class: '',
         permission: ['view-report'] },
 ];
 
@@ -63,7 +63,7 @@ export const LANDLORD_ROUTES: RouteInfo[] = [
     { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-landlord'] },
     { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-landlord'] },
     { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '', permission: ['am-landlord'] },
-    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '', permission: ['am-landlord'] },
+    { path: '/notices', title: 'robi.vacate.title',  icon: 'lock_open', class: '', permission: ['am-landlord'] },
     { path: '/landlord/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-landlord'] },
 ];
 
@@ -71,7 +71,7 @@ export const TENANT_ROUTES: RouteInfo[] = [
     { path: '/tenant/dashboard', title: 'robi.sidebar.dashboard',  icon: 'dashboard', class: '', permission: ['am-tenant'] },
     { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-tenant'] },
     { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-tenant'] },
-    { path: '/notices', title: 'Vacate Notice',  icon: 'lock_open', class: '', permission: ['am-tenant'] },
+    { path: '/notices', title: 'robi.vacate.title',  icon: 'lock_open', class: '', permission: ['am-tenant'] },
     { path: '/tenant/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-tenant'] },
 ];
 

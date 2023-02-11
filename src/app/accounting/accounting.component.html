@@ -4,22 +4,22 @@
             <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <h4 class="card-title ">Reports</h4>
+                <h4 class="card-title ">{{ 'reports.list.title' | translate }}</h4>
             </div>
             <div class="card-body">
                 <nav mat-tab-nav-bar>
                     <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive" [routerLinkActiveOptions]="{exact: true}"
                        routerLink="/reports">
-                        <span class="nav-text"> Property Report </span>
+                        <span class="nav-text"> {{ 'reports.property_report.title' | translate }} </span>
                     </a>
 
                     <a mat-tab-link routerLinkActive #ledger="routerLinkActive" [active]="ledger.isActive" [routerLink]="['ledger']"
                        routerLink="/ledger">
-                        <span class="nav-text"> General Ledger </span>
+                        <span class="nav-text"> {{ 'reports.general_ledger.title' | translate }} </span>
                     </a>
 
                     <a mat-tab-link routerLinkActive #journal="routerLinkActive" [active]="journal.isActive" [routerLink]="['journal']">
-                        <span class="nav-text">  Journal </span>
+                        <span class="nav-text">   {{ 'reports.journal.title' | translate }} </span>
                     </a>
                 </nav>
                 <router-outlet></router-outlet>
