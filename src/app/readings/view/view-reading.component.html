@@ -1,7 +1,7 @@
 <div class="main-content">
     <ng-template #no_data>
         <div class="not-found">
-            <mat-icon>error</mat-icon> Not Found
+            <mat-icon>error</mat-icon> {{ 'not_found' | translate }}
         </div>
     </ng-template>
     <div class="container-fluid" *ngIf="readingData$ | async as reading; else no_data">
@@ -9,7 +9,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header card-header-info">
-                            <h4 class="card-title">Utility Reading Details</h4>
+                            <h4 class="card-title">{{ 'utilities.fields.utility_reading_details' | translate }}</h4>
                             <p class="card-title">{{reading?.property?.property_name}} - {{reading?.property?.location}},
                                 {{reading?.unit?.unit_name}}
                             </p>
@@ -18,16 +18,12 @@
                             </p>
                         </div>
                         <div class="card-body">
-
                             <nav mat-tab-nav-bar>
-
                                 <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive"
                                    [routerLinkActiveOptions]="{exact: true}" routerLink="/readings/{{readingID}}">
-                                    <span class="nav-text">  Info </span></a>
+                                    <span class="nav-text">  {{ 'info' | translate }} </span></a>
                             </nav>
-
                             <router-outlet></router-outlet>
-
                         </div>
                     </div>
                 </div>
