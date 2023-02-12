@@ -477,10 +477,12 @@
   "settings.payments.method.notify.delete.success": "Réussi !! La Méthode de paiement à été supprimée.",
   "settings.payments.method.notify.delete.error": "Erreur Suppression !!",
 
+  "settings.payments.method.title": "Payment Method",
   "settings.payments.method.edit": "Editer Méthode de Paiement",
   "settings.payments.method.add": "Ajouter Méthode de Paiement",
   "settings.payments.method.payment_method_name": "Nom",
   "settings.payments.method.payment_method_display_name": "Afficher Nom",
+  "settings.payments.method.payment_method_description": "Description",
 
   "settings.payments.method.add.payment_method_type": "Type",
   "settings.payments.method.add.display_name": "Afficher Nom",

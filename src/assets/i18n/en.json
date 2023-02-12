@@ -497,10 +497,12 @@
   "settings.payments.method.notify.delete.success": "Success !! Payment Method has been deleted.",
   "settings.payments.method.notify.delete.error": "Delete Error !!",
 
+  "settings.payments.method.title": "Payment Method",
   "settings.payments.method.edit": "Edit Payment Method",
   "settings.payments.method.add": "Add Payment Method",
   "settings.payments.method.payment_method_name": "Name",
   "settings.payments.method.payment_method_display_name": "Display Name",
+  "settings.payments.method.payment_method_description": "Description",
 
   "settings.payments.method.add.payment_method_type": "Type",
   "settings.payments.method.add.display_name": "Display Name",
