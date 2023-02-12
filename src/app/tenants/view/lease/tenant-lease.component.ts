@@ -21,7 +21,6 @@ export class TenantLeaseComponent implements OnInit, AfterViewInit {
         'rent_amount',
         'lease_type_id',
         'due_on',
-        'billing_frequency',
         'billed_on',
         'status'
     ];
