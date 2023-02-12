@@ -6,7 +6,7 @@
                     <mat-expansion-panel [expanded]="true">
                         <mat-expansion-panel-header>
                             <mat-panel-title>
-                                Email Config
+                                {{ 'settings.email.config.title' | translate }}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
 
@@ -14,25 +14,16 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail Driver</mat-label>
-                                        <input matInput placeholder="Mail Driver" formControlName="driver">
+                                        <mat-label>{{ 'settings.email.config.driver' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.driver' | translate }}" formControlName="driver">
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail Host</mat-label>
-                                        <input matInput placeholder="Mail Host" formControlName="host">
-                                    </mat-form-field>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail Username</mat-label>
-                                        <input matInput placeholder="Mail Username" formControlName="username">
+                                        <mat-label>{{ 'settings.email.config.host' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.host' | translate }}" formControlName="host">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -40,8 +31,8 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail Password</mat-label>
-                                        <input matInput placeholder="Mail Password" formControlName="password">
+                                        <mat-label>{{ 'settings.email.config.username' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.username' | translate }}" formControlName="username">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -49,8 +40,8 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail Port</mat-label>
-                                        <input matInput placeholder="Mail Port" formControlName="port">
+                                        <mat-label>{{ 'settings.email.config.password' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.password' | translate }}" formControlName="password">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -58,8 +49,8 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail From Address</mat-label>
-                                        <input matInput placeholder="Mail From Address" formControlName="from_address">
+                                        <mat-label>{{ 'settings.email.config.port' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.port' | translate }}" formControlName="port">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -67,8 +58,17 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="full-width" color="primary" appearance="outline">
-                                        <mat-label>Mail From Name</mat-label>
-                                        <input matInput placeholder="Mail From Name" formControlName="from_name">
+                                        <mat-label>{{ 'settings.email.config.from_address' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.from_address' | translate }}" formControlName="from_address">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <mat-form-field class="full-width" color="primary" appearance="outline">
+                                        <mat-label>{{ 'settings.email.config.from_name' | translate }}</mat-label>
+                                        <input matInput placeholder="{{ 'settings.email.config.from_name' | translate }}" formControlName="from_name">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -85,7 +85,9 @@
                             </div>
 
                             <div>
-                                <button mat-raised-button type="submit" class="btn pull-right" color="accent" (click)="update()" [disabled]="!form.valid || loader">Update Settings</button>
+                                <button mat-raised-button type="submit" class="btn pull-right" color="accent" (click)="update()" [disabled]="!form.valid || loader">
+                                    {{ 'settings.email.config.update' | translate }}
+                                </button>
                             </div>
 
                             <div class="clearfix"></div>

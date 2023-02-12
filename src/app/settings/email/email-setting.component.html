@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <p class="card-category">Email & SMS Settings</p>
+                <p class="card-category">{{ 'settings.email.title' | translate }}</p>
             </div>
 
             <div class="card-body">
@@ -11,15 +11,15 @@
 
                     <a mat-tab-link routerLinkActive #email="routerLinkActive" [active]="email.isActive" [routerLinkActiveOptions]="{exact: true}"
                        [routerLink]="['/settings/email']">
-                        <span class="nav-text"> General</span></a>
+                        <span class="nav-text"> {{ 'settings.email.menu.general' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #email_template="routerLinkActive" [active]="email_template.isActive"
                        [routerLink]="['email_template']">
-                        <span class="nav-text"> Templates</span></a>
+                        <span class="nav-text"> {{ 'settings.email.menu.templates' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #email_config="routerLinkActive" [active]="email_config.isActive"
                        [routerLink]="['email_config']">
-                        <span class="nav-text"> Config</span></a>
+                        <span class="nav-text"> {{ 'settings.email.menu.config' | translate }}</span></a>
                 </nav>
 
                 <router-outlet></router-outlet>
