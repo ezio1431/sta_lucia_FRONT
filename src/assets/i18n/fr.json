@@ -369,10 +369,12 @@
   "settings.menu.system": "Systeme",
   "settings.menu.property": "Propriété",
   "settings.menu.lease": "Location",
-  "settings.menu.tenant": "Location",
+  "settings.menu.tenant": "Locataire",
   "settings.menu.notifications": "Notifications",
   "settings.menu.payment": "Paiement",
   "settings.menu.users_roles": "Utilisateurs et Roles",
+  "settings.menu.logout": "Logout",
+  "settings.menu.clean_up": "clean up ...",
 
   "settings.general.title": "General",
   "settings.general.logo": "Logo",

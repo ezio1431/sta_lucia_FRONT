@@ -393,6 +393,8 @@
   "settings.menu.notifications": "Notifications",
   "settings.menu.payment": "Payment",
   "settings.menu.users_roles": "User & Roles",
+  "settings.menu.logout": "Logout",
+  "settings.menu.clean_up": "clean up ...",
 
   "settings.general.title": "General",
   "settings.general.logo": "Logo",

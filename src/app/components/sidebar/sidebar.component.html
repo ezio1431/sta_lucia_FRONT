@@ -8,9 +8,6 @@
   <div *ngIf="isMobileMenu()">
   </div>
     <ul class="nav">
-        <!--{{isAgent$|async}}
-        {{scopes$|async|json}}-->
-
         <ng-container *ngIf="isAgent$ | async">
             <ng-container *ngFor="let menuItem of menuItemsAdmin">
                 <li routerLinkActive="active" *robiPermission = menuItem?.permission class="{{menuItem.class}} nav-item">
@@ -19,13 +16,6 @@
                         <p> {{menuItem.title | translate}}</p>
                     </a>
                 </li>
-
-                <!-- <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" [routerLinkActiveOptions]="{exact: true}" *robiPermission = menuItem?.permission class="{{menuItem.class}} nav-item">
-                     <a class="nav-link" [routerLink]="[menuItem.path]">
-                         <i class="material-icons">{{menuItem.icon}}</i>
-                         <p> {{menuItem.title | translate}}</p>
-                     </a>
-                 </li>-->
             </ng-container>
         </ng-container>
 
@@ -55,11 +45,11 @@
         <li routerLinkActive="active" class="nav-item">
             <a class="nav-link pointer" *ngIf="!loading" (click)="logout()">
                 <i class="material-icons">power_settings_new</i>
-                <p>Logout</p>
+                <p>{{ 'settings.menu.logout' | translate }}</p>
             </a>
             <a class="nav-link" *ngIf="loading">
                 <i class="material-icons">clear_all</i>
-                <p>clean up ...</p>
+                <p>{{ 'settings.menu.clean_up' | translate }}</p>
             </a>
         </li>
     </ul>

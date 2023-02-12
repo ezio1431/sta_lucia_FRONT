@@ -9,13 +9,13 @@ declare interface RouteInfo {
     activeOption?: any;
 }
 export const ROUTES: RouteInfo[] = [
-    { path: '/settings', title: 'System',  icon: '', class: '', permission: ['settings-general'], activeOption: true },
-    { path: 'property', title: 'Property',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'lease', title: 'Lease',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'tenant', title: 'Tenant',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'email', title: 'Email & SMS',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'payments', title: 'Payment',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
-    { path: 'user', title: 'Users & Roles',  icon: '', class: '', permission: ['settings-users'], activeOption: false }
+    { path: '/settings', title: 'settings.menu.system',  icon: '', class: '', permission: ['settings-general'], activeOption: true },
+    { path: 'property', title: 'settings.menu.property',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'lease', title: 'settings.menu.lease',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'tenant', title: 'settings.menu.tenant',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'email', title: 'settings.menu.notifications',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'payments', title: 'settings.menu.payment',  icon: '', class: '', permission: ['settings-users'], activeOption: false },
+    { path: 'user', title: 'settings.menu.users_roles',  icon: '', class: '', permission: ['settings-users'], activeOption: false }
 ];
 
 @Component({

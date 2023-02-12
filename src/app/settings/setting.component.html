@@ -3,7 +3,7 @@
         <div class="card">
             <div class="card-header card-header-info">
                 <p class="card-category">
-                    <i class="material-icons color-info">settings</i> {{ 'robi.settings.title' | translate }}
+                    <i class="material-icons color-info">settings</i> {{ 'settings.title' | translate }}
                 </p>
             </div>
             <div class="card-body">
@@ -15,7 +15,7 @@
                             <ng-container *ngFor="let menuItem of settingMenuItems">
                                 <li class="nav-item">
                                     <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: menuItem.activeOption}" class="nav-link" [routerLink]="[menuItem.path]">
-                                        <span class="nav-text"> {{menuItem.title}} </span>
+                                        <span class="nav-text"> {{menuItem.title | translate}} </span>
                                     </a>
                                 </li>
                             </ng-container>
