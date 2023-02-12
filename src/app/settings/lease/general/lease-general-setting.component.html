@@ -6,32 +6,32 @@
                     <div class="row">
                         <div class="col-md-12">
                             <mat-form-field class="full-width" color="primary" appearance="outline">
-                                <mat-label>Lease Number Prefix</mat-label>
-                                <input matInput placeholder="Lease Number Prefix" formControlName="lease_number_prefix">
+                                <mat-label>{{ 'settings.lease.general.lease_number_prefix' | translate }}</mat-label>
+                                <input matInput placeholder="{{ 'settings.lease.general.lease_number_prefix' | translate }}" formControlName="lease_number_prefix">
                             </mat-form-field>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <mat-form-field class="full-width" color="primary" appearance="outline">
-                                <mat-label>Invoice Number Prefix</mat-label>
-                                <input matInput placeholder="Invoice Number Prefix" formControlName="invoice_number_prefix">
+                                <mat-label>{{ 'settings.lease.general.invoice_number_prefix' | translate }}</mat-label>
+                                <input matInput placeholder="{{ 'settings.lease.general.invoice_number_prefix' | translate }}" formControlName="invoice_number_prefix">
                             </mat-form-field>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <mat-form-field class="full-width" color="primary" appearance="outline">
-                                <mat-label>Invoice Disclaimer</mat-label>
-                                <input matInput placeholder="Invoice Footer" formControlName="invoice_disclaimer">
+                                <mat-label>{{ 'settings.lease.general.invoice_disclaimer' | translate }}</mat-label>
+                                <input matInput placeholder="{{ 'settings.lease.general.invoice_disclaimer' | translate }}" formControlName="invoice_disclaimer">
                             </mat-form-field>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
                             <mat-form-field class="full-width" color="primary" appearance="outline">
-                                <mat-label>Invoice Terms</mat-label>
-                                <input matInput placeholder="Invoice Terms" formControlName="invoice_terms">
+                                <mat-label>{{ 'settings.lease.general.invoice_terms' | translate }}</mat-label>
+                                <input matInput placeholder="{{ 'settings.lease.general.invoice_terms' | translate }}" formControlName="invoice_terms">
                             </mat-form-field>
                         </div>
                     </div>
@@ -39,8 +39,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <mat-form-field class="full-width" color="primary" appearance="outline">
-                                <mat-label>Receipt Notes</mat-label>
-                                <input matInput placeholder="Receipt Notes" formControlName="receipt_notes">
+                                <mat-label>{{ 'settings.lease.general.receipt_notes' | translate }}</mat-label>
+                                <input matInput placeholder="{{ 'settings.lease.general.receipt_notes' | translate }}" formControlName="receipt_notes">
                             </mat-form-field>
                         </div>
                     </div>
@@ -48,13 +48,13 @@
                     <div class="row">
                         <div class="col-12">
                             <mat-form-field class="full-width" color="primary" appearance="outline">
-                                <mat-label>Generate Invoice On (Day of Month)</mat-label>
+                                <mat-label>{{ 'settings.lease.general.generate_invoice_on' | translate }}</mat-label>
                                 <mat-select formControlName="generate_invoice_on">
                                     <mat-option *ngFor="let day of dueON" [value]="day">
                                         {{day}}
                                     </mat-option>
                                 </mat-select>
-                                <mat-hint>Day of each month when invoices are generated and sent to tenants.</mat-hint>
+                                <mat-hint>{{ 'settings.lease.general.month_when_invoices_generated' | translate }}.</mat-hint>
                                 <mat-error align="start" *ngIf="formErrors?.generate_invoice_on" class="form__error">{{ formErrors.generate_invoice_on }}</mat-error>
                             </mat-form-field>
                         </div>
@@ -62,25 +62,25 @@
 
                     <div class="col-12 mat-form-field mt-3 mb-3">
                         <mat-checkbox formControlName="show_payment_method_on_invoice">
-                            Show Payment Methods On Invoice
+                            {{ 'settings.lease.general.show_payment_methods_on_invoice' | translate }}
                         </mat-checkbox>
                     </div>
 
                     <div class="col-12 mat-form-field mt-3 mb-3">
                         <mat-checkbox formControlName="next_period_billing">
-                             Next Period Billing
+                            {{ 'settings.lease.general.next_period_billing' | translate }}
                         </mat-checkbox>
                         <div>
-                            <mat-hint><small>When billing, invoice period is set as next month.</small></mat-hint>
+                            <mat-hint><small>{{ 'settings.lease.general.when_billing_invoice_period_is_set_as_next_month' | translate }}</small></mat-hint>
                         </div>
                     </div>
 
                     <div class="col-12 mat-form-field">
                         <mat-checkbox formControlName="skip_starting_period">
-                            Skip Starting Period
+                            {{ 'settings.lease.general.skip_starting_period' | translate }}
                         </mat-checkbox>
                         <div>
-                            <mat-hint><small>For new lease, do not bill the first period.</small></mat-hint>
+                            <mat-hint><small>{{ 'settings.lease.general.for_new_lease_do_not_bill_the_first_period' | translate }}</small></mat-hint>
                         </div>
                     </div>
 
@@ -96,7 +96,7 @@
 
                     <div>
                         <button mat-raised-button type="submit" class="btn pull-right" color="accent"
-                                (click)="update()" [disabled]="!form.valid || loader">Update Settings</button>
+                                (click)="update()" [disabled]="!form.valid || loader">{{ 'settings.lease.general.update_settings' | translate }}</button>
                     </div>
 
                     <div class="clearfix"></div>

@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <p class="card-category">Lease Settings</p>
+                <p class="card-category">{{ 'settings.lease.title' | translate }}</p>
             </div>
 
             <div class="card-body">
@@ -11,15 +11,15 @@
 
                     <a mat-tab-link routerLinkActive #lease="routerLinkActive" [active]="lease.isActive" [routerLinkActiveOptions]="{exact: true}"
                        [routerLink]="['/settings/lease']">
-                        <span class="nav-text"> General</span></a>
+                        <span class="nav-text"> {{ 'settings.lease.general.title' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #lease_type="routerLinkActive" [active]="lease_type.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['lease_type']">
-                        <span class="nav-text"> Lease Types</span></a>
+                        <span class="nav-text"> {{ 'settings.lease.lease_types.title' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #extra_charge="routerLinkActive" [active]="extra_charge.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['extra_charge']">
-                        <span class="nav-text"> Extra Charges</span></a>
+                        <span class="nav-text"> {{ 'settings.lease.extra_charges.title' | translate }} </span></a>
                 </nav>
 
                 <router-outlet></router-outlet>
