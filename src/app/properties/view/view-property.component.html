@@ -1,7 +1,7 @@
 <div class="main-content">
     <ng-template #no_data>
         <div class="not-found">
-            <mat-icon>error</mat-icon> Not Found
+            <mat-icon>error</mat-icon> {{ 'not_found' | translate }}
         </div>
     </ng-template>
     <div class="container-fluid" *ngIf="propertyData$ | async as property; else no_data">
@@ -11,7 +11,7 @@
                         <div class="card-header card-header-info">
                             <div class="row">
                                 <div class="col-8">
-                                    <h4 class="card-title">Property Details</h4>
+                                    <h4 class="card-title">{{ 'properties.details.title' | translate }}</h4>
                                     <p class="card-category">{{property?.property_name}} ({{property?.property_code}})
                                         - {{property?.location}}</p>
                                 </div>
@@ -23,87 +23,36 @@
                                         <button mat-menu-item matTooltip="Edit Property." [matTooltipPosition]="'above'"
                                                 routerLink="edit" (click)="onSelected(property)">
                                             <mat-icon>edit</mat-icon>
-                                            <span>Edit Property</span>
+                                            <span>{{ 'properties.edit.title' | translate }}</span>
                                         </button>
                                     </mat-menu>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body">
-
-
-                        <!--    <div class="row">
-                                <div class="col-6">
-
-                                    <div class="card card-chart">
-                                        <div class="card-header">
-                                            <x-chartist
-                                                    [type]="type"
-                                                    [data]="data"
-                                                    [options]="options"
-                                                    [events]="events"
-                                            ></x-chartist>
-                                        </div>
-
-                                        <div class="card-body">
-                                            <h4 class="card-title">Payment Trend</h4>
-                                            <p class="card-category">
-                                                <mat-icon>file_download</mat-icon> Download Report
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="col-6">
-
-                                    <div class="card card-chart">
-                                        <div class="card-header">
-                                            <x-chartist
-                                                    [type]="type2"
-                                                    [data]="data"
-                                                    [options]="options"
-                                                    [events]="events"
-                                            ></x-chartist>
-                                        </div>
-
-                                        <div class="card-body">
-                                            <h4 class="card-title">Occupancy Trend</h4>
-                                            <p class="card-category">
-                                                {{property?.location}}
-                                                <span class="text-success"><i class="fa fa-long-arrow-up"></i> 55% </span> increase in today sales.3
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
--->
-
-
                             <div class="row">
                                 <div class="col-md-8">
                                     <nav mat-tab-nav-bar>
                                         <a mat-tab-link routerLinkActive #general="routerLinkActive" [active]="general.isActive"
                                            [routerLinkActiveOptions]="{exact: true}"
                                            routerLink="/properties/{{propertyID}}">
-                                            <span class="nav-text"> Info </span></a>
+                                            <span class="nav-text"> {{ 'info' | translate }} </span></a>
 
                                         <a mat-tab-link routerLinkActive #units="routerLinkActive" [active]="units.isActive"
                                            [routerLink]="['units']">
-                                            <span class="nav-text"> Units </span></a>
+                                            <span class="nav-text"> {{ 'properties.field.units' | translate }} </span></a>
 
                                         <a mat-tab-link routerLinkActive #leases="routerLinkActive" [active]="leases.isActive"
                                            [routerLink]="['leases']">
-                                            <span class="nav-text"> Leases </span></a>
+                                            <span class="nav-text"> {{ 'properties.field.leases' | translate }} </span></a>
 
                                         <a mat-tab-link routerLinkActive #invoices="routerLinkActive" [active]="invoices.isActive"
                                            [routerLink]="['invoices']">
-                                            <span class="nav-text"> Invoices </span></a>
+                                            <span class="nav-text"> {{ 'properties.field.invoices' | translate }} </span></a>
 
                                         <a mat-tab-link routerLinkActive #notices="routerLinkActive" [active]="notices.isActive"
                                            [routerLink]="['notices']">
-                                            <span class="nav-text"> Vacate Notices </span></a>
+                                            <span class="nav-text"> {{ 'properties.field.vacate_notices' | translate }} </span></a>
                                     </nav>
                                     <router-outlet></router-outlet>
 
@@ -115,15 +64,15 @@
                                         <div class="card-header card-header-info">
                                             <div class="row">
                                                 <div class="col-4">
-                                                    <div class="card-category"> Total Units: </div>
+                                                    <div class="card-category"> {{ 'properties.field.total_units' | translate }}: </div>
                                                     <div>{{property?.total_units}}</div>
                                                 </div>
                                                 <div class="col-4">
-                                                    <div class="card-category"> Occupied: </div>
+                                                    <div class="card-category"> {{ 'properties.field.occupied' | translate }}: </div>
                                                     <div>{{(property?.total_units) - (property?.total_vacant_units)}}</div>
                                                 </div>
                                                 <div class="col-4">
-                                                    <div class="card-category text-danger"> Vacant: </div>
+                                                    <div class="card-category text-danger"> {{ 'properties.field.vacant' | translate }}: </div>
                                                     <div>{{property?.total_vacant_units}}</div>
                                                 </div>
                                             </div>
@@ -134,16 +83,16 @@
 
                                             <div class="row">
                                                 <div class="col-6">
-                                                    <div class="card-category text-gray"> Name: </div>
+                                                    <div class="card-category text-gray"> {{ 'properties.field.name' | translate }}: </div>
                                                     <div>{{property?.property_name}}</div>
                                                 </div>
                                                 <div class="col-6">
-                                                    <div class="card-category text-gray"> Code: </div>
+                                                    <div class="card-category text-gray"> {{ 'properties.field.code' | translate }}: </div>
                                                     <div>{{property?.property_code}}</div>
                                                 </div>
                                             </div>
 
-                                            <div class="card-category text-gray"> Location: </div>
+                                            <div class="card-category text-gray"> {{ 'properties.field.location' | translate }}: </div>
                                             <div>{{property?.location}}</div>
                                         </div>
                                     </div>

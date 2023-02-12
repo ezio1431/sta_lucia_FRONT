@@ -4,37 +4,37 @@
                matSortDirection="desc" matSortDisableClear>
 
         <ng-container matColumnDef="unit_name">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Unit Name </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.unit_name' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.unit_name}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="unit_type_id">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Unit Type </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.unit_type' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.unit_type?.unit_type_display_name}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="unit_mode">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Unit Mode </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.unit_mode' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.unit_mode}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="bed_rooms">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Bed Rooms </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.bed_rooms' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.bed_rooms}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="total_rooms">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Total Rooms </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.total_rooms' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.total_rooms}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="square_foot">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Square Foot </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.square_foot' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row"> {{row.square_foot}} </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="leases">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Lease </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'properties.unit.lease' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let row">
                 <ng-container *ngIf="row?.lease_numbers == ''">
                     -
@@ -50,7 +50,7 @@
         <mat-row *matRowDef="let row; columns: unitColumns;"> </mat-row>
 
     </mat-table>
-    <span *ngIf="meta?.total===0">No Lease Data.</span>
+    <span *ngIf="meta?.total===0">{{ 'no_data' | translate }}</span>
 
     <div class="d-flex justify-content-center spinner-container" *ngIf="(unitDataSource?.loading$ | async) || loader">
         <mat-progress-bar
