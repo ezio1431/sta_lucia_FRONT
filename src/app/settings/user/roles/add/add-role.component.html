@@ -1,16 +1,16 @@
-<h5 mat-dialog-title>Add Role</h5>
+<h5 mat-dialog-title>{{ 'settings.users.role.add' | translate }}</h5>
 
 <mat-dialog-content class="mat-dialog-data" [formGroup]="form"  (ngSubmit)="create()">
 
     <mat-form-field class="full-width" color="primary" appearance="outline">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" placeholder="Name">
+        <mat-label>{{ 'settings.users.role.name' | translate }}</mat-label>
+        <input matInput formControlName="name" placeholder="{{ 'settings.users.role.name' | translate }}">
         <mat-error align="start" *ngIf="formErrors?.name" class="form__error">{{ formErrors.name }}</mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width" color="primary" appearance="outline">
-        <mat-label>Display Name</mat-label>
-        <textarea  formControlName="display_name" matInput #display_name placeholder="Display Name" maxlength="150" rows="5"></textarea>
+        <mat-label>{{ 'settings.users.permission.display_name' | translate }}</mat-label>
+        <textarea  formControlName="display_name" matInput #display_name placeholder="{{ 'settings.users.permission.display_name' | translate }}" maxlength="150" rows="5"></textarea>
         <mat-hint align="end">{{display_name.value.length}} / 150</mat-hint>
         <mat-error align="start" *ngIf="formErrors?.display_name" class="form__error">{{ formErrors.display_name }}</mat-error>
     </mat-form-field>
@@ -27,6 +27,10 @@
 </div>
 
 <mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">Cancel</button>
-    <button mat-raised-button  color="primary" (click)="create()" [disabled]="!form.valid || loader">Save</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">
+        {{ 'cancel' | translate }}
+    </button>
+    <button mat-raised-button  color="primary" (click)="create()" [disabled]="!form.valid || loader">
+        {{ 'save' | translate }}
+    </button>
 </mat-dialog-actions>

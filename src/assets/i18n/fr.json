@@ -592,6 +592,7 @@
   "settings.users.role.update.success": "Réussi !! Le Role à été mis à jour.",
 
   "settings.users.role.edit": "Editer Role",
+  "settings.users.role.edit_assign": "Edit / Assign Permissions",
   "settings.users.role.add": "Ajouter Role",
 
   "settings.users.role.name": "Nom",

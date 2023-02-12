@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <p class="card-category">User Settings</p>
+                <p class="card-category">{{ 'settings.users.title' | translate }}</p>
             </div>
 
             <div class="card-body">
@@ -10,14 +10,14 @@
                 <nav mat-tab-nav-bar>
                     <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/user']">
-                        <span class="nav-text"> Users</span></a>
+                        <span class="nav-text"> {{ 'settings.users.menu.general' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #role="routerLinkActive" [active]="role.isActive" [routerLink]="['roles']">
-                        <span class="nav-text"> Roles</span></a>
+                        <span class="nav-text"> {{ 'settings.users.menu.roles' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #permission="routerLinkActive" [active]="permission.isActive"
                        [routerLink]="['permissions']">
-                        <span class="nav-text"> Permissions</span></a>
+                        <span class="nav-text"> {{ 'settings.users.menu.permissions' | translate }}</span></a>
 
                 </nav>
 
