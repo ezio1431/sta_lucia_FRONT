@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-info">
-                <p class="card-category">Property Settings</p>
+                <p class="card-category">{{ 'settings.property.title' | translate }}</p>
             </div>
 
             <div class="card-body">
@@ -10,23 +10,19 @@
                 <nav mat-tab-nav-bar>
                     <a mat-tab-link routerLinkActive #user="routerLinkActive" [active]="user.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['/settings/property']">
-                        <span class="nav-text"> Property Types</span></a>
-
-                    <!--<a mat-tab-link routerLinkActive #property_type="routerLinkActive" [active]="property_type.isActive"
-                       [routerLink]="['property_types']">
-                        <span class="nav-text"> Property Types</span></a>-->
+                        <span class="nav-text"> {{ 'settings.property.property_types.title' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #amenity="routerLinkActive" [active]="amenity.isActive"
                        [routerLink]="['amenities']">
-                        <span class="nav-text"> Amenities</span></a>
+                        <span class="nav-text"> {{ 'settings.property.amenities.title' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #utility="routerLinkActive" [active]="utility.isActive"
                        [routerLink]="['utilities']">
-                        <span class="nav-text"> Utilities</span></a>
+                        <span class="nav-text"> {{ 'settings.property.utilities.title' | translate }}</span></a>
 
                     <a mat-tab-link routerLinkActive #unit_type="routerLinkActive" [active]="unit_type.isActive"
                        [routerLink]="['unit_types']">
-                        <span class="nav-text"> Unit Types</span></a>
+                        <span class="nav-text"> {{ 'settings.property.unit_types.title' | translate }}</span></a>
 
                 </nav>
 

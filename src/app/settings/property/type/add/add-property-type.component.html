@@ -1,29 +1,32 @@
-<h5 mat-dialog-title *ngIf="isAdd">Add Property Type
+<h5 mat-dialog-title *ngIf="isAdd">{{ 'settings.property.property_types.add' | translate }}
     <ng-container *ngIf="formError$ | async">
         <mat-icon color="warn">error_outline</mat-icon>
     </ng-container>
 </h5>
-<h5 mat-dialog-title *ngIf="!isAdd">Edit Property Type
+<h5 mat-dialog-title *ngIf="!isAdd">{{ 'settings.property.property_types.edit' | translate }}
     <ng-container *ngIf="formError$ | async">
         <mat-icon color="warn">error_outline</mat-icon>
     </ng-container>
 </h5>
 
-<mat-dialog-content class="mat-dialog-data" [formGroup]="form"  (ngSubmit)="create()">
+<mat-dialog-content class="mat-dialog-data" [formGroup]="form" (ngSubmit)="create()">
 
     <div class="row">
         <div class="col-sm-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Name</mat-label>
-                <input matInput formControlName="name" placeholder="Name">
+                <mat-label>{{ 'settings.property.property_types.field.name' | translate }}</mat-label>
+                <input matInput formControlName="name"
+                       placeholder="{{ 'settings.property.property_types.field.name' | translate }}">
                 <mat-error align="start" *ngIf="formErrors?.name" class="form__error">{{ formErrors.name }}</mat-error>
             </mat-form-field>
         </div>
         <div class="col-sm-6">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Display Name</mat-label>
-                <input matInput formControlName="display_name" placeholder="Display Name">
-                <mat-error align="start" *ngIf="formErrors?.display_name" class="form__error">{{ formErrors.display_name }}</mat-error>
+                <mat-label>{{ 'settings.property.property_types.field.display_name' | translate }}</mat-label>
+                <input matInput formControlName="display_name"
+                       placeholder="{{ 'settings.property.property_types.field.display_name' | translate }}">
+                <mat-error align="start" *ngIf="formErrors?.display_name"
+                           class="form__error">{{ formErrors.display_name }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -31,10 +34,13 @@
     <div class="row">
         <div class="col-sm-12">
             <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>Description</mat-label>
-                <textarea  formControlName="description" matInput #description placeholder="Description" maxlength="150" rows="2"></textarea>
+                <mat-label>{{ 'settings.property.property_types.field.description' | translate }}</mat-label>
+                <textarea formControlName="description" matInput #description
+                          placeholder="{{ 'settings.property.property_types.field.description' | translate }}"
+                          maxlength="150" rows="2"></textarea>
                 <mat-hint align="end">{{description.value.length}} / 150</mat-hint>
-                <mat-error align="start" *ngIf="formErrors?.description" class="form__error">{{ formErrors.description }}</mat-error>
+                <mat-error align="start" *ngIf="formErrors?.description"
+                           class="form__error">{{ formErrors.description }}</mat-error>
             </mat-form-field>
         </div>
     </div>
@@ -51,6 +57,10 @@
 </div>
 
 <mat-dialog-actions align="center">
-    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">Cancel</button>
-    <button mat-raised-button  color="primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">Save</button>
+    <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">
+        {{ 'cancel' | translate }}
+    </button>
+    <button mat-raised-button color="primary" (click)="createOrUpdate()" [disabled]="!form.valid || loader">
+        {{ 'save' | translate }}
+    </button>
 </mat-dialog-actions>
