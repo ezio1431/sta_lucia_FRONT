@@ -5,12 +5,12 @@ import { MatSort } from '@angular/material/sort';
 import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation-dialog-component';
 import { NotificationService } from '../../../shared/notification.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { GeneralSettingService } from '../../general/data/general-setting.service';
 import { TenantGeneralService } from './data/tenant-general.service';
 import { Store } from '@ngrx/store';
 import { State } from '../../../core/settings/settings.model';
 import { ActivatedRoute } from '@angular/router';
 import { TenantGeneralSettingModel } from './model/tenant-general-setting.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-sms-general-setting',
@@ -33,7 +33,8 @@ export class TenantGeneralSettingComponent implements OnInit {
     pageSizeOptions: number[] = [5, 10, 25, 50, 100];
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
-    constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
+    constructor(private store: Store<State>, private fb: FormBuilder,
+                private translateService: TranslateService, private route: ActivatedRoute,
                 private tenantSettingService: TenantGeneralService, private notification: NotificationService) {
         this.form = this.fb.group({
             tenant_number_prefix: ['', [Validators.required]]
@@ -76,7 +77,8 @@ export class TenantGeneralSettingComponent implements OnInit {
         this.tenantSettingService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Setting has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.tenant.general.notification.updated'));
                 },
                 (error) => {
                     this.loader = false;

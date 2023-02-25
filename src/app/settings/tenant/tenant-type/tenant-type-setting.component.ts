@@ -3,17 +3,14 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation-dialog-component';
-
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
 import { TenantTypeModel } from './model/tenant-type-model';
 import { AddTenantTypeComponent } from './add/add-tenant-type.component';
-import { AmenityDataSource } from '../../property/amenity/data/amenity-data.source';
 import { TenantTypeDataSource } from './data/tenant-type-data.source';
 import { TenantTypeService } from './data/tenant-type.service';
-import { AmenityModel } from '../../property/amenity/model/amenity-model';
-import { AddAmenityComponent } from '../../property/amenity/add/add-amenity.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-tenant-type-setting',
@@ -49,6 +46,7 @@ export class TenantTypeSettingComponent implements OnInit, AfterViewInit {
 
     constructor(private notification: NotificationService,
                 private tenantTypeService: TenantTypeService,
+                private translateService: TranslateService,
                 private dialog: MatDialog) {
     }
 
@@ -161,14 +159,16 @@ export class TenantTypeSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Tenant Type has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.tenant.tenant_types.notification.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

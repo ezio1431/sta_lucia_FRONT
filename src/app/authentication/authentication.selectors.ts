@@ -86,6 +86,24 @@ export const selectorUserGeneralSettings = createSelector(
     }
 );
 
+export const selectorLanguage = createSelector(
+    selectorUserGeneralSettings,
+    g_settings => {
+        if (g_settings) {
+            return g_settings?.language;
+        }
+    }
+);
+
+export const selectorTheme = createSelector(
+    selectorUserGeneralSettings,
+    g_settings => {
+        if (g_settings) {
+            return g_settings?.theme;
+        }
+    }
+);
+
 export const selectorCompanyName = createSelector(
     selectorAuthenticatedUser,
     user => {

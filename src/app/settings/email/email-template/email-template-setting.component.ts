@@ -12,6 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SmsTemplateModel } from './model/sms-template-model';
 import { SmsTemplateService } from './data/sms-template.service';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-email-template-setting',
@@ -111,6 +112,7 @@ export class EmailTemplateSettingComponent implements OnInit {
     };
     constructor(private fb: FormBuilder, private route: ActivatedRoute,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private smsTemplateService: SmsTemplateService,
                 private emailTemplateService: EmailTemplateService,
                 private dialog: MatDialog) {
@@ -210,7 +212,8 @@ export class EmailTemplateSettingComponent implements OnInit {
                     this.loader = false;
 
                     // notify success
-                    this.notification.showNotification('success', 'Success !!  Email Template has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.email.notification.email_template_updated'));
                     this.fetchEmailTemplates();
                 },
                 (error) => {
@@ -247,7 +250,8 @@ export class EmailTemplateSettingComponent implements OnInit {
                     this.loader = false;
 
                     // notify success
-                    this.notification.showNotification('success', 'Success !!  Sms Template has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.email.notification.sms_template_updated'));
                     this.fetchSmsTemplates();
                 },
                 (error) => {

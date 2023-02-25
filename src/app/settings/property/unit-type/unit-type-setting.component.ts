@@ -3,7 +3,6 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation-dialog-component';
-
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
@@ -11,6 +10,7 @@ import { UnitTypeModel } from './model/unit-type-model';
 import { AddUnitTypeComponent } from './add/add-unit-type.component';
 import { UnitTypeDataSource } from './data/unit-type-data.source';
 import { UnitTypeService } from './data/unit-type.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-unit-type-setting',
@@ -45,6 +45,7 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
     constructor(private unitTypeService: UnitTypeService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialog: MatDialog) {
     }
@@ -158,7 +159,8 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! UnitType has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.property.unit_types.notifications.deleted'));
                 },
                 (error) => {
                     this.loader = false;
@@ -166,6 +168,8 @@ export class UnitTypeSettingComponent implements OnInit, AfterViewInit {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
                         this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { AppState } from '../../reducers';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
@@ -8,8 +7,8 @@ import { tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { selectEffectiveTheme } from '../../core/settings/settings.selectors';
 import { AuthenticationActions } from '../action-types';
-import { selectorIsLoggedIn, selectorScopes } from '../auth.selectors';
 import { selectorCompanyName, selectorUserScopes } from '../authentication.selectors';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({templateUrl: 'login.component.html'})
 export class LoginComponent implements OnInit {
@@ -24,7 +23,9 @@ export class LoginComponent implements OnInit {
 
     loginScopes: any;
     companyName: string;
-    constructor(private fb: FormBuilder, private store: Store, private route: ActivatedRoute,
+    constructor(private fb: FormBuilder,
+                private translateService: TranslateService,
+                private store: Store, private route: ActivatedRoute,
                 private router: Router, private authenticationService: AuthenticationService) {
         this.loginForm = fb.group({
             email: ['', [Validators.required, Validators.email]],
@@ -65,11 +66,7 @@ export class LoginComponent implements OnInit {
             .pipe(tap(
                 user => {
                     this.loader = false;
-                 //   console.log('AuthActions.actionLogin({user}');
-                  //  console.log(user);
-
                     this.store.dispatch(AuthenticationActions.actionLogin({user}));
-
                     this.store.pipe(select(selectorUserScopes)).subscribe(scopes => {
                         this.loginScopes = scopes;
                         // We have a landlord
@@ -90,11 +87,10 @@ export class LoginComponent implements OnInit {
             .subscribe(
                 () => {},
                 (error) => {
-                   // console.log(error);
                     if (error.error.message) {
                         this.loginError = error.error.message;
                     } else {
-                        this.loginError = 'Server Error. Please try again later.';
+                        this.loginError = this.translateService.instant('server_error');
                     }
                     this.loader = false;
                 });

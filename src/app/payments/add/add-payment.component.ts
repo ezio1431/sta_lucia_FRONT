@@ -14,6 +14,7 @@ import { TenantService } from '../../tenants/data/tenant.service';
 import { LeaseService } from '../../leases/data/lease.service';
 import { TenantModel } from '../../tenants/models/tenant-model';
 import { LeaseModel } from '../../leases/models/lease-model';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -75,6 +76,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
                 private paymentService: PaymentService,
                 private leaseService: LeaseService,
                 private tenantService: TenantService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private paymentMethodService: PaymentMethodService,
                 private dialogRef: MatDialogRef<AddPaymentComponent>) {
@@ -203,7 +205,8 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
         this.paymentService.create(body)
             .subscribe((data) => {
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! New payment created.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('payment.notifications.payment_created'));
                 },
                 (error) => {
                     this.loader = false;
@@ -212,8 +215,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
                         return;
                     }
                     if (error.payment === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     this.formErrors = error;

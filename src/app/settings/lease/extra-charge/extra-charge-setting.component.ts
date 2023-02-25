@@ -11,6 +11,7 @@ import { ExtraChargeModel } from './model/extra-charge-model';
 import { AddExtraChargeComponent } from './add/add-extra-charge.component';
 import { ExtraChargeDataSource } from './data/extra-charge-data.source';
 import { ExtraChargeService } from './data/extra-charge.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-extra-charge-setting',
@@ -46,6 +47,7 @@ export class ExtraChargeSettingComponent implements OnInit, AfterViewInit {
 
     constructor(private extraChargeService: ExtraChargeService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private dialog: MatDialog) {
     }
 
@@ -158,14 +160,16 @@ export class ExtraChargeSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! ExtraCharge has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.lease.extra_charges.notifications.extra_charge_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

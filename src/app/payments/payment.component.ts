@@ -20,6 +20,7 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { UserSettingService } from '../settings/user/data/user-setting.service';
 import { TenantService } from '../tenants/data/tenant.service';
 import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-utility-bills',
@@ -69,6 +70,7 @@ export class PaymentComponent implements OnInit, AfterViewInit {
                 private tenantService: TenantService,
                 private paymentService: PaymentService,
                 private utilityBillService: PaymentService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private authenticationService: AuthenticationService,
                 private dialog: MatDialog) {
@@ -238,18 +240,20 @@ export class PaymentComponent implements OnInit, AfterViewInit {
         this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
             disableClose: true,
             data: {
-                'title' : 'Approve Payment? Confirm permanent action.'
+                'title' : this.translateService.instant('payment.notifications.confirm_approve')
             }
         });
         this.dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.paymentService.approve({id: data.id}).subscribe((payment) => {
                         this.loader = false;
-                        this.notification.showNotification('success', 'Success !! Payment has been Approved.');
+                        this.notification.showNotification('success',
+                            this.translateService.instant('payment.notifications.payment_approved'));
                         this.loadData();
                     },
                     (error) => {
-                        this.notification.showNotification('danger', 'Error !! Could not approve payment.');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('payment.notifications.payment_approve_error'));
                     }
                 );
             }
@@ -274,47 +278,6 @@ export class PaymentComponent implements OnInit, AfterViewInit {
                 }
             }
         );
-    }
-
-    /**
-     * Open Edit form
-     * @param landlord
-     */
-    openConfirmationDialog(landlord: PaymentModel) {
-
-        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(landlord);
-            }
-            this.dialogRef = null;
-        });
-    }
-
-    /**
-     * Remove resource from db
-     * @param landlord
-     */
-   delete(landlord: PaymentModel) {
-       // this.loader = true;
-     /*   this.service.delete(lead)
-            .subscribe((data) => {
-                    this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! Lead has been deleted.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
-                    }
-                });*/
     }
 
     onSelected(payment: PaymentModel): void {

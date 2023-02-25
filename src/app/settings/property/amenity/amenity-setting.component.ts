@@ -11,6 +11,7 @@ import { NotificationService } from '../../../shared/notification.service';
 import { AmenityDataSource } from './data/amenity-data.source';
 import { AmenityService } from './data/amenity.service';
 import { AmenityModel } from './model/amenity-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-amenity-setting',
@@ -45,6 +46,7 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
     constructor(private amenityService: AmenityService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialog: MatDialog) {
     }
@@ -158,14 +160,16 @@ export class AmenitySettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Amenity has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.property.notifications.amenity_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthActions } from '../../../../authentication/action-types';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../reducers';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-user',
@@ -36,6 +37,7 @@ export class AddUserComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private store: Store<AppState>,
                 private fb: FormBuilder,
+                private translateService: TranslateService,
                 private userService: UserSettingService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddUserComponent>) {
@@ -87,7 +89,8 @@ export class AddUserComponent implements OnInit  {
         this.loader = true;
         this.userService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! User created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.users.general.notification.created'));
             },
             (error) => {
                 this.errorInForm.next(true);
@@ -114,7 +117,8 @@ export class AddUserComponent implements OnInit  {
         this.userService.update(body).subscribe((data) => {
                 this.loader = false;
                 this.dialogRef.close(this.form.value);
-                this.notification.showNotification('success', 'Success !! User has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.users.general.notification.updated'));
                 this.store.dispatch(AuthActions.actionLogout());
             },
             (error) => {

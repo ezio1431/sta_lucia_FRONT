@@ -5,6 +5,7 @@ import { NotificationService } from '../../../../shared/notification.service';
 import { BehaviorSubject } from 'rxjs';
 import { PaymentMethodModel } from '../model/payment-method-model';
 import { PaymentMethodService } from '../data/payment-method.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-payment-method',
@@ -34,6 +35,7 @@ export class AddPaymentMethodComponent implements OnInit  {
                 private fb: FormBuilder,
                 private paymentMethodService: PaymentMethodService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private dialogRef: MatDialogRef<AddPaymentMethodComponent>) {
         this.roles = row.roles;
         this.employees = row.employees;
@@ -74,7 +76,8 @@ export class AddPaymentMethodComponent implements OnInit  {
 
         this.paymentMethodService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Payment Method created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.payments.method.notification.created'));
             },
             (error) => {
                 this.loader = false;
@@ -104,7 +107,8 @@ export class AddPaymentMethodComponent implements OnInit  {
                 this.loader = false;
                 this.dialogRef.close(this.form.value);
                 // notify success
-                this.notification.showNotification('success', 'Success !! Payment Method has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.payments.method.notification.updated'));
             },
             (error) => {
                 this.loader = false;

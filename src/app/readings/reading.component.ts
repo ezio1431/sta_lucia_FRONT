@@ -11,6 +11,7 @@ import { ReadingDataSource } from './data/reading-data.source';
 import { NotificationService } from '../shared/notification.service';
 import { ReadingService } from './data/reading.service';
 import { EditReadingComponent } from './edit/edit-reading.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-utility-bills',
@@ -48,6 +49,7 @@ export class ReadingComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
     constructor(private readingService: ReadingService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialog: MatDialog) {
     }
@@ -161,15 +163,15 @@ export class ReadingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Reading has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('utilities.notifications.utility_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

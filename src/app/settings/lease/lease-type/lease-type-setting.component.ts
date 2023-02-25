@@ -3,7 +3,6 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ConfirmationDialogComponent } from '../../../shared/delete/confirmation-dialog-component';
-
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { NotificationService } from '../../../shared/notification.service';
@@ -11,6 +10,7 @@ import { LeaseTypeModel } from './model/lease-type-model';
 import { AddLeaseTypeComponent } from './add/add-lease-type.component';
 import { LeaseTypeDataSource } from './data/lease-type-data.source';
 import { LeaseTypeService } from './data/lease-type.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-lease-type-setting',
@@ -46,6 +46,7 @@ export class LeaseTypeSettingComponent implements OnInit, AfterViewInit {
 
     constructor(private leaseTypeService: LeaseTypeService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private dialog: MatDialog) {
     }
 
@@ -158,14 +159,16 @@ export class LeaseTypeSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! LeaseType has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.lease.lease_type.notifications.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

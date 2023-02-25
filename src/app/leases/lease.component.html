@@ -91,7 +91,7 @@
                                     <mat-header-cell *matHeaderCellDef> {{ 'leases.field.statement' | translate }} </mat-header-cell>
                                     <mat-cell *matCellDef="let row">
                                         <button [disabled]="loader" mat-icon-button
-                                                [matTooltipPosition]="'above'" (click)="viewPdfStatement(row)">
+                                                (click)="viewPdfStatement(row)">
                                             <mat-icon>picture_as_pdf</mat-icon>
                                         </button>
                                     </mat-cell>
@@ -103,7 +103,7 @@
                                         <ng-container *robiPermission="['edit-lease', 'delete-lease']">
                                         <ng-container *ngIf="isAdmin$ | async">
                                             <button *ngIf="row?.terminated_on == null" mat-raised-button type="button"
-                                                    [matTooltipPosition]="'above'" class="btn btn-link btn-sm btn-just-icon"
+                                                   class="btn btn-link btn-sm btn-just-icon"
                                                     routerLink="{{row.id}}/edit" (click)="onSelected(row)">
                                                 <i class="material-icons">edit</i>
                                             </button>

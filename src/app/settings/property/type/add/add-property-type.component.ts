@@ -5,6 +5,7 @@ import { NotificationService } from '../../../../shared/notification.service';
 import { BehaviorSubject } from 'rxjs';
 import { PropertyTypeModel } from '../model/property-type-model';
 import { PropertyTypeService } from '../data/property-type.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-property-type',
@@ -29,6 +30,7 @@ export class AddPropertyTypeComponent implements OnInit  {
 
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
+                private translateService: TranslateService,
                 private propertyTypeService: PropertyTypeService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddPropertyTypeComponent>) {
@@ -69,7 +71,8 @@ export class AddPropertyTypeComponent implements OnInit  {
 
         this.propertyTypeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! PropertyType created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.property_types.notifications.created'));
             },
             (error) => {
                 this.loader = false;
@@ -102,7 +105,8 @@ export class AddPropertyTypeComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! PropertyType has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.property_types.notifications.updated'));
 
             },
             (error) => {

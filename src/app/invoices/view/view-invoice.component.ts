@@ -14,6 +14,7 @@ import { AppState } from '../../reducers';
 import { LandlordService } from '../../landlords/data/landlord.service';
 import { WaiveInvoiceComponent } from './waive/waive-invoice.component';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-view-invoice',
@@ -40,6 +41,7 @@ export class ViewInvoiceComponent implements OnInit, AfterViewInit  {
                 private dialog: MatDialog,
                 private invoiceService: InvoiceService,
                 private authenticationService: AuthenticationService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private router: Router, private route: ActivatedRoute) {
         this.domSanitizer = sanitizer;
@@ -93,7 +95,8 @@ export class ViewInvoiceComponent implements OnInit, AfterViewInit  {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error downloading Invoice !');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('invoices.notifications.download_error'));
                 }
             );
     }

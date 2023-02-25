@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RoleSettingModel } from '../../model/role-setting-model';
 import { RoleSettingService } from '../../data/role-setting.service';
 import { NotificationService } from '../../../../shared/notification.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-role',
@@ -23,6 +24,7 @@ export class AddRoleComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private roleService: RoleSettingService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddRoleComponent>) {
 
@@ -56,13 +58,14 @@ export class AddRoleComponent implements OnInit  {
         this.roleService.create(body)
             .subscribe((data) => {
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! New role created.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.users.role.notification.created'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.role === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('connection_error'));
                         return;
                     }
                     // An array of all form errors as returned by server

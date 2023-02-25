@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EmailGeneralSettingModel } from '../model/email-general-setting.model';
 import { NotificationService } from '../../../../shared/notification.service';
 import { EmailGeneralService } from '../data/email-general.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-edit-email-general',
@@ -31,6 +32,7 @@ export class EditEmailGeneralComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private communicationGeneralSettingService: EmailGeneralService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
     private dialogRef: MatDialogRef<EditEmailGeneralComponent>) {
 
@@ -64,7 +66,8 @@ export class EditEmailGeneralComponent implements OnInit  {
                     this.dialogRef.close(this.form.value);
 
                     // notify success
-                    this.notification.showNotification('success', 'Success !! Setting has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.email.notification.general_setting_updated'));
 
                 },
                 (error) => {

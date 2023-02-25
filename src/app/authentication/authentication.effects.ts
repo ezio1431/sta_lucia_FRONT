@@ -39,7 +39,7 @@ export class AuthEffects {
     @Effect()
     init$ = defer(() => {
         const user = this.localStorageService.getItem(AUTH_KEY);
-        console.log('authData', user);
+      /*  console.log('authData', user);*/
         if (user) {
             return of(AuthActions.actionLogin({user: user}));
         } else {

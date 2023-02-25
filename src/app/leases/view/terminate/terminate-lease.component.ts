@@ -2,12 +2,11 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from '../../../shared/notification.service';
-import { LeaseModel } from '../../models/lease-model';
-import { RoleSettingService } from '../../../settings/user/data/role-setting.service';
 import { LeaseService } from '../../data/lease.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { TerminateModel } from '../../models/terminate-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-terminate-lease',
@@ -35,6 +34,7 @@ export class TerminateLeaseComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private leaseService: LeaseService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private router: Router,
                 private dialogRef: MatDialogRef<TerminateLeaseComponent>) {
@@ -72,7 +72,8 @@ export class TerminateLeaseComponent implements OnInit  {
                 console.log(data);
                     this.loader = false;
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Lease is terminated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('leases.notifications.lease_terminated'));
                 },
                 (error) => {
                     this.errorInForm.next(true);
@@ -80,8 +81,7 @@ export class TerminateLeaseComponent implements OnInit  {
                     this.terminationErrorMessage.next(error.error.message);
 
                     if (error.role === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !!' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     // An array of all form errors as returned by server

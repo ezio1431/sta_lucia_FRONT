@@ -11,6 +11,7 @@ import { EmailGeneralSettingModel } from './model/email-general-setting.model';
 import { EmailGeneralDataSource } from './data/email-general-data.source';
 import { EmailGeneralService } from './data/email-general.service';
 import { EditEmailGeneralComponent } from './edit/edit-email-general.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-system-email-setting',
@@ -49,6 +50,7 @@ export class EmailGeneralSettingComponent implements OnInit, AfterViewInit {
 
     constructor(private emailGeneralService: EmailGeneralService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private dialog: MatDialog) {
     }
 
@@ -163,15 +165,17 @@ export class EmailGeneralSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Communication Setting has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.email.notification.communication_setting_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('connection_error'));
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

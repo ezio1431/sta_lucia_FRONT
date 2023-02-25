@@ -8,15 +8,12 @@ import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialo
 import { AddLeaseComponent } from './add/add-lease.component';
 import { LeaseModel } from './models/lease-model';
 import { LeaseDataSource } from './data/lease-data.source';
-import { NotificationService } from '../shared/notification.service';
 import { LeaseService } from './data/lease.service';
 import { LandlordService } from '../landlords/data/landlord.service';
 import { TenantService } from '../tenants/data/tenant.service';
 import { UserSettingService } from '../settings/user/data/user-setting.service';
 import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
-import { Router } from '@angular/router';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { AccountingModel } from '../accounting/models/accounting-model';
 import { PdfStatementComponent } from '../accounting/pdf-statement/pdf-statement.component';
 
 @Component({
@@ -64,7 +61,6 @@ export class LeaseComponent implements OnInit, AfterViewInit {
                 private tenantService: TenantService,
                 private userService: UserSettingService,
                 private leaseService: LeaseService,
-                private notification: NotificationService,
                 private authenticationService: AuthenticationService,
                 private dialog: MatDialog) {
         this.activeUser = this.userService.getActiveUser();
@@ -198,45 +194,6 @@ export class LeaseComponent implements OnInit, AfterViewInit {
                 }
             }
         );
-    }
-
-    /**
-     * Open Edit form
-     * @param lease
-     */
-    openConfirmationDialog(lease: LeaseModel) {
-        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(lease);
-            }
-            this.dialogRef = null;
-        });
-    }
-
-    /**
-     * Remove resource from db
-     * @param landlord
-     */
-   delete(landlord: LeaseModel) {
-       // this.loader = true;
-     /*   this.service.delete(lead)
-            .subscribe((data) => {
-                    this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! Lead has been deleted.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
-                    }
-                });*/
     }
 
     /**

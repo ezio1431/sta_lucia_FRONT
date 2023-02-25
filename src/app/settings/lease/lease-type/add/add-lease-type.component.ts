@@ -8,6 +8,7 @@ import { LeaseTypeModel } from '../model/lease-type-model';
 import { LeaseTypeService } from '../data/lease-type.service';
 import { AmenityModel } from '../../../property/amenity/model/amenity-model';
 import { AmenityService } from '../../../property/amenity/data/amenity.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-lease-type',
@@ -33,6 +34,7 @@ export class AddLeaseTypeComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private leaseTypeService: LeaseTypeService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddLeaseTypeComponent>) {
         this.isAdd = row.isAdd;
@@ -71,7 +73,8 @@ export class AddLeaseTypeComponent implements OnInit  {
 
         this.leaseTypeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! LeaseType created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.lease.lease_type.notifications.created'));
             },
             (error) => {
                 this.loader = false;
@@ -104,7 +107,8 @@ export class AddLeaseTypeComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! LeaseType has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.lease.lease_type.notifications.updated'));
 
             },
             (error) => {

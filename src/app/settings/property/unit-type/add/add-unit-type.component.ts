@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import { UnitTypeModel } from '../model/unit-type-model';
-import { AmenityService } from '../../amenity/data/amenity.service';
 import { UnitTypeService } from '../data/unit-type.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-unit-type',
@@ -31,6 +31,7 @@ export class AddUnitTypeComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private unitTypeService: UnitTypeService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddUnitTypeComponent>) {
         this.isAdd = row.isAdd;
@@ -70,7 +71,8 @@ export class AddUnitTypeComponent implements OnInit  {
 
         this.unitTypeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! UnitType created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.unit_types.notifications.created'));
             },
             (error) => {
                 this.loader = false;
@@ -103,7 +105,8 @@ export class AddUnitTypeComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! UnitType has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.unit_types.notifications.updated'));
 
             },
             (error) => {

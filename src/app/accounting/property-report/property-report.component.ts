@@ -8,6 +8,7 @@ import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { PropertyService } from '../../properties/data/property.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-property-report',
@@ -40,6 +41,7 @@ export class PropertyReportComponent implements OnInit {
                 private generalJournalService: GeneralJournalService,
                 sanitizer: DomSanitizer,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private dialog: MatDialog,
                 private memberService: NotificationService,
                 private propertyService: PropertyService) {
@@ -105,7 +107,8 @@ export class PropertyReportComponent implements OnInit {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error downloading Report !');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('reports.notifications.download_error'));
                 }
             );
     }

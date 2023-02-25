@@ -50,7 +50,7 @@ export const ADMIN_ROUTES: RouteInfo[] = [
     { path: '/settings', title: 'robi.sidebar.setting',  icon: 'settings', class: '',
         permission: ['manage-setting'] },
 
-    { path: '/profile', title: 'sidebar.profile',  icon: 'person', class: '',
+    { path: '/profile', title: 'profile',  icon: 'person', class: '',
         permission: ['view-profile'] },
 
     { path: '/reports', title: 'reports.list.title',  icon: 'account_tree', class: '',
@@ -64,7 +64,7 @@ export const LANDLORD_ROUTES: RouteInfo[] = [
     { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-landlord'] },
     { path: '/invoices', title: 'robi.sidebar.invoices',  icon: 'receipt', class: '', permission: ['am-landlord'] },
     { path: '/notices', title: 'robi.vacate.title',  icon: 'lock_open', class: '', permission: ['am-landlord'] },
-    { path: '/landlord/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-landlord'] },
+    { path: '/landlord/profile', title: 'profile',  icon: 'person', class: '', permission: ['am-landlord'] },
 ];
 
 export const TENANT_ROUTES: RouteInfo[] = [
@@ -72,7 +72,7 @@ export const TENANT_ROUTES: RouteInfo[] = [
     { path: '/leases', title: 'robi.sidebar.leases',  icon: 'gavel', class: '', permission: ['am-tenant'] },
     { path: '/payments', title: 'robi.sidebar.payments',  icon: 'payment', class: '', permission: ['am-tenant'] },
     { path: '/notices', title: 'robi.vacate.title',  icon: 'lock_open', class: '', permission: ['am-tenant'] },
-    { path: '/tenant/profile', title: 'sidebar.profile',  icon: 'person', class: '', permission: ['am-tenant'] },
+    { path: '/tenant/profile', title: 'profile',  icon: 'person', class: '', permission: ['am-tenant'] },
 ];
 
 @Component({

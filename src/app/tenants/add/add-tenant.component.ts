@@ -10,8 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthenticationService } from '../../authentication/authentication.service';
-import { LATE_FEE_TYPES } from '../../shared/enums/late-fee-types.enum';
 import { GENDER } from '../../shared/enums/gender-enum';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-tenant',
@@ -52,6 +52,7 @@ export class AddTenantComponent implements OnInit  {
                 private tenantService: TenantService,
                 private tenantTypeService: TenantTypeService,
                 private authenticationService: AuthenticationService,
+                private translateService: TranslateService,
                 private notification: NotificationService) {
         this.gender = GENDER;
             this.isAdmin$ = this.authenticationService.isAdmin();
@@ -207,14 +208,14 @@ export class AddTenantComponent implements OnInit  {
         this.tenantService.create(tenantFields)
             .subscribe((res) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! New Tenant created.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('tenants.notification.tenant_created'));
                     this.onSaveComplete();
                 },
                 (error) => {
                     this.loader = false;
                     if (error.lead === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     this.formErrors = error;
@@ -256,7 +257,8 @@ export class AddTenantComponent implements OnInit  {
         this.tenantService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Tenant has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('tenants.notification.tenant_updated'));
                     this.onSaveComplete();
                 },
                 (error) => {
@@ -303,14 +305,15 @@ export class AddTenantComponent implements OnInit  {
             .subscribe((data) => {
                     this.loader = false;
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Tenant has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('tenants.notification.tenant_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

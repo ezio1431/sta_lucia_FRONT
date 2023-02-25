@@ -25,6 +25,7 @@ import { PropertyModel } from '../../properties/models/property-model';
 import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-lease',
@@ -169,6 +170,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
                 private utilityService: UtilityService,
                 private leaseSettingService: LeaseSettingService,
                 private authenticationService: AuthenticationService,
+                private translateService: TranslateService,
                 private notification: NotificationService) {
         this.lateFeeFrequencies = LATE_FEE_FREQUENCIES;
         this.newTenant = 'new';
@@ -863,7 +865,8 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.loader = true;
         this.leaseService.create(body).subscribe((data) => {
                 this.loader = false;
-                this.notification.showNotification('success', 'Success !! Lease created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('leases.notifications.lease_created'));
                 this.onSaveComplete();
             },
             (error) => {
@@ -871,8 +874,7 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
 
                 this.loader = false;
                 if (error.lease === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
+                    this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                     return;
                 }
                 this.formErrors = error?.error;
@@ -950,7 +952,8 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
         this.leaseService.update(body)
             .subscribe((res) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Lease has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('leases.notifications.lease_updated'));
                     this.onSaveComplete();
                 },
                 (error) => {
@@ -1021,14 +1024,15 @@ export class AddLeaseComponent implements OnInit, AfterViewInit, OnDestroy  {
             .subscribe((data) => {
                     this.loader = false;
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Lease has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('leases.notifications.lease_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

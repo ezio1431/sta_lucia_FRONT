@@ -18,6 +18,7 @@ import { UserSettingService } from '../settings/user/data/user-setting.service';
 import { TenantService } from '../tenants/data/tenant.service';
 import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
 import { AuthenticationService } from '../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-utility-bills',
@@ -68,6 +69,7 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
                 private tenantService: TenantService,
                 private invoiceService: InvoiceService,
                 private utilityBillService: InvoiceService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private authenticationService: AuthenticationService,
                 private dialog: MatDialog) {
@@ -216,47 +218,6 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * Open Edit form
-     * @param landlord
-     */
-    openConfirmationDialog(landlord: InvoiceModel) {
-
-        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(landlord);
-            }
-            this.dialogRef = null;
-        });
-    }
-
-    /**
-     * Remove resource from db
-     * @param landlord
-     */
-   delete(landlord: InvoiceModel) {
-       // this.loader = true;
-     /*   this.service.delete(lead)
-            .subscribe((data) => {
-                    this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! Lead has been deleted.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
-                    }
-                });*/
-    }
-
-    /**
      *
      * @param row
      */
@@ -269,7 +230,8 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error Downloading File!');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('invoices.notifications.download_error'));
                 }
             );
     }

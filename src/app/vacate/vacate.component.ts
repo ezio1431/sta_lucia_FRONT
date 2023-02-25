@@ -15,6 +15,7 @@ import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
 import { LandlordService } from '../landlords/data/landlord.service';
 import { TenantService } from '../tenants/data/tenant.service';
 import { AuthenticationService } from '../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-vacate',
@@ -54,6 +55,7 @@ export class VacateComponent implements OnInit, AfterViewInit {
     isAdmin$: Observable<boolean>;
     constructor(private vacateNoticeService: VacateService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private userService: UserSettingService,
                 private landlordService: LandlordService,
                 private authenticationService: AuthenticationService,
@@ -219,14 +221,14 @@ export class VacateComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Vacate Notice has been deleted.');
+                    this.notification.showNotification('danger', this.translateService.instant('vacates.notifications.notice_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

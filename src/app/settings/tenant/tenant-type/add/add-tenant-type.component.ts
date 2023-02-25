@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import { TenantTypeModel } from '../model/tenant-type-model';
 import { TenantTypeService } from '../data/tenant-type.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-tenant-ype',
@@ -30,6 +31,7 @@ export class AddTenantTypeComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private tenantTypeService: TenantTypeService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddTenantTypeComponent>) {
         this.isAdd = row.isAdd;
@@ -69,7 +71,8 @@ export class AddTenantTypeComponent implements OnInit  {
 
         this.tenantTypeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! TenantType created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.tenant.tenant_types.notification.created'));
             },
             (error) => {
                 this.loader = false;
@@ -101,7 +104,8 @@ export class AddTenantTypeComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! TenantType has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.tenant.tenant_types.notification.updated'));
 
             },
             (error) => {

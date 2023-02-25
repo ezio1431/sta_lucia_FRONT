@@ -5,6 +5,7 @@ import { NotificationService } from '../../shared/notification.service';
 import { BehaviorSubject } from 'rxjs';
 import { ReadingModel } from '../models/reading-model';
 import { ReadingService } from '../data/reading.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-edit-reading',
@@ -24,6 +25,7 @@ export class EditReadingComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private readingService: ReadingService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<EditReadingComponent>) {
         this.isAdd = row?.isAdd;
@@ -64,7 +66,8 @@ export class EditReadingComponent implements OnInit  {
             .subscribe((data) => {
                     this.loader = false;
                     this.dialogRef.close(this.form.value);
-                    this.notification.showNotification('success', 'Success !! reading has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('utilities.notifications.utility_updated'));
                 },
                 (error) => {
                     this.loader = false;

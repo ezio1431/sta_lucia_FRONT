@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LeaseGeneralSettingModel } from './model/lease-general-setting.model';
 import { ThemePalette } from '@angular/material/core';
 import { LeaseSettingService } from './data/lease-setting.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-lease-general-setting',
@@ -54,7 +55,9 @@ export class LeaseGeneralSettingComponent implements OnInit {
     color: ThemePalette = 'accent';
     nextPeriodBilling: boolean;
 
-    constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
+    constructor(private store: Store<State>,
+                private translateService: TranslateService,
+                private fb: FormBuilder, private route: ActivatedRoute,
                 private leaseSettingService: LeaseSettingService, private notification: NotificationService) {
 
         this.form = this.fb.group({
@@ -122,7 +125,8 @@ export class LeaseGeneralSettingComponent implements OnInit {
         this.leaseSettingService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Lease Setting has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.lease.general.notifications.updated'));
                 },
                 (error) => {
                     this.loader = false;

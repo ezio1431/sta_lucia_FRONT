@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PermissionSettingService } from '../../data/permission-setting.service';
 import { PermissionSettingModel } from '../../model/permission-setting-model';
 import { NotificationService } from '../../../../shared/notification.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-edit-permission',
@@ -23,6 +24,7 @@ export class EditPermissionComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private permissionService: PermissionSettingService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
     private dialogRef: MatDialogRef<EditPermissionComponent>) {
 
@@ -55,7 +57,8 @@ export class EditPermissionComponent implements OnInit  {
                     this.dialogRef.close(this.form.value);
 
                     // notify success
-                    this.notification.showNotification('success', 'Success !! Permission has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.users.permission.notification.updated'));
 
                 },
                 (error) => {

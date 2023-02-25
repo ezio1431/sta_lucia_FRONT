@@ -8,7 +8,6 @@ import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialo
 import { AddPropertyComponent } from './add/add-property.component';
 import { PropertyModel } from './models/property-model';
 import { PropertyDataSource } from './data/property-data.source';
-import { NotificationService } from '../shared/notification.service';
 import { PropertyService } from './data/property.service';
 import { LandlordService } from '../landlords/data/landlord.service';
 import { AuthenticationService } from '../authentication/authentication.service';
@@ -58,7 +57,6 @@ export class PropertyComponent implements OnInit, AfterViewInit {
                 private landlordService: LandlordService,
                 private tenantService: TenantService,
                 private propertyService: PropertyService,
-                private notification: NotificationService,
                 private authenticationService: AuthenticationService,
                 private dialog: MatDialog) {
         this.activeUser = this.userService.getActiveUser();
@@ -193,47 +191,6 @@ export class PropertyComponent implements OnInit, AfterViewInit {
                 break;
             }
         }
-    }
-
-    /**
-     * Open Edit form
-     * @param property
-     */
-    openConfirmationDialog(property: PropertyModel) {
-
-        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(property);
-            }
-            this.dialogRef = null;
-        });
-    }
-
-    /**
-     * Remove resource from db
-     * @param property
-     */
-   delete(property: PropertyModel) {
-       // this.loader = true;
-     /*   this.service.delete(lead)
-            .subscribe((data) => {
-                    this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! Lead has been deleted.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
-                    }
-                });*/
     }
 
     /**

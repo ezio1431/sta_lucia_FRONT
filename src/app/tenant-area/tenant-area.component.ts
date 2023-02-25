@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TenantSummaryModel } from './model/tenant-summary-model';
 import { ChartType } from 'chart.js';
 import { Color } from 'ng2-charts';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-landlord-area',
@@ -24,7 +25,7 @@ export class TenantAreaComponent implements OnInit {
             backgroundColor: ['rgba(0,255,0,0.3)', 'rgba(0,0,255,0.3)'],
         }
     ];
-    constructor(private route: ActivatedRoute) {
+    constructor(private route: ActivatedRoute, private translateService: TranslateService) {
     }
     ngOnInit() {
 
@@ -42,7 +43,7 @@ export class TenantAreaComponent implements OnInit {
 
         this.lineChartLabels = paymentDate;
         this.lineChartData = [
-            {data: paidAmount, label: 'Payment'}
+            {data: paidAmount, label: this.translateService.instant('settings.menu.payment')}
         ];
     }
 }

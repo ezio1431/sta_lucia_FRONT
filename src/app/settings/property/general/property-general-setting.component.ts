@@ -14,6 +14,7 @@ import { selectSettings } from '../../../core/settings/settings.selectors';
 import { SettingsState, State } from '../../../core/settings/settings.model';
 import { ActivatedRoute } from '@angular/router';
 import { PropertyGeneralSettingModel } from './model/property-general-setting.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-property-general-setting',

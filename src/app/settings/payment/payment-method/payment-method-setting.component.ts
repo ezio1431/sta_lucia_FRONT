@@ -10,6 +10,7 @@ import { PaymentMethodModel } from './model/payment-method-model';
 import { PaymentMethodDataSource } from './data/payment-method-data.source';
 import { PaymentMethodService } from './data/payment-method.service';
 import { NotificationService } from '../../../shared/notification.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-payment-method-setting',
@@ -45,6 +46,7 @@ export class PaymentMethodSettingComponent implements OnInit, AfterViewInit {
 
     constructor(private paymentMethodService: PaymentMethodService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private dialog: MatDialog) {
     }
 
@@ -151,14 +153,16 @@ export class PaymentMethodSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Payment Method has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.payments.method.notification.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

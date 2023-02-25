@@ -16,11 +16,6 @@ export class StatementComponent implements OnInit  {
     account: AccountingModel;
     id: string;
     type: string;
-
-    loanAmount: any;
-    totalPeriods: any;
-    interest: any;
-
     loader = false;
 
     table: any;

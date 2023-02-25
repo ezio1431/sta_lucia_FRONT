@@ -34,6 +34,7 @@ import {
   selectElementsAnimations
 } from './settings.selectors';
 import { State } from './settings.model';
+import { selectorLanguage } from '../../authentication/authentication.selectors';
 
 export const SETTINGS_KEY = 'SETTINGS';
 
@@ -124,7 +125,8 @@ export class SettingsEffects {
   setTranslateServiceLanguage = createEffect(
     () =>
       this.store.pipe(
-        select(selectSettingsLanguage),
+       // select(selectSettingsLanguage),
+        select(selectorLanguage),
         distinctUntilChanged(),
         tap(language => this.translateService.use(language))
       ),

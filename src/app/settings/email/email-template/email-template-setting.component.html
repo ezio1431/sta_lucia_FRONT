@@ -16,7 +16,7 @@
                                             formControlName="template" #templateSelect
                                             (selectionChange)="onTemplateItemChange(templateSelect.value)">
                                     <mat-option *ngFor="let template of templates" [value]="template.id">
-                                        {{template.display_name}}
+                                        {{ 'settings.email.event.' + template.display_name | translate }}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
@@ -94,7 +94,7 @@
                                             #smsTemplateSelect
                                             (selectionChange)="onSMSTemplateItemChange(smsTemplateSelect.value)">
                                     <mat-option *ngFor="let template of smsTemplates" [value]="template.id">
-                                        {{template.display_name}}
+                                        {{ 'settings.email.event.' + template.display_name | translate }}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>

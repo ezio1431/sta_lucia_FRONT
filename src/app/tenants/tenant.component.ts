@@ -8,9 +8,7 @@ import { ConfirmationDialogComponent } from '../shared/delete/confirmation-dialo
 import { AddTenantComponent } from './add/add-tenant.component';
 import { TenantModel } from './models/tenant-model';
 import { TenantDataSource } from './data/tenant-data.source';
-import { NotificationService } from '../shared/notification.service';
 import { TenantService } from './data/tenant.service';
-import { PropertyModel } from '../properties/models/property-model';
 import { AuthenticationService } from '../authentication/authentication.service';
 
 @Component({
@@ -48,7 +46,6 @@ export class TenantComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort, {static: true}) sort: MatSort;
     isAdmin$: Observable<boolean>;
     constructor(private tenantService: TenantService,
-                private notification: NotificationService,
                 private authenticationService: AuthenticationService,
                 private dialog: MatDialog) {
         this.isAdmin$ = this.authenticationService.isAdmin();
@@ -136,47 +133,6 @@ export class TenantComponent implements OnInit, AfterViewInit {
                 }
             }
         );
-    }
-
-    /**
-     * Open Edit form
-     * @param landlord
-     */
-    openConfirmationDialog(landlord: TenantModel) {
-
-        this.dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            disableClose: true
-        });
-
-        this.dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.delete(landlord);
-            }
-            this.dialogRef = null;
-        });
-    }
-
-    /**
-     * Remove resource from db
-     * @param landlord
-     */
-   delete(landlord: TenantModel) {
-       // this.loader = true;
-     /*   this.service.delete(lead)
-            .subscribe((data) => {
-                    this.loader = false;
-                    this.loadData();
-                    this.notification.showNotification('success', 'Success !! Lead has been deleted.');
-                },
-                (error) => {
-                    this.loader = false;
-                    if (!error.error['error']) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing deleted.' +
-                            ' Check Connection and retry. ');
-                    } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
-                    }
-                });*/
     }
 
     /**

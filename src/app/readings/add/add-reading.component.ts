@@ -10,6 +10,7 @@ import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap 
 import { PropertyService } from '../../properties/data/property.service';
 import { UtilityService } from '../../settings/property/utility/data/utility.service';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-reading',
@@ -27,25 +28,8 @@ export class AddReadingComponent implements OnInit  {
     member: ReadingModel;
 
     loader = false;
-
-    memberMethods: any = [];
     groups: any = [];
-
     formGroup: FormGroup;
-
-    memberStatuses: any = [];
-    memberSources: any = [];
-    memberTypes: any = [];
-
-    profilePicFileToUpload: File = null;
-    membershipFormFileToUpload: File = null;
-    profilePicUrl = '';
-
-    membershipFormToUpload: File = null;
-    membershipFormUrl = '';
-
-    urls = new Array<string>();
-
     tenant: ReadingModel;
 
     @ViewChild('stepper', {static: true }) stepper: MatStepper;
@@ -109,6 +93,7 @@ export class AddReadingComponent implements OnInit  {
                 private utilityService: UtilityService,
                 private propertyService: PropertyService,
                 private readingService: ReadingService,
+                private translateService: TranslateService,
                 private notification: NotificationService) {
         this.entryType = 'manual';
         // Load properties list
@@ -291,7 +276,8 @@ export class AddReadingComponent implements OnInit  {
         this.readingService.uploadReadings(formData)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Readings has been uploaded.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('utilities.notifications.utility_uploaded'));
                 },
                 (error) => {
                     this.loader = false;
@@ -387,7 +373,8 @@ export class AddReadingComponent implements OnInit  {
 
         this.readingService.create(unitReadings).subscribe((data) => {
                 this.loader = false;
-                this.notification.showNotification('success', 'Success !! Utility Readings Added.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('utilities.notifications.utility_added'));
                 this.onSaveComplete();
             },
             (error) => {
@@ -395,8 +382,8 @@ export class AddReadingComponent implements OnInit  {
 
                 this.loader = false;
                 if (error.member === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
+                    this.notification.showNotification('danger', this.translateService.instant('connection_error'));
+
                     return;
                 }
                 // An array of all form errors as returned by server

@@ -1,8 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NotificationService } from '../../../shared/notification.service';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { LandlordService } from '../../data/landlord.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LandlordModel } from '../../models/landlord-model';
@@ -14,18 +11,7 @@ import { LandlordModel } from '../../models/landlord-model';
 })
 export class ViewLandlordGeneralComponent implements OnInit {
 
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    profilePicUrl: string;
-    profilePicFileToUpload: File = null;
-
-    imageToShow: any;
-
     loader = false;
-    memberShipForm = false;
-
     landlordID: string;
     landlord$: Observable<LandlordModel>;
     landlordData$: Observable<LandlordModel>;

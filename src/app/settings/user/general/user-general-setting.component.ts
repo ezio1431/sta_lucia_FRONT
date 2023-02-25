@@ -13,6 +13,7 @@ import { UserSettingDataSource } from '../data/user-setting-data.source';
 import { UserSettingService } from '../data/user-setting.service';
 import { NotificationService } from '../../../shared/notification.service';
 import { RoleSettingService } from '../data/role-setting.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-user-general-setting',
@@ -48,7 +49,8 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
 
     roles: any = [];
 
-    constructor(private service: UserSettingService, private notification: NotificationService,
+    constructor(private service: UserSettingService, private translateService: TranslateService,
+                private notification: NotificationService,
                 private roleService: RoleSettingService, private dialog: MatDialog) {
     }
 
@@ -164,14 +166,16 @@ export class UserGeneralSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! User has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.users.general.notification.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (!error.error['error']) {
                         this.notification.showNotification('danger', error?.error?.message);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

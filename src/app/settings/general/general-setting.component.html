@@ -50,7 +50,7 @@
                                                         (selectionChange)="onThemeSelect($event)"
                                                         formControlName="theme">
                                                 <mat-option *ngFor="let t of themes" [value]="t.value">
-                                                    {{ 'robi.settings.themes.' + t.label | translate }}
+                                                    {{ 'settings.themes.' + t.label | translate }}
                                                 </mat-option>
                                             </mat-select>
                                         </mat-form-field>

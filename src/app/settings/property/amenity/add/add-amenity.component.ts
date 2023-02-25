@@ -5,6 +5,7 @@ import { NotificationService } from '../../../../shared/notification.service';
 import { BehaviorSubject } from 'rxjs';
 import { AmenityService } from '../data/amenity.service';
 import { AmenityModel } from '../model/amenity-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-amenity',
@@ -30,6 +31,7 @@ export class AddAmenityComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private amenityService: AmenityService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddAmenityComponent>) {
         this.isAdd = row.isAdd;
@@ -70,7 +72,8 @@ export class AddAmenityComponent implements OnInit  {
 
         this.amenityService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Amenity created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.notifications.amenity_created'));
             },
             (error) => {
                 this.loader = false;
@@ -103,7 +106,8 @@ export class AddAmenityComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! Amenity has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.notifications.amenity_updated'));
 
             },
             (error) => {

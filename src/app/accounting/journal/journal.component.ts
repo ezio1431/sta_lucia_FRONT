@@ -8,15 +8,11 @@ import { GeneralJournalDataSource } from '../data/general-journal-data.source';
 import { AccountingService } from '../data/accounting.service';
 import { GeneralJournalService } from '../data/general-journal.service';
 import { NotificationService } from '../../shared/notification.service';
-// import { MemberService } from '../../members/data/member.service';
-// import { BranchService } from '../../settings/branch/general/data/branch.service';
 import { fromEvent, merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
 import { PropertyService } from '../../properties/data/property.service';
-// import { branch } from '../../auth/auth.selectors';
-
 @Component({
     selector: 'robi-journal',
     templateUrl: './journal.component.html',

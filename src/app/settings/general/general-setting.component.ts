@@ -17,8 +17,9 @@ import {
     actionSettingsChangeTheme
 } from '../../core/settings/settings.actions';
 import { AuthActions, AuthenticationActions } from '../../authentication/action-types';
-import { selectorAuthenticatedUser, selectorCompanyName } from '../../authentication/authentication.selectors';
+import { selectorAuthenticatedUser, selectorCompanyName, selectorUserGeneralSettings } from '../../authentication/authentication.selectors';
 import { User } from '../../authentication/model/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-general-setting',
@@ -68,17 +69,23 @@ export class GeneralSettingComponent implements OnInit {
     ];
 
     languages = [
-        { value: 'en', label: 'en' },
+        { value: 'ar', label: 'ar' },
         { value: 'de', label: 'de' },
-        { value: 'sk', label: 'sk' },
-        { value: 'fr', label: 'fr' },
+        { value: 'en', label: 'en' },
         { value: 'es', label: 'es' },
+        { value: 'fr', label: 'fr' },
+        { value: 'hi', label: 'hi' },
+        { value: 'id', label: 'id' },
+        { value: 'pt', label: 'pt' },
         { value: 'pt-br', label: 'pt-br' },
-        { value: 'zh-cn', label: 'zh-cn' },
-        { value: 'he', label: 'he' }
-    ];
+        { value: 'ru', label: 'ru' },
+        { value: 'sw', label: 'sw' },
+        { value: 'zh_CN', label: 'zh_CN' }
+        ];
     constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
-                private generalSettingService: GeneralSettingService, private notification: NotificationService ) {
+                private generalSettingService: GeneralSettingService,
+                private translateService: TranslateService,
+                private notification: NotificationService ) {
 
         this.form = this.fb.group({
             theme: [''],
@@ -102,7 +109,8 @@ export class GeneralSettingComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.settings$ = this.store.pipe(select(selectSettings));
+      //  this.settings$ = this.store.pipe(select(selectSettings));
+        this.settings$ = this.store.pipe(select(selectorUserGeneralSettings));
 
         if (this.route.snapshot.data['setting']) {
             this.setting = this.route.snapshot.data['setting'];
@@ -131,10 +139,12 @@ export class GeneralSettingComponent implements OnInit {
 
     onLanguageSelect({ value: language }) {
         this.store.dispatch(actionSettingsChangeLanguage({ language }));
+        this.update();
     }
 
     onThemeSelect({ value: theme }) {
         this.store.dispatch(actionSettingsChangeTheme({ theme }));
+        this.update();
     }
 
     onAutoNightModeToggle({ checked: autoNightMode }) {
@@ -265,7 +275,8 @@ export class GeneralSettingComponent implements OnInit {
                     this.loader = false;
                     this.getImageFromService();
                     // notify success
-                    this.notification.showNotification('success', 'Success !! Logo has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.general.notification.logo_updated'));
                 },
                 (error) => {
                     this.loader = false;
@@ -310,7 +321,8 @@ export class GeneralSettingComponent implements OnInit {
         this.generalSettingService.update(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Setting has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.general.notification.setting_updated'));
                 },
                 (error) => {
                     this.loader = false;

@@ -8,6 +8,7 @@ import { ExtraChargeModel } from '../model/extra-charge-model';
 import { ExtraChargeService } from '../data/extra-charge.service';
 import { AmenityModel } from '../../../property/amenity/model/amenity-model';
 import { AmenityService } from '../../../property/amenity/data/amenity.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-extra-charge',
@@ -33,6 +34,7 @@ export class AddExtraChargeComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private extraChargeService: ExtraChargeService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddExtraChargeComponent>) {
         this.isAdd = row.isAdd;
@@ -71,7 +73,8 @@ export class AddExtraChargeComponent implements OnInit  {
 
         this.extraChargeService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! ExtraCharge created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.lease.extra_charges.notifications.extra_charge_created'));
             },
             (error) => {
                 this.loader = false;
@@ -104,7 +107,8 @@ export class AddExtraChargeComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! ExtraCharge has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.lease.extra_charges.notifications.extra_charge_updated'));
 
             },
             (error) => {

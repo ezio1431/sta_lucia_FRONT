@@ -13,21 +13,7 @@ import { ReadingService } from '../../data/reading.service';
     styleUrls: ['./view-reading-general.component.css']
 })
 export class ViewReadingGeneralComponent implements OnInit {
-
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    profilePicUrl: string;
-    profilePicFileToUpload: File = null;
-
-    imageToShow: any;
-
     loader = false;
-    memberShipForm = false;
-
-    landlord$: Observable<any>;
-
     readingID: string;
     readingData$: Observable<ReadingModel>;
     constructor(private fb: FormBuilder,

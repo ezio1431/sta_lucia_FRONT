@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NotificationService } from '../../../shared/notification.service';
 import { Observable, of } from 'rxjs';
 import { TenantModel } from '../../models/tenant-model';
 import { FormBuilder } from '@angular/forms';
@@ -13,26 +12,11 @@ import { ActivatedRoute, Router } from '@angular/router';
     styleUrls: ['./view-tenant-general.component.css']
 })
 export class ViewTenantGeneralComponent implements OnInit {
-
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    profilePicUrl: string;
-    profilePicFileToUpload: File = null;
-
-    imageToShow: any;
-
     loader = false;
-    memberShipForm = false;
-
-    landlord$: Observable<any>;
-
     tenantID: string;
     tenantData$: Observable<TenantModel>;
     constructor(private fb: FormBuilder,
                 private dialog: MatDialog,
-                private notification: NotificationService,
                 private tenantService: TenantService,
                 private router: Router, private route: ActivatedRoute) {
     }

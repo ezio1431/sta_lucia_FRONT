@@ -4,6 +4,7 @@ import { NotificationService } from '../../shared/notification.service';
 import { UserSettingService } from '../../settings/user/data/user-setting.service';
 import { ResetPasswordModel } from './reset-password.model';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({templateUrl: 'reset-password.component.html'})
 export class ResetPasswordComponent implements OnInit {
@@ -14,7 +15,9 @@ export class ResetPasswordComponent implements OnInit {
 
     resetModel: ResetPasswordModel;
 
-    constructor(private fb: FormBuilder, private userService: UserSettingService,
+    constructor(private fb: FormBuilder,
+                private translateService: TranslateService,
+                private userService: UserSettingService,
                 private notification: NotificationService, private router: Router ){
         this.form = this.fb.group({
             email: ['', [Validators.required,
@@ -46,8 +49,10 @@ export class ResetPasswordComponent implements OnInit {
             .subscribe((data) => {
                     this.loader = false;
                     // navigate to login
-                    this.notification.showNotification('success', 'Success !! Password reset is complete.');
-                    this.notification.showNotification('success', 'You may now login with your new password.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('password_is_reset'));
+                    this.notification.showNotification('success',
+                        this.translateService.instant('may_login'));
                     this.router.navigate(['login']);
                 },
                 (error) => {

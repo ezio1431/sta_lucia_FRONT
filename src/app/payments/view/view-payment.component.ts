@@ -11,6 +11,7 @@ import { AppState } from '../../reducers';
 import { LandlordService } from '../../landlords/data/landlord.service';
 import { PaymentModel } from '../models/payment-model';
 import { PaymentService } from '../data/payment.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-view-payment',
@@ -20,30 +21,9 @@ import { PaymentService } from '../data/payment.service';
 export class ViewPaymentComponent implements OnInit, AfterViewInit  {
 
     form: FormGroup;
-    generalForm: FormGroup;
-    guarantorForm: FormGroup;
-    assetForm: FormGroup;
-
     formErrors: any;
-
     loader = false;
-
-    memberStatuses: any = [];
-    members: any = [];
-    guarantorStatues: any = [];
-
     paymentID: string;
-
-    routeData: any;
-
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    imageToShow: any;
-
-    landlord$: Observable<any>;
-
     paymentData$: Observable<PaymentModel>;
     public src: Blob;
 
@@ -58,6 +38,7 @@ export class ViewPaymentComponent implements OnInit, AfterViewInit  {
                 sanitizer: DomSanitizer,
                 private dialog: MatDialog,
                 private paymentService: PaymentService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private router: Router, private route: ActivatedRoute) {
         this.domSanitizer = sanitizer;
@@ -114,7 +95,8 @@ export class ViewPaymentComponent implements OnInit, AfterViewInit  {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error downloading receipt !');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('payment.notifications.receipt_download_error'));
                 }
             );
     }

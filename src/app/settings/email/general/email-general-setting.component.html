@@ -19,7 +19,9 @@
 
                         <ng-container matColumnDef="display_name">
                             <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'settings.email.event' | translate }} </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.display_name}} </mat-cell>
+                            <mat-cell *matCellDef="let row">
+                                {{ 'settings.email.event.' + row.display_name | translate }}
+                            </mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="send_email">

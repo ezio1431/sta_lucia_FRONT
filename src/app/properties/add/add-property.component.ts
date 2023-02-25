@@ -26,6 +26,7 @@ import { LATE_FEE_TYPES } from '../../shared/enums/late-fee-types.enum';
 import { PropertyExtraDataService } from '../data/property-extra-data.service';
 import { ConfirmationDialogComponent } from '../../shared/delete/confirmation-dialog-component';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-property',
@@ -118,6 +119,7 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
                 private amenityService: AmenityService,
                 private utilityService: UtilityService,
                 private authenticationService: AuthenticationService,
+                private translateService: TranslateService,
                 private notification: NotificationService) {
         this.isAdmin$ = this.authenticationService.isAdmin();
         this.lateFeeTypes = LATE_FEE_TYPES;
@@ -680,14 +682,14 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
         this.propertyService.create(body)
             .subscribe((res) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! New Property created.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('properties.notification.property_created'));
                     this.onSaveComplete();
                 },
                 (error) => {
                     this.loader = false;
                     if (error.lead === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     this.formErrors = error;
@@ -732,7 +734,8 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
         this.propertyService.update(body)
             .subscribe((res) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Property has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('properties.notification.property_updated'));
                     this.onSaveComplete();
                 },
                 (error) => {
@@ -801,14 +804,15 @@ export class AddPropertyComponent implements OnInit, OnDestroy  {
             .subscribe((data) => {
                     this.loader = false;
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Property has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('properties.notification.property_deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 import { WaiverModel } from '../../models/waiver-model';
 import { WaiverService } from '../../data/waiver.service';
 import { InvoiceModel } from '../../models/invoice-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-waive-invoice',
@@ -34,6 +35,7 @@ export class WaiveInvoiceComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private waiverService: WaiverService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private router: Router,
                 private dialogRef: MatDialogRef<WaiveInvoiceComponent>) {
@@ -74,7 +76,8 @@ export class WaiveInvoiceComponent implements OnInit  {
             .subscribe((data) => {
                     this.loader = false;
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Waiver was a success.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('invoices.notifications.waiver_success'));
                 },
                 (error) => {
                     this.errorInForm.next(true);
@@ -82,8 +85,7 @@ export class WaiveInvoiceComponent implements OnInit  {
                     this.terminationErrorMessage.next(error.error.message);
 
                     if (error.role === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !!' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     // An array of all form errors as returned by server

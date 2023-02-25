@@ -3,7 +3,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { merge } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { NotificationService } from '../../../shared/notification.service';
 import { TenantService } from '../../data/tenant.service';
 import { DocumentDataSource } from '../../../documents/data/document-data.source';
 import { DocumentService } from '../../../documents/data/document.service';
@@ -39,8 +38,7 @@ export class TenantDocumentComponent implements OnInit, AfterViewInit {
     tenantData: any;
     tenantID: string;
 
-    constructor(private notification: NotificationService,
-                private documentService: DocumentService,
+    constructor(private documentService: DocumentService,
                 private tenantService: TenantService) {}
 
     ngOnInit() {

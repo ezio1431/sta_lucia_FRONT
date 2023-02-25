@@ -8,9 +8,9 @@ import { CheckboxItem } from './check-box-item';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../reducers';
 import { AuthActions } from '../../../../authentication/action-types';
-import { LandlordModel } from '../../../../landlords/models/landlord-model';
 import { ConfirmationDialogComponent } from '../../../../shared/delete/confirmation-dialog-component';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-edit-role',
@@ -30,6 +30,7 @@ export class EditRoleComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private store: Store<AppState>,
                 private fb: FormBuilder,
+                private translateService: TranslateService,
                 private dialog: MatDialog,
                 private roleService: RoleSettingService,
                 private notification: NotificationService,
@@ -108,7 +109,8 @@ export class EditRoleComponent implements OnInit  {
                     this.loader = false;
                     this.dialogRef.close(this.editForm.value);
                     // notify success
-                    this.notification.showNotification('success', 'Success !! Role has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.users.role.notification.updated'));
                     this.store.dispatch(AuthActions.actionLogout());
                 },
                 (error) => {

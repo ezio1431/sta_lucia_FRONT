@@ -4,6 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { NotificationService } from '../../shared/notification.service';
 import { AccountingService } from '../data/accounting.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-pdf-statement',
@@ -20,6 +21,7 @@ export class PdfStatementComponent implements OnInit  {
                 private fb: FormBuilder,
                 sanitizer: DomSanitizer,
                 private accountingService: AccountingService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<PdfStatementComponent>) {
         this.domSanitizer = sanitizer;
@@ -47,7 +49,8 @@ export class PdfStatementComponent implements OnInit  {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error downloading Statement !');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('reports.notifications.download_error'));
                 }
             );
     }
@@ -63,7 +66,8 @@ export class PdfStatementComponent implements OnInit  {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error downloading lease statement !');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('reports.notifications.download_error'));
                 }
             );
     }

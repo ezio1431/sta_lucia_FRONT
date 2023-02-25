@@ -10,7 +10,7 @@ import { NotificationService } from '../../../shared/notification.service';
 import { PropertyTypeDataSource } from './data/property-type-data.source';
 import { PropertyTypeService } from './data/property-type.service';
 import { PropertyTypeModel } from './model/property-type-model';
-import { AmenityModel } from '../amenity/model/amenity-model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-property-type-setting',
@@ -45,6 +45,7 @@ export class PropertyTypeSettingComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
     constructor(private propertyTypeService: PropertyTypeService,
+                private translateService: TranslateService,
                 private notification: NotificationService, private dialog: MatDialog) {
     }
 
@@ -156,14 +157,16 @@ export class PropertyTypeSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! PropertyType has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.property.property_types.notifications.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

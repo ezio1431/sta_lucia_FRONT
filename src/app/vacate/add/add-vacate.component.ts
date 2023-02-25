@@ -8,7 +8,6 @@ import { NotificationService } from '../../shared/notification.service';
 import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { TenantService } from '../../tenants/data/tenant.service';
-import { LeaseModel } from '../../leases/models/lease-model';
 import { LeaseService } from '../../leases/data/lease.service';
 import { TenantModel } from '../../tenants/models/tenant-model';
 import { Router } from '@angular/router';
@@ -17,6 +16,7 @@ import { AuthenticationService } from '../../authentication/authentication.servi
 import { select, Store } from '@ngrx/store';
 import { AppState } from '../../reducers';
 import { selectorUserID } from '../../authentication/authentication.selectors';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-vacate',
@@ -81,6 +81,7 @@ export class AddVacateComponent implements OnInit  {
                 private vacateService: VacateService,
                 private tenantService: TenantService,
                 private leaseService: LeaseService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private router: Router,
                 private dialog: MatDialog,
@@ -196,13 +197,12 @@ export class AddVacateComponent implements OnInit  {
         this.vacateService.create(body)
             .subscribe((data) => {
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! New Vacate Notice created.');
+                    this.notification.showNotification('success', this.translateService.instant('vacates.notifications.notice_created'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.member === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     // An array of all form errors as returned by server
@@ -239,7 +239,7 @@ export class AddVacateComponent implements OnInit  {
                     this.loader = false;
                     this.dialogRef.close(this.form.value);
                     this.router.navigate(['/notices']);
-                    this.notification.showNotification('success', 'Success !! Vacate Notice has been updated.');
+                    this.notification.showNotification('success', this.translateService.instant('vacates.notifications.notice_updated'));
                 },
                 (error) => {
                     this.loader = false;

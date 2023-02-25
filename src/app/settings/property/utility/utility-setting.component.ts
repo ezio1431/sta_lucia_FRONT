@@ -11,6 +11,7 @@ import { UtilityModel } from './model/utility-model';
 import { AddUtilityComponent } from './add/add-utility.component';
 import { UtilityDataSource } from './data/utility-data.source';
 import { UtilityService } from './data/utility.service';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface PageQuery {
     pageIndex: number,
@@ -49,7 +50,9 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
     meta: any;
     @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-    constructor(private utilityService: UtilityService, private notification: NotificationService,
+    constructor(private utilityService: UtilityService,
+                private translateService: TranslateService,
+                private notification: NotificationService,
                 private dialog: MatDialog) {
     }
 
@@ -163,14 +166,16 @@ export class UtilitySettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Utility has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.property.utilities.notifications.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

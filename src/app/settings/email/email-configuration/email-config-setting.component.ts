@@ -14,6 +14,7 @@ import { SettingsState, State } from '../../../core/settings/settings.model';
 import { ActivatedRoute } from '@angular/router';
 import { EmailConfigSettingModel } from './model/email-config-setting.model';
 import { EmailConfigService } from './data/email-config.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-email-general-setting',
@@ -52,7 +53,9 @@ export class EmailConfigSettingComponent implements OnInit {
     employees: any = [];
     branches: any = [];
 
-    constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
+    constructor(private store: Store<State>,
+                private translateService: TranslateService,
+                private fb: FormBuilder, private route: ActivatedRoute,
                 private emailConfigService: EmailConfigService, private notification: NotificationService) {
         this.form = this.fb.group({
             driver: ['', [Validators.required,
@@ -120,7 +123,8 @@ export class EmailConfigSettingComponent implements OnInit {
         this.emailConfigService.create(body)
             .subscribe((data) => {
                     this.loader = false;
-                    this.notification.showNotification('success', 'Success !! Email Config Setting has been updated.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.email.config.update.success'));
                 },
                 (error) => {
                     this.loader = false;
@@ -134,7 +138,7 @@ export class EmailConfigSettingComponent implements OnInit {
                         // loop through from fields, If has an error, mark as invalid so mat-error can show
                         for (const prop in this.formErrors) {
                             if (this.form) {
-								this.form.controls[prop]?.markAsTouched();
+                                this.form.controls[prop]?.markAsTouched();
                                 this.form.controls[prop].setErrors({incorrect: true});
                             }
                         }

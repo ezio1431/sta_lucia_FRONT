@@ -13,21 +13,7 @@ import { VacateService } from '../../data/vacate.service';
     styleUrls: ['./view-vacate-general.component.css']
 })
 export class ViewVacateGeneralComponent implements OnInit {
-
-    memberData: any;
-    memberId = '';
-    memberData$: any;
-
-    profilePicUrl: string;
-    profilePicFileToUpload: File = null;
-
-    imageToShow: any;
-
     loader = false;
-    memberShipForm = false;
-
-    landlord$: Observable<any>;
-
     noticeID: string;
     noticeData$: Observable<VacateModel>;
     constructor(private fb: FormBuilder,

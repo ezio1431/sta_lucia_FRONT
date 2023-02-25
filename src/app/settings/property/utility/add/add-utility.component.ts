@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import { UtilityModel } from '../model/utility-model';
 import { UtilityService } from '../data/utility.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-utility',
@@ -30,6 +31,7 @@ export class AddUtilityComponent implements OnInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private utilityService: UtilityService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private dialogRef: MatDialogRef<AddUtilityComponent>) {
         this.isAdd = row.isAdd;
@@ -70,7 +72,8 @@ export class AddUtilityComponent implements OnInit  {
 
         this.utilityService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Utility created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.utilities.notifications.created'));
             },
             (error) => {
                 this.loader = false;
@@ -103,7 +106,8 @@ export class AddUtilityComponent implements OnInit  {
                 this.dialogRef.close(this.form.value);
 
                 // notify success
-                this.notification.showNotification('success', 'Success !! Utility has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('settings.property.utilities.notifications.updated'));
 
             },
             (error) => {

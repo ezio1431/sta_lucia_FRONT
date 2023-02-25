@@ -4,6 +4,7 @@ import { LandlordSummaryModel } from './model/landlord-summary-model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { ChartType } from 'chart.js';
+import { TranslateService } from '@ngx-translate/core';
 
 
 @Component({
@@ -20,7 +21,11 @@ export class LandlordAreaComponent implements OnInit {
     billed$: Observable<string>;
     paid$: Observable<string>;
     pending$: Observable<string>;
-    public pieChartLabels = ['Pending', 'Paid', 'Billed'];
+    public pieChartLabels = [
+        this.translateService.instant('dashboard.pending'),
+        this.translateService.instant('dashboard.paid'),
+        this.translateService.instant('dashboard.billed'),
+    ];
     public pieChartData$: Observable<[any, any, any]>;
     public pieChartType = 'doughnut' as ChartType;
     options = {
@@ -28,6 +33,7 @@ export class LandlordAreaComponent implements OnInit {
         maintainAspectRatio: false
     }
     constructor(private fb: FormBuilder,
+                private translateService: TranslateService,
                 private route: ActivatedRoute) {
     }
 

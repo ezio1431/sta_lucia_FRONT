@@ -4,6 +4,7 @@ import { NotificationService } from '../../shared/notification.service';
 import { UserSettingService } from '../../settings/user/data/user-setting.service';
 import { UserSettingModel } from '../../settings/user/model/user-setting.model';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({templateUrl: 'forgot-password.component.html'})
 export class ForgotPasswordComponent implements OnInit {
@@ -14,7 +15,9 @@ export class ForgotPasswordComponent implements OnInit {
 
     user: UserSettingModel;
 
-    constructor(private fb: FormBuilder, private userService: UserSettingService,
+    constructor(private fb: FormBuilder,
+                private translateService: TranslateService,
+                private userService: UserSettingService,
                 private notification: NotificationService, private router: Router ){
         this.form = this.fb.group({
             email: ['', [Validators.required,
@@ -38,8 +41,7 @@ export class ForgotPasswordComponent implements OnInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.router.navigate(['reset-password']);
-                    // notify success
-                    this.notification.showNotification('info', 'Check your email for password reset code.');
+                    this.notification.showNotification('info', this.translateService.instant('check_email_for_reset_code'));
                 },
                 (error) => {
                     this.loader = false;

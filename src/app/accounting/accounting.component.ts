@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'app-accounting',
+    selector: 'robi-accounting',
     templateUrl: './accounting.component.html',
     styleUrls: ['./accounting.component.css']
 })

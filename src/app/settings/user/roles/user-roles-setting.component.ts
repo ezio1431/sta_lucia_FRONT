@@ -14,6 +14,7 @@ import { CheckboxItem } from './edit/check-box-item';
 import { RoleSettingService } from '../data/role-setting.service';
 import { NotificationService } from '../../../shared/notification.service';
 import { PermissionSettingService } from '../data/permission-setting.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-user-role-setting',
@@ -52,7 +53,8 @@ export class UserRolesSettingComponent implements OnInit, AfterViewInit {
     rolePermissions: any;
 
 
-    constructor(private roleService: RoleSettingService, private permissionService: PermissionSettingService,
+    constructor(private roleService: RoleSettingService, private translateService: TranslateService,
+                private permissionService: PermissionSettingService,
                 private notification: NotificationService, private dialog: MatDialog) {
     }
 
@@ -208,14 +210,16 @@ export class UserRolesSettingComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Role has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('settings.users.role.notification.deleted'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger',
+                            this.translateService.instant('delete_error'));
                     }
                 });
     }

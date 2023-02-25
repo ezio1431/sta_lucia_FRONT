@@ -2,7 +2,7 @@
      <div class="card">
             <div class="card-header card-header-info">
                <!-- <h4 class="card-title">Signal Rentals</h4>-->
-                <p class="card-category">Log In</p>
+                <p class="card-category">{{ 'login' | translate }}</p>
             </div>
             <div class="card-body">
 
@@ -16,13 +16,13 @@
 
                 <form [formGroup]="loginForm">
                     <mat-form-field>
-                        <input matInput type="email" placeholder="Email" formControlName="email">
+                        <input matInput type="email" placeholder="{{ 'email' | translate }}" formControlName="email">
                         <mat-icon matSuffix class="material-icons">mail_outline</mat-icon>
                         <mat-error align="start" class="form__error"></mat-error>
                     </mat-form-field>
 
                     <mat-form-field>
-                        <input matInput type="password" placeholder="Password" formControlName="password">
+                        <input matInput type="password" placeholder="{{ 'password' | translate }}" formControlName="password">
                         <mat-icon matSuffix class="material-icons">lock_outline</mat-icon>
                     </mat-form-field>
 
@@ -30,10 +30,10 @@
 
                     <div class="additional-info">
                         <span class="divider-h"></span>
-                        <a [routerLink]="['/forgot-password']">Forgot your password?</a>
+                        <a [routerLink]="['/forgot-password']">{{ 'forgot_password' | translate }}</a>
 
                         <button mat-raised-button type="submit" (click)="login()" class="pull-right btn" color="primary" [disabled]="!loginForm.valid || loader">
-                            Login
+                            {{ 'login' | translate }}
                         </button>
 
                     </div>

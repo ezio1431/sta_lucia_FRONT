@@ -5,6 +5,7 @@ import { NotificationService } from '../../shared/notification.service';
 import { AccountingService } from '../data/accounting.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { InvoiceService } from '../../invoices/data/invoice.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-pdf-invoice',
@@ -21,6 +22,7 @@ export class PdfInvoiceComponent implements OnInit  {
                 private fb: FormBuilder,
                 sanitizer: DomSanitizer,
                 private accountingService: AccountingService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private invoiceService: InvoiceService,
                 private dialogRef: MatDialogRef<PdfInvoiceComponent>) {
@@ -45,7 +47,8 @@ export class PdfInvoiceComponent implements OnInit  {
                 },
                 () => {
                     this.loader = false;
-                    this.notification.showNotification('danger', 'Error downloading Invoice !');
+                    this.notification.showNotification('danger',
+                        this.translateService.instant('reports.notifications.download_error'));
                 }
             );
     }

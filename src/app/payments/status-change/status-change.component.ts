@@ -10,6 +10,7 @@ import { PaymentStatusModel } from '../models/payment-status.model';
 import { PaymentMethodService } from '../../settings/payment/payment-method/data/payment-method.service';
 import { TransactionDataSource } from '../data/transaction-data.source';
 import { TransactionService } from '../data/transaction.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-status-change',
@@ -48,6 +49,7 @@ export class StatusChangeComponent implements OnInit, AfterViewInit  {
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private paymentService: PaymentService,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private transactionService: TransactionService,
                 private paymentMethodService: PaymentMethodService,
@@ -91,7 +93,8 @@ export class StatusChangeComponent implements OnInit, AfterViewInit  {
         this.paymentService.cancel(body)
             .subscribe((data) => {
                     this.onSaveComplete();
-                    this.notification.showNotification('success', 'Success !! Payment has been Cancelled.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('payment.notifications.payment_cancelled'));
                 },
                 (error) => {
                     this.loader = false;
@@ -101,8 +104,7 @@ export class StatusChangeComponent implements OnInit, AfterViewInit  {
                         return;
                     }
                     if (error.payment === 0) {
-                        this.notification.showNotification('danger', 'Connection Error !!.' +
-                            ' Check your connection and retry.');
+                        this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                         return;
                     }
                     // An array of all form errors as returned by server
