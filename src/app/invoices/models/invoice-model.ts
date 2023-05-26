@@ -24,6 +24,7 @@ export class InvoiceModel extends BaseModel {
 
     summary: {
         amount_due: string;
+        amount_due_number: number;
         amount_paid: string;
         count: number;
         invoice_amount: string;

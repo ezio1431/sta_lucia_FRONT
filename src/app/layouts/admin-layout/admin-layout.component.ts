@@ -6,9 +6,9 @@ import { Subscription } from 'rxjs/Subscription';
 import PerfectScrollbar from 'perfect-scrollbar';
 import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
-import { selectEffectiveTheme } from '../../core/settings/settings.selectors';
 import { selectorScopes } from '../../authentication/auth.selectors';
 import { AppState } from '../../core/core.state';
+import { selectAuthenticationTheme } from '../../authentication/authentication.selectors';
 
 @Component({
   selector: 'robi-admin-layout',
@@ -66,7 +66,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
           let ps = new PerfectScrollbar(elemMainPanel);
           ps = new PerfectScrollbar(elemSidebar);
       }
-      this.theme$ = this.store.pipe(select(selectEffectiveTheme));
+      this.theme$ = this.store.pipe(select(selectAuthenticationTheme));
       this.scopesAdmin$ = this.store.pipe(select(selectorScopes));
 
     /*  this.scopesAdmin$.subscribe(scopes => {

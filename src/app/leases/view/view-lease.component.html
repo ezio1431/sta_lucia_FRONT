@@ -16,7 +16,6 @@
                                 </button>
                                 <mat-menu #menu="matMenu">
                                     <button *ngIf="lease?.terminated_on == null" mat-menu-item
-                                            [matTooltipPosition]="'above'"
                                             routerLink="edit" (click)="onSelected(lease)">
                                         <mat-icon>edit</mat-icon>
                                         <span>{{ 'leases.edit.title' | translate }}</span>
@@ -77,6 +76,13 @@
                             <div>{{ 'leases.field.on' | translate }}: {{lease?.terminated_on}}</div>
                         </div>
                     </ng-container>
+                </div>
+
+                <div class="card">
+                    <button mat-raised-button color="primary"
+                            (click)="viewAgreement(lease)">
+                        {{ 'settings.lease.contract.title' | translate }}
+                    </button>
                 </div>
             </div>
         </div>

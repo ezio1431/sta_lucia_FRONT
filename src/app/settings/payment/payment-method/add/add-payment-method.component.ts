@@ -6,6 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { PaymentMethodModel } from '../model/payment-method-model';
 import { PaymentMethodService } from '../data/payment-method.service';
 import { TranslateService } from '@ngx-translate/core';
+import { PAYMENT_METHOD_TYPES } from '../../../../shared/enums/payment-method-type-enum';
 
 @Component({
     selector: 'robi-add-payment-method',
@@ -29,8 +30,13 @@ export class AddPaymentMethodComponent implements OnInit  {
     employees: any = [];
     branches: any = [];
     isAdd: boolean;
-
-
+    isCash = false;
+    isPayPal = false;
+    isStripe = false;
+    isMpesa = false;
+    isBankWire = false;
+    isOther = false;
+    paymentMethodTypes: any;
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
                 private paymentMethodService: PaymentMethodService,
@@ -42,24 +48,115 @@ export class AddPaymentMethodComponent implements OnInit  {
         this.branches = row.branches;
         this.isAdd = row.isAdd;
         this.paymentMethod = row.paymentMethod;
+        this.paymentMethodTypes = PAYMENT_METHOD_TYPES;
     }
 
     ngOnInit() {
         if (this.isAdd) {
             this.form = this.fb.group({
-                payment_method_name: ['', [Validators.required,
-                    Validators.minLength(3)]],
-                payment_method_display_name: [''],
+                type: ['', [Validators.required]],
+                display_name: ['', [Validators.required]],
+                paypal_fields: this.fb.group({
+                    client_id: [''],
+                    secret_key: [''],
+                    live_status: ['sandbox']
+                }),
+                stripe_fields: this.fb.group({
+                    public_key: [''],
+                    secret_key: ['']
+                }),
+                mpesa_fields: this.fb.group({
+                    short_code: [''],
+                    consumer_key: [''],
+                    consumer_secret: [''],
+                    initiator_username: [''],
+                    security_credential: [''],
+                    account_number_match: ['lease_number']
+                }),
+                charge_fields: this.fb.group({
+                    percent_charge: [''],
+                    fixed_charge: ['']
+                }),
                 payment_method_description: ['', [Validators.required,
                     Validators.minLength(3)]],
             });
         }
         if (!this.isAdd) {
+            const type = this.paymentMethod?.type;
+            this.isCash = type === 'cash';
+            this.isPayPal = type === 'paypal';
+            this.isBankWire = type === 'bank_wire';
+            this.isStripe = type === 'stripe';
+            this.isMpesa = type === 'mpesa';
+
             this.form = this.fb.group({
-                payment_method_name: [this.paymentMethod?.payment_method_name, [Validators.required,
-                    Validators.minLength(2)]],
-                payment_method_display_name: [this.paymentMethod?.payment_method_display_name],
-                payment_method_description: [this.paymentMethod?.payment_method_description]
+                type: [this.paymentMethod?.type, [Validators.required]],
+                display_name: [this.paymentMethod?.display_name, [Validators.required]],
+                payment_method_description: [this.paymentMethod?.payment_method_description],
+                paypal_fields: this.fb.group({
+                    client_id: [this.paymentMethod?.details?.client_id],
+                    secret_key: [this.paymentMethod?.details?.secret_key],
+                    live_status: [this.paymentMethod?.details?.live_status]
+                }),
+                stripe_fields: this.fb.group({
+                    public_key: [this.paymentMethod?.details?.public_key],
+                    secret_key: [this.paymentMethod?.details?.secret_key]
+                }),
+                mpesa_fields: this.fb.group({
+                    short_code: [this.paymentMethod?.details?.short_code],
+                    consumer_key: [this.paymentMethod?.details?.consumer_key],
+                    consumer_secret: [this.paymentMethod?.details?.consumer_secret],
+                    initiator_username: [this.paymentMethod?.details?.initiator_username],
+                    security_credential: [this.paymentMethod?.details?.security_credential],
+                    account_number_match: [this.paymentMethod?.details?.account_number_match]
+                }),
+                charge_fields: this.fb.group({
+                    percent_charge: [this.paymentMethod?.charges?.percent_charge],
+                    fixed_charge: [this.paymentMethod?.charges?.fixed_charge],
+                }),
+            });
+        }
+    }
+
+    /**
+     * @param value
+     */
+    onPaymentMethodTypeChange(value) {
+        const methodType = this.paymentMethodTypes.find((item: any) => item?.key === value)?.value;
+        this.isCash = methodType === 'cash';
+        this.isPayPal = methodType === 'paypal';
+        this.isStripe = methodType === 'stripe';
+        this.isMpesa = methodType === 'mpesa';
+        this.isBankWire = methodType === 'bank_wire';
+        this.isOther = methodType === 'other';
+        if (this.isCash) {
+            this.form.patchValue({
+                display_name: 'Cash'
+            });
+        }
+        if (this.isStripe) {
+            this.form.patchValue({
+                display_name: 'Stripe'
+            });
+        }
+        if (this.isPayPal) {
+            this.form.patchValue({
+                display_name: 'PayPal'
+            });
+        }
+        if (this.isMpesa) {
+            this.form.patchValue({
+                display_name: 'Mpesa'
+            });
+        }
+        if (this.isBankWire) {
+            this.form.patchValue({
+                display_name: 'BankWire'
+            });
+        }
+        if (this.isOther) {
+            this.form.patchValue({
+                display_name: ''
             });
         }
     }
@@ -148,5 +245,4 @@ export class AddPaymentMethodComponent implements OnInit  {
         this.form.reset();
         this.dialogRef.close(this.form.value);
     }
-
 }

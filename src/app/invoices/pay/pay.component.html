@@ -1,0 +1,120 @@
+<h5 mat-dialog-title>{{'invoices.payments.pay' | translate}}
+  <ng-container *ngIf="formError$ | async">
+    <mat-icon color="warn">error_outline</mat-icon>
+  </ng-container>
+</h5>
+
+<mat-dialog-content class="mat-dialog-data" [formGroup]="form">
+  <div class="row small mb-3">
+    <div class="col-6">{{'invoices.payments.invoice' | translate}} {{invoice?.invoice_number}}</div>
+    <div class="col-6 text-warning align-content-end">{{'invoices.fields.amount_due' | translate}} : {{invoice?.summary?.amount_due}}</div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <mat-form-field class="input-group" color="primary" appearance="outline">
+        <mat-label>{{'payment.fields.payment_method' | translate}}</mat-label>
+        <mat-select placeholder="{{'payment.fields.payment_method' | translate}}" formControlName="payment_method"
+                    #paymentMethodSelect (selectionChange)="onPaymentMethodItemChange(paymentMethodSelect.value)">
+          <mat-option *ngFor="let paymentMethod of paymentMethods$ | async" [value]="paymentMethod">
+            {{paymentMethod.display_name}}
+          </mat-option>
+        </mat-select>
+        <mat-error align="start" *ngIf="formErrors?.payment_method" class="form__error">{{ formErrors.payment_method }}</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <mat-form-field class="input-group" color="primary" appearance="outline">
+        <mat-label>{{'settings.general.currency' | translate}}</mat-label>
+        <mat-select formControlName="currency" #currencySelect (selectionChange)="onCurrencyItemChange(currencySelect.value)">
+          <mat-option>
+            <ngx-mat-select-search [formControl]="currencyServerSideFilteringCtrl" [searching]="searching"
+                                   placeholderLabel="{{'settings.general.find_currency' | translate}}"
+                                   noEntriesFoundLabel="{{'settings.general.no_matching_currency' | translate}}">
+            </ngx-mat-select-search>
+          </mat-option>
+          <mat-option *ngFor="let currency of currenciesFiltered$ | async" [value]="currency">
+            {{currency?.code}}  ({{currency?.currency}}) - {{currency?.country}}
+          </mat-option>
+        </mat-select>
+        <mat-error align="start" *ngIf="formErrors?.currency" class="form__error">{{ formErrors.currency }}</mat-error>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <mat-form-field class="input-group" color="primary" appearance="outline">
+        <mat-label>{{'reports.journal.fields.amount' | translate}}</mat-label>
+        <input matInput type="number" min="0" formControlName="amount"
+               placeholder="{{'reports.journal.fields.amount' | translate}}" (keyup)="amountValueChange($event)">
+        <mat-error align="start" *ngIf="formErrors?.amount" class="form__error">{{ formErrors.amount }}</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="row"  *ngIf="formError$ | async">
+      <div class="col-12 text-danger ml-4 mb-4">
+        {{formError}}
+      </div>
+    </div>
+
+    <!--  <div class="col-6">
+        <button *ngIf="!loader" class="mt-0" mat-raised-button  color="primary" (click)="makePayment(invoice)" [disabled]="!form.valid || loader">
+          {{'pay_now' | translate}}
+        </button>
+      </div>-->
+  </div>
+
+  <div class="row" [hidden]="!(isStripe$ | async)">
+    <!-- Display a stripe payment form -->
+    <form #checkout="ngForm" (ngSubmit)="onSubmit(checkout)" class="checkout">
+      <div class="form-row">
+        <div style="width: 30em" id="card-info" #cardInfo></div>
+
+        <small class="text-danger mt-1" id="card-errors" role="alert" *ngIf="error">
+          {{ error }}
+        </small>
+      </div>
+      <button type="submit">{{'pay' | translate}} {{payAmount$ | async}}</button>
+    </form>
+  </div>
+
+  <div class="row" [hidden]="!(isPayPal$ | async) || loader">
+    <div class="col-12">
+      <ngx-paypal [config]="payPalConfig"></ngx-paypal>
+    </div>
+  </div>
+
+  <div class="row" [hidden]="!(isBankWire$ | async) || loader">
+    <div class="col-12">
+      {{bankWireDetails$ | async}}
+    </div>
+  </div>
+
+</mat-dialog-content>
+
+<div class="d-flex justify-content-center spinner-container" *ngIf="loader">
+  <mat-progress-bar
+          color="green"
+          mode="query"
+          value=50
+          bufferValue=75>
+  </mat-progress-bar>
+</div>
+
+<!--<mat-dialog-actions align="center">
+  <button [disabled]="loader" mat-button class="mr-2" color="accent" [mat-dialog-close]="true" (click)="close()">
+    {{'cancel' | translate}}
+  </button>
+</mat-dialog-actions>-->
+
+<mat-dialog-actions align="center">
+  <!--<button [disabled]="loader" mat-button color="accent" [mat-dialog-close]="true" (click)="close()">
+    {{ 'cancel' | translate }}
+  </button>-->
+  <button mat-raised-button  color="primary" [disabled]="!form.valid || loader">
+    {{ 'save' | translate }}
+  </button>
+</mat-dialog-actions>

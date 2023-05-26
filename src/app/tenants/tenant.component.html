@@ -19,9 +19,9 @@
                     <div class="card-body">
                         <div class="row search-form-section">
                             <div class="col-5" *robiPermission="['create-tenant']">
-                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button aria-label="add new"
+                                <button [disabled]="(dataSource?.loading$ | async)" mat-button matPrefix mat-stroked-button
                                         [routerLink]="['create']">
-                                    <mat-icon>add</mat-icon>Add Tenant
+                                    <mat-icon>add</mat-icon>{{ 'tenants.add.title' | translate }}
                                 </button>
                             </div>
                             <div class="col-7" [hidden]="!(isAdmin$ | async)">

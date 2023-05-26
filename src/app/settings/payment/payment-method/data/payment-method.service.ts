@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { BaseService } from '../../../../shared/base-service';
 import { PaymentMethodModel } from '../model/payment-method-model';
@@ -13,6 +13,13 @@ export class PaymentMethodService extends BaseService<PaymentMethodModel> {
     constructor(httpClient: HttpClient) {
         super( httpClient, 'payment_methods');
         this.localHttpClient = httpClient;
+    }
+
+    listForTenant(fieldName: any): Observable<{}> {
+        return this.localHttpClient.get(this.getResourceUrl(), {
+            params: new HttpParams()
+                .set('list-tenant', fieldName)
+        });
     }
 
     changeSelectedLease(selectedLease: PaymentMethodModel | null ): void {
@@ -35,6 +42,12 @@ export class PaymentMethodService extends BaseService<PaymentMethodModel> {
      */
     public create(item: any): Observable<PaymentMethodModel> {
         return this.localHttpClient.post<any>(super.getResourceUrl(), item);
+    }
+
+    public getPayPalClientID() {
+        const endPoint = 'paypal_client';
+        const url =  `${super.getResourceUrl()}/${endPoint}`;
+        return this.localHttpClient.post<any>(url, null);
     }
 
     /**

@@ -50,7 +50,7 @@
                                 <ng-container matColumnDef="payment_method_id">
                                     <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'payment.fields.payment_method' | translate }}</mat-header-cell>
                                     <mat-cell
-                                            *matCellDef="let row"> {{row.payment_method?.payment_method_display_name}} </mat-cell>
+                                            *matCellDef="let row"> {{row.payment_method?.display_name}} </mat-cell>
                                 </ng-container>
 
                                 <ng-container matColumnDef="payment_date">

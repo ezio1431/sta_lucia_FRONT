@@ -34,7 +34,7 @@ import {
   selectElementsAnimations
 } from './settings.selectors';
 import { State } from './settings.model';
-import { selectorLanguage } from '../../authentication/authentication.selectors';
+import { selectorLanguage, selectorTheme } from '../../authentication/authentication.selectors';
 
 export const SETTINGS_KEY = 'SETTINGS';
 
@@ -106,7 +106,7 @@ export class SettingsEffects {
   updateTheme = createEffect(
     () =>
       merge(INIT, this.actions$.pipe(ofType(actionSettingsChangeTheme))).pipe(
-        withLatestFrom(this.store.pipe(select(selectEffectiveTheme))),
+        withLatestFrom(this.store.pipe(select(selectorTheme))),
         tap(([action, effectiveTheme]) => {
           const classList = this.overlayContainer.getContainerElement()
             .classList;

@@ -6,7 +6,7 @@ export class GeneralSettingModel extends BaseModel {
     company_name: string;
     email: string;
     phone: string;
-    currency: string;
+    currency: any;
     country: string;
     county: string;
     town: string;

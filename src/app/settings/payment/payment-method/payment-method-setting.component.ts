@@ -19,8 +19,8 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class PaymentMethodSettingComponent implements OnInit, AfterViewInit {
     displayedColumns = [
-        'payment_method_name',
-        'payment_method_display_name',
+        'type',
+        'display_name',
         'actions'
     ];
 

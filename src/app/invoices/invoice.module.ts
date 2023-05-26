@@ -7,19 +7,23 @@ import { ViewInvoiceComponent } from './view/view-invoice.component';
 import { UtilityBillUnitDetailsComponent } from './add/unit-details/utility-bill-unit-details.component';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { WaiveInvoiceComponent } from './view/waive/waive-invoice.component';
+import { NgxPayPalModule } from 'ngx-paypal';
+import { PayComponent } from './pay/pay.component';
 
 @NgModule({
     imports: [
         SharedModule,
         InvoiceRoutingModule,
-        NgxMatSelectSearchModule
+        NgxMatSelectSearchModule,
+        NgxPayPalModule
     ],
     declarations: [
         InvoiceComponent,
         AddInvoiceComponent,
         ViewInvoiceComponent,
         UtilityBillUnitDetailsComponent,
-        WaiveInvoiceComponent
+        WaiveInvoiceComponent,
+        PayComponent
     ]
 })
 

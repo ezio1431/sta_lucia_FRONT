@@ -35,6 +35,8 @@
                                     <span class="nav-text">  {{ 'info' | translate }} </span></a>
                                 <a mat-tab-link routerLinkActive #properties="routerLinkActive" [active]="properties.isActive" [routerLink]="['properties']">
                                     <span class="nav-text">  {{ 'properties.list.title' | translate }} </span></a>
+                                <a mat-tab-link routerLinkActive #documents="routerLinkActive" [active]="documents.isActive" [routerLink]="['documents']">
+                                    <span class="nav-text">  {{ 'documents.list.title' | translate }} </span></a>
                             </nav>
                             <router-outlet></router-outlet>
                         </div>

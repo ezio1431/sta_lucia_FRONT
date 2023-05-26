@@ -1,0 +1,31 @@
+<p mat-dialog-title class="text-lg font-medium">
+    {{lease?.property?.property_name}} ({{lease?.property?.property_code}}) - {{lease?.unit_names}}
+</p>
+<p class="text-secondary  mb-1">
+    {{lease?.lease_number}}
+</p>
+<div class="w-full flex-auto">
+        <mat-dialog-content class="mat-dialog-data">
+            <iframe *ngIf="pdfSrc" width="500" height="600" style="width: 100%"
+                    [src]="pdfSrc" type="application/pdf">
+            </iframe>
+        </mat-dialog-content>
+
+        <!-- Progress bar -->
+        <div class="flex items-center mt-10 -mx-6">
+            <mat-progress-bar *ngIf="loader"
+                              color="green"
+                              mode="query"
+                              value=50
+                              bufferValue=75>
+            </mat-progress-bar>
+        </div>
+
+    <!-- Actions -->
+        <div class="flex items-center -mx-6 py-4 pr-4 pl-1 sm:pr-8 sm:pl-7 border-t bg-gray-50 dark:bg-transparent">
+            <button class="ml-auto" [disabled]="loader" mat-button [mat-dialog-close]="true" [matTooltip]="'Cancel'">
+                {{ 'close' | translate }}
+            </button>
+        </div>
+</div>
+

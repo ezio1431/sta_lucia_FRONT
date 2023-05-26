@@ -18,6 +18,7 @@ import { CheckboxItem } from '../properties/add/unit-details/check-box-item';
 import { UnitTypeService } from '../settings/property/unit-type/data/unit-type.service';
 import { AmenityService } from '../settings/property/amenity/data/amenity.service';
 import { UtilityService } from '../settings/property/utility/data/utility.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-units',
@@ -71,6 +72,7 @@ export class UnitComponent implements OnInit, AfterViewInit {
                 private unitsService: UnitService,
                 private propertyService: PropertyService,
                 private notification: NotificationService,
+                private translateService: TranslateService,
                 private route: ActivatedRoute,
                 private unitTypeService: UnitTypeService,
                 private amenityService: AmenityService,
@@ -227,14 +229,15 @@ export class UnitComponent implements OnInit, AfterViewInit {
             .subscribe((data) => {
                     this.loader = false;
                     this.loadData();
-                    this.notification.showNotification('success', 'Success !! Unit has been deleted.');
+                    this.notification.showNotification('success',
+                        this.translateService.instant('units.field.delete'));
                 },
                 (error) => {
                     this.loader = false;
                     if (error.error['message']) {
                         this.notification.showNotification('danger', error.error['message']);
                     } else {
-                        this.notification.showNotification('danger', 'Delete Error !! ');
+                        this.notification.showNotification('danger', this.translateService.instant('delete_error'));
                     }
                 });
     }

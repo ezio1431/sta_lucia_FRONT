@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { selectEffectiveTheme } from '../../core/settings/settings.selectors';
 import { AuthenticationActions } from '../action-types';
-import { selectorCompanyName, selectorUserScopes } from '../authentication.selectors';
+import { selectAuthenticationTheme, selectorCompanyName, selectorUserScopes } from '../authentication.selectors';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({templateUrl: 'login.component.html'})
@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.theme$ = this.store.pipe(select(selectEffectiveTheme));
+        this.theme$ = this.store.pipe(select(selectAuthenticationTheme));
 
         this.store.dispatch(AuthenticationActions.actionLogout());
         this.returnUrl = '/';

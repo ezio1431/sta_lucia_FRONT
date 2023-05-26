@@ -18,8 +18,20 @@ export const authenticationReducer = createReducer(
         }
     }),
     on(AuthenticationActions.actionLogout, state => {
+        let language = state?.user?.g_settings?.language;
+        let theme = state?.user?.g_settings?.theme;
+        if (typeof language === 'undefined' || null) {
+            language = 'en';
+            theme = 'GREEN-THEME';
+        }
+        const userData = <User>{
+            g_settings : {
+                language: language,
+                theme: theme,
+            }
+        };
         return {
-            user: undefined
+            user: userData
         }
     })
 );

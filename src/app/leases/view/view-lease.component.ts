@@ -13,6 +13,7 @@ import { AppState } from '../../reducers';
 import { LandlordService } from '../../landlords/data/landlord.service';
 import { selectorIsLandlord, selectorUserID } from '../../authentication/authentication.selectors';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { ViewAgreementComponent } from '../../settings/lease/agreement/view/view-agreement.component';
 
 @Component({
     selector: 'robi-view-lease',
@@ -131,5 +132,21 @@ export class ViewLeaseComponent implements OnInit, AfterViewInit  {
 
     onSelected(lease: LeaseModel) {
         this.leaseService.changeSelectedLease(lease);
+    }
+
+    viewAgreement(lease: LeaseModel) {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = true;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {lease: lease};
+        dialogConfig.minWidth = '80vw';
+        const dialogRef = this.dialog.open(ViewAgreementComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe(
+            (val) => {
+                if ((val)) {
+                }
+            }
+        );
     }
 }

@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { GeneralSettingModel } from './model/general-setting.model';
 import { ActivatedRoute } from '@angular/router';
 import { GeneralSettingService } from './data/general-setting.service';
 import { NotificationService } from '../../shared/notification.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, ReplaySubject, Subject, Subscription } from 'rxjs';
 import { SettingsState, State } from '../../core/settings/settings.model';
 import { select, Store } from '@ngrx/store';
 import { ROUTE_ANIMATIONS_ELEMENTS } from '../../core/animations/route.animations';
-import { selectSettings } from '../../core/settings/settings.selectors';
 import {
     actionSettingsChangeAnimationsElements,
     actionSettingsChangeAnimationsPage,
@@ -16,17 +15,19 @@ import {
     actionSettingsChangeLanguage, actionSettingsChangeStickyHeader,
     actionSettingsChangeTheme
 } from '../../core/settings/settings.actions';
-import { AuthActions, AuthenticationActions } from '../../authentication/action-types';
-import { selectorAuthenticatedUser, selectorCompanyName, selectorUserGeneralSettings } from '../../authentication/authentication.selectors';
+import { AuthActions } from '../../authentication/action-types';
+import { selectorAuthenticatedUser, selectorUserGeneralSettings } from '../../authentication/authentication.selectors';
 import { User } from '../../authentication/model/user.model';
 import { TranslateService } from '@ngx-translate/core';
+import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
+import { CurrencySettingService } from '../payment/currency/data/currency-setting.service';
 
 @Component({
     selector: 'robi-general-setting',
     templateUrl: './general-setting.component.html',
     styleUrls: ['./general-setting.component.css']
 })
-export class GeneralSettingComponent implements OnInit {
+export class GeneralSettingComponent implements OnInit, OnDestroy {
 
     form: FormGroup;
     formErrors: any;
@@ -36,7 +37,6 @@ export class GeneralSettingComponent implements OnInit {
 
     logoToUpload: File = null;
     logoUrl = '';
-    showLogo: any;
 
     photoToUpload: File = null;
     photoName: any;
@@ -51,7 +51,6 @@ export class GeneralSettingComponent implements OnInit {
     amountDecimals: any;
     authenticatedUser: User;
 
-    routeAnimationsElements = ROUTE_ANIMATIONS_ELEMENTS;
     settings$: Observable<SettingsState>;
 
     themes = [
@@ -82,40 +81,24 @@ export class GeneralSettingComponent implements OnInit {
         { value: 'sw', label: 'sw' },
         { value: 'zh_CN', label: 'zh_CN' }
         ];
+
+    /** indicate search operation is in progress */
+    public searching = false;
+    public currencyServerSideFilteringCtrl: FormControl = new FormControl();
+    public  filteredServerSideCurrencies: ReplaySubject<any> = new ReplaySubject<any>(1);
+    currenciesFiltered$: Observable<any>;
+    protected _onDestroy = new Subject<void>();
+    selectedCurrencySub = new Subscription();
+    currencySymbol: string;
     constructor(private store: Store<State>, private fb: FormBuilder, private route: ActivatedRoute,
                 private generalSettingService: GeneralSettingService,
                 private translateService: TranslateService,
+                private currencyService: CurrencySettingService,
                 private notification: NotificationService ) {
-
-        this.form = this.fb.group({
-            theme: [''],
-            language: [''],
-            company_name: ['', [Validators.required,
-                Validators.minLength(3)]],
-            email: ['',
-                [Validators.required,
-                    Validators.minLength(3)]],
-            currency: [''],
-            phone: [''],
-            physical_address: [''],
-            postal_address: [''],
-            website_url: [''],
-            postal_code: [''],
-            date_format: [''],
-            amount_thousand_separator: [''],
-            amount_decimal_separator: [''],
-            amount_decimal: [''],
-        });
-    }
-
-    ngOnInit(): void {
-      //  this.settings$ = this.store.pipe(select(selectSettings));
-        this.settings$ = this.store.pipe(select(selectorUserGeneralSettings));
 
         if (this.route.snapshot.data['setting']) {
             this.setting = this.route.snapshot.data['setting'];
-
-            this.prePopulateForm(this.setting);
+            this.currenciesFiltered$ = of([this.setting.currency]);
             this.settingId = this.setting.id;
             // Fetch photo
             this.getImageFromService();
@@ -125,17 +108,54 @@ export class GeneralSettingComponent implements OnInit {
             this.amountThousandSeparators = this.setting.amount_thousand_separators;
             this.amountDecimalSeparators = this.setting.amount_decimal_separators;
             this.amountDecimals = this.setting.amount_decimals;
+
+            this.form = this.fb.group({
+                theme: '',
+                language: '',
+                company_name: this.setting.company_name,
+                email: this.setting.email,
+                currency: this.setting?.currency,
+                phone: this.setting.phone,
+                country: this.setting.country,
+                county: this.setting.county,
+                town: this.setting.town,
+                physical_address: this.setting.physical_address,
+                postal_address: this.setting.postal_address,
+                postal_code: this.setting.postal_code,
+                website_url: this.setting.website_url,
+                logo: this.setting.logo,
+                date_format: this.setting.date_format,
+                amount_thousand_separator: this.setting.amount_thousand_separator,
+                amount_decimal_separator: this.setting.amount_decimal_separator,
+                amount_decimal: this.setting.amount_decimal
+            });
         }
+    }
 
-        // update the store
-        /*this.store.pipe(select(selectorAuthenticatedUser)).subscribe(user => {
-            const mimi = {...user};
-            mimi.g_settings = this.setting;
-            this.authenticatedUser = mimi;
-        });
-        this.store.dispatch(AuthenticationActions.actionSettings({user: this.authenticatedUser}));*/
+    ngOnInit(): void {
+        this.settings$ = this.store.pipe(select(selectorUserGeneralSettings));
+        // currency Server Side search
+        this.currencyServerSideFilteringCtrl.valueChanges
+            .pipe(
+                filter(search => !!search),
+                tap(() => this.searching = true),
+                takeUntil(this._onDestroy),
+                debounceTime(200),
+                distinctUntilChanged(),
+                map(search => {
+                    search = search.toLowerCase();
+                    this.currenciesFiltered$ =  this.currencyService.search(search);
+                }),
+                delay(500)
+            )
+            .subscribe(filteredCurrencies => {
+                    this.searching = false;
+                    this.filteredServerSideCurrencies.next(filteredCurrencies);
+                },
+                error => {
+                    this.searching = false;
+                });
      }
-
 
     onLanguageSelect({ value: language }) {
         this.store.dispatch(actionSettingsChangeLanguage({ language }));
@@ -163,35 +183,6 @@ export class GeneralSettingComponent implements OnInit {
         this.store.dispatch(
             actionSettingsChangeAnimationsElements({ elementsAnimations })
         );
-    }
-
-    /**
-     *
-     * @param setting
-     */
-    prePopulateForm(setting: GeneralSettingModel) {
-        this.setting = setting;
-
-        this.form.patchValue({
-            theme: '',
-            language: '',
-            company_name: this.setting.company_name,
-            email: this.setting.email,
-            currency: this.setting.currency,
-            phone: this.setting.phone,
-            country: this.setting.country,
-            county: this.setting.county,
-            town: this.setting.town,
-            physical_address: this.setting.physical_address,
-            postal_address: this.setting.postal_address,
-            postal_code: this.setting.postal_code,
-            website_url: this.setting.website_url,
-            logo: this.setting.logo,
-            date_format: this.setting.date_format,
-            amount_thousand_separator: this.setting.amount_thousand_separator,
-            amount_decimal_separator: this.setting.amount_decimal_separator,
-            amount_decimal: this.setting.amount_decimal
-        });
     }
 
     onSubmit() {}
@@ -227,7 +218,6 @@ export class GeneralSettingComponent implements OnInit {
 
             this.loader = true;
             // upload to server
-
             const formData = new FormData();
             formData.append('logo', this.photoToUpload);
             formData.append('id',  this.settingId);
@@ -297,7 +287,6 @@ export class GeneralSettingComponent implements OnInit {
                 });
     }
 
-
     /**
      * Update settings
      */
@@ -342,5 +331,16 @@ export class GeneralSettingComponent implements OnInit {
                         }
                     }
                 });
+    }
+
+    onCurrencyItemChange(value) {
+        this.selectedCurrencySub = this.currencyService.getById(value?.id).subscribe(data => {
+            this.currencySymbol = data?.symbol;
+        });
+        this.update();
+    }
+
+    ngOnDestroy() {
+        this.selectedCurrencySub.unsubscribe();
     }
 }

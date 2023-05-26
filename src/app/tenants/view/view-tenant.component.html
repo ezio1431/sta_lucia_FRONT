@@ -43,6 +43,9 @@
                                 <a mat-tab-link routerLinkActive #payments="routerLinkActive" [active]="payments.isActive"
                                    [routerLink]="['payments']">
                                     <span class="nav-text">  {{ 'tenants.field.payments' | translate }} </span></a>
+
+                                <a mat-tab-link routerLinkActive #documents="routerLinkActive" [active]="documents.isActive" [routerLink]="['documents']">
+                                    <span class="nav-text">  {{ 'documents.list.title' | translate }} </span></a>
                             </nav>
 
                             <router-outlet></router-outlet>

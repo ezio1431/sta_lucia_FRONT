@@ -19,6 +19,8 @@ import { TenantService } from '../tenants/data/tenant.service';
 import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { TranslateService } from '@ngx-translate/core';
+import { PayComponent } from './pay/pay.component';
+import { PaymentMethodService } from '../settings/payment/payment-method/data/payment-method.service';
 
 @Component({
     selector: 'robi-utility-bills',
@@ -62,6 +64,7 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
     isLandlord = false;
     landlordID: string;
     activeUser: any;
+    clientID: any;
     isAdmin$: Observable<boolean>;
     constructor(private store: Store<AppState>,
                 private userService: UserSettingService,
@@ -69,6 +72,7 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
                 private tenantService: TenantService,
                 private invoiceService: InvoiceService,
                 private utilityBillService: InvoiceService,
+                private paymentMethodsService: PaymentMethodService,
                 private translateService: TranslateService,
                 private notification: NotificationService,
                 private authenticationService: AuthenticationService,
@@ -112,6 +116,11 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
                 break;
             }
         }
+        this.getClientID();
+    }
+
+    getClientID() {
+      this.paymentMethodsService.getPayPalClientID().subscribe((id: string) => this.clientID = id);
     }
 
     /**
@@ -256,5 +265,29 @@ export class InvoiceComponent implements OnInit, AfterViewInit {
         setTimeout(function() {
             window.URL.revokeObjectURL(data);
         }, 100);
+    }
+
+    addPayment(invoice: InvoiceModel) {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.disableClose = false;
+        dialogConfig.autoFocus = true;
+
+        dialogConfig.data = {invoice,  clientID: this.clientID};
+        dialogConfig.width = '500px';
+        dialogConfig.minHeight = '200px';
+        const dialogRef = this.dialog.open(PayComponent, dialogConfig);
+
+        dialogRef.afterClosed().subscribe(
+            (val) => {
+                if ((val)) {
+                    if (!val.error) {
+                        this.notification.showNotification('success',
+                            this.translateService.instant('Payment Successful. Thank you.'));
+                    }
+                    console.log(val);
+                    this.loadData();
+                }
+            }
+        );
     }
 }

@@ -20,6 +20,11 @@ export const ROUTES: Routes = [
                 path: 'extra_charge',
                 loadChildren: () => import('app/settings/lease/extra-charge/extra-charge-setting.module')
                     .then(m => m.ExtraChargeSettingModule)
+            },
+            {
+                path: 'contract',
+                loadChildren: () => import('app/settings/lease/agreement/lease-agreement-setting.module')
+                    .then(m => m.LeaseAgreementSettingModule)
             }
         ]
     }

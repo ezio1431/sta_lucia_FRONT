@@ -1,7 +1,9 @@
 import { BaseModel } from '../../../../shared/models/base-model';
 
 export class PaymentMethodModel extends BaseModel {
-    payment_method_name: string;
-    payment_method_display_name: string;
+    display_name: string;
+    type: string;
+    details: any;
+    charges: any;
     payment_method_description: string;
 }

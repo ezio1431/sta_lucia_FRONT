@@ -78,12 +78,22 @@
                                 </ng-container>
 
                                 <ng-container matColumnDef="actions">
-                                    <mat-header-cell *matHeaderCellDef>{{ 'actions' | translate }}</mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
                                     <mat-cell *matCellDef="let row" class="button-row">
-                                        <button mat-raised-button type="button" matTooltip="View Invoice" [matTooltipPosition]="'above'"
+                                        <!--<button mat-raised-button type="button" matTooltip="View Invoice" [matTooltipPosition]="'above'"
                                                 class="btn btn-link btn-sm btn-just-icon" routerLink="{{row.id}}" (click)="onSelected(row)">
                                             <i class="material-icons">expand_more</i>
-                                        </button>
+                                        </button>-->
+
+                                        <ng-container *ngIf="!row.is_paid">
+                                            <div *ngIf="!(isAdmin$ | async)" class="text-success">
+                                                <button mat-stroked-button (click)="addPayment(row)">
+                                                    <mat-icon>add_circle</mat-icon>
+                                                    {{'pay' | translate}}
+                                                </button>
+                                            </div>
+                                        </ng-container>
+
                                     </mat-cell>
                                 </ng-container>
 

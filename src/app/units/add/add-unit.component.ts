@@ -10,6 +10,7 @@ import { UnitModel } from '../model/unit-model';
 import { NotificationService } from '../../shared/notification.service';
 import { UnitService } from '../data/unit.service';
 import { AuthenticationService } from '../../authentication/authentication.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'robi-add-unit',
@@ -53,6 +54,7 @@ export class AddUnitComponent implements OnInit, AfterViewInit  {
     isAdmin$: Observable<boolean>;
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private fb: FormBuilder,
+                private translateService: TranslateService,
                 private notification: NotificationService,
                 private unitService: UnitService,
                 private authenticationService: AuthenticationService,
@@ -236,14 +238,14 @@ export class AddUnitComponent implements OnInit, AfterViewInit  {
         this.loader = true;
         this.unitService.create(body).subscribe((data) => {
                 this.onSaveComplete();
-                this.notification.showNotification('success', 'Success !! Unit created.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('units.field.created'));
             },
             (error) => {
                 this.errorInForm.next(true);
                 this.loader = false;
                 if (error.member === 0) {
-                    this.notification.showNotification('danger', 'Connection Error !! Nothing created.' +
-                        ' Check your connection and retry.');
+                    this.notification.showNotification('danger', this.translateService.instant('connection_error'));
                     return;
                 }
                 this.formErrors = error;
@@ -269,7 +271,8 @@ export class AddUnitComponent implements OnInit, AfterViewInit  {
         this.unitService.update(body).subscribe((data) => {
                 this.loader = false;
                 this.dialogRef.close(this.form.value);
-                this.notification.showNotification('success', 'Success !! Unit has been updated.');
+                this.notification.showNotification('success',
+                    this.translateService.instant('units.field.updated'));
             },
             (error) => {
                 this.loader = false;

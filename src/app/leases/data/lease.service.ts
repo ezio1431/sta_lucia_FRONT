@@ -87,4 +87,23 @@ export class LeaseService extends BaseService<LeaseModel> {
         const url =  `${super.getResourceUrl()}/${imageUrl}`;
         return this.localHttpClient.post<any>(url, {file_path}, { responseType: 'blob' as 'json'});
     }
+
+    /**
+     *
+     * @param item
+     */
+    search(item: any): Observable<any> {
+        const imageUrl = 'search';
+        const url =  `${super.getResourceUrl()}/${imageUrl}`;
+        return this.localHttpClient.post<any>(url, {filter: item});
+    }
+
+    /**
+     *
+     * @param item
+     */
+    public downloadAgreement(item: any): Observable<any> {
+        const itemUrl = 'download_agreement';
+        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item, { responseType: 'blob' as 'json'});
+    }
 }

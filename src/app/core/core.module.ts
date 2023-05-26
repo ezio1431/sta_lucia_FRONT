@@ -1,7 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { NgModule, Optional, SkipSelf, ErrorHandler } from '@angular/core';
 import {
-  HttpClientModule,
   HttpClient,
   HTTP_INTERCEPTORS
 } from '@angular/common/http';

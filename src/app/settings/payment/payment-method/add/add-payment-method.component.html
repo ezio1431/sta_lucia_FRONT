@@ -10,29 +10,200 @@
 </h5>
 
 <mat-dialog-content class="mat-dialog-data" [formGroup]="form">
+
     <div class="row">
         <div class="col-12">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>{{ 'settings.payments.method.payment_method_name' | translate }}</mat-label>
-                <input matInput formControlName="payment_method_name"
-                       placeholder="{{ 'settings.payments.method.payment_method_name' | translate }}">
-                <mat-error align="start" *ngIf="formErrors?.payment_method_name"
-                           class="form__error">{{ formErrors.payment_method_name }}</mat-error>
+            <mat-form-field class="input-group" color="primary" appearance="outline">
+                <mat-label>{{'settings.payments.method.add.payment_method_type' | translate}}</mat-label>
+                <mat-select placeholder="{{'settings.payments.method.add.payment_method_type' | translate}}" formControlName="type"
+                            #methodTypeSelect (selectionChange)="onPaymentMethodTypeChange(methodTypeSelect.value)">
+                    <mat-option *ngFor="let paymentMethodType of paymentMethodTypes" [value]="paymentMethodType.key">
+                        {{paymentMethodType.value}}
+                    </mat-option>
+                </mat-select>
+                <mat-error align="start" *ngIf="formErrors?.type" class="form__error">{{ formErrors.type }}</mat-error>
             </mat-form-field>
         </div>
     </div>
 
     <div class="row">
         <div class="col-12">
-            <mat-form-field class="full-width" color="primary" appearance="outline">
-                <mat-label>{{ 'settings.payments.method.payment_method_display_name' | translate }}</mat-label>
-                <input matInput formControlName="payment_method_display_name"
-                       placeholder="{{ 'settings.payments.method.payment_method_display_name' | translate }}">
-                <mat-error align="start" *ngIf="formErrors?.payment_method_display_name"
-                           class="form__error">{{ formErrors.payment_method_display_name }}</mat-error>
+            <mat-form-field class="input-group" color="primary" appearance="outline">
+                <mat-label>{{'settings.payments.method.add.display_name' | translate}}</mat-label>
+                <input matInput formControlName="display_name" placeholder="{{'settings.payments.method.add.display_name' | translate}}">
+                <mat-error align="start" *ngIf="formErrors?.display_name" class="form__error">{{ formErrors.display_name }}</mat-error>
             </mat-form-field>
         </div>
     </div>
+
+    <div *ngIf="isPayPal">
+        <div formGroupName="paypal_fields">
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.paypal.client_id' | translate}}</mat-label>
+                        <input matInput formControlName="client_id" placeholder="{{'settings.payments.method.paypal.client_id' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.client_id" class="form__error">{{ formErrors.client_id }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.paypal.secret_key' | translate}}</mat-label>
+                        <input matInput formControlName="secret_key" placeholder="{{'settings.payments.method.paypal.secret_key' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.secret_key" class="form__error">{{ formErrors.secret_key }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <mat-radio-group formControlName="live_status">
+                        <div class="row">
+                            <div class="col-6">
+                                <mat-radio-button value="live">{{'settings.payments.method.paypal.live' | translate}}</mat-radio-button>
+                            </div>
+                            <div class="col-6">
+                                <mat-radio-button value="sandbox">{{'settings.payments.method.paypal.sandbox' | translate}}</mat-radio-button>
+                            </div>
+                        </div>
+                    </mat-radio-group>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isStripe">
+        <div formGroupName="stripe_fields">
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.stripe.public_key' | translate}}</mat-label>
+                        <input matInput formControlName="public_key" placeholder="{{'settings.payments.method.stripe.public_key' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.public_key" class="form__error">{{ formErrors.public_key }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.stripe.secret_key' | translate}}</mat-label>
+                        <input matInput formControlName="secret_key" placeholder="{{'settings.payments.method.stripe.secret_key' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.secret_key" class="form__error">{{ formErrors.secret_key }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div *ngIf="isMpesa">
+        <div formGroupName="mpesa_fields">
+
+            <!--Short Code (Pay Bill)-->
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.mpesa.short_code' | translate}}</mat-label>
+                        <input type="number" min="0" matInput formControlName="short_code" placeholder="{{'settings.payments.method.mpesa.short_code' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.short_code" class="form__error">{{ formErrors.short_code }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <p class="text-primary mb-2">
+                        {{'settings.payments.method.mpesa.paybill_account_number_match' | translate}}
+                    </p>
+                </div>
+
+                <mat-radio-group formControlName="account_number_match">
+                    <div class="col-12">
+                        <mat-radio-button class="mb-2" value="id_number_or_passport">
+                            {{'settings.payments.method.mpesa.tenant_passport_number' | translate}}
+                        </mat-radio-button>
+                    </div>
+                    <div class="col-12">
+                        <mat-radio-button class="mb-2" value="lease_number">
+                            {{'settings.payments.method.mpesa.lease_number' | translate}}
+                        </mat-radio-button>
+                    </div>
+                    <div class="col-12">
+                        <mat-radio-button class="mb-2" value="unit_number">
+                            {{'settings.payments.method.mpesa.unit_number' | translate}}
+                        </mat-radio-button>
+                    </div>
+                </mat-radio-group>
+            </div>
+
+            <!--Consumer Key-->
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.mpesa.consumer_key' | translate}}</mat-label>
+                        <input matInput formControlName="consumer_key" placeholder="{{'settings.payments.method.mpesa.consumer_key' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.consumer_key" class="form__error">{{ formErrors.consumer_key }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!--Consumer Secret-->
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.mpesa.consumer_secret' | translate}}</mat-label>
+                        <input matInput formControlName="consumer_secret" placeholder="{{'settings.payments.method.mpesa.consumer_secret' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.consumer_secret" class="form__error">{{ formErrors.consumer_secret }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!--Initiator Username-->
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.mpesa.initiator_username' | translate}}</mat-label>
+                        <input matInput formControlName="initiator_username" placeholder="{{'settings.payments.method.mpesa.initiator_username' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.initiator_username" class="form__error">{{ formErrors.initiator_username }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!--Security Credential-->
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="input-group" color="primary" appearance="outline">
+                        <mat-label>{{'settings.payments.method.mpesa.security_credential' | translate}}</mat-label>
+                        <input matInput formControlName="security_credential" placeholder="{{'settings.payments.method.mpesa.security_credential' | translate}}">
+                        <mat-error align="start" *ngIf="formErrors?.security_credential" class="form__error">{{ formErrors.security_credential }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div formGroupName="charge_fields">
+        <div class="row mt-2">
+            <div class="col-6">
+                <mat-form-field class="input-group" color="primary" appearance="outline">
+                    <mat-label>{{'settings.payments.method.percent_charge' | translate}}</mat-label>
+                    <input type="number" min="0" matInput formControlName="percent_charge" placeholder="{{'settings.payments.method.percent_charge' | translate}}">
+                    <mat-error align="start" *ngIf="formErrors?.percent_charge" class="form__error">{{ formErrors.percent_charge }}</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="col-6">
+                <mat-form-field class="input-group" color="primary" appearance="outline">
+                    <mat-label>{{'settings.payments.method.fixed_charge' | translate}}</mat-label>
+                    <input type="number" min="0" matInput formControlName="fixed_charge" placeholder="{{'settings.payments.method.fixed_charge' | translate}}">
+                    <mat-error align="start" *ngIf="formErrors?.fixed_charge" class="form__error">{{ formErrors.fixed_charge }}</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-12">
             <mat-form-field class="full-width" color="primary" appearance="outline">

@@ -161,7 +161,7 @@ material-dashboard-angular
 │   │       ├── user-profile.component.css
 │   │       ├── user-profile.component.html
 │   │       ├── user-profile.component.spec.ts
-│   │       └── tenant-profile.component.ts
+│   │       └── landlord-document.component.ts
 │   ├── assets
 │   │   ├── css
 │   │   │   └── demo.css

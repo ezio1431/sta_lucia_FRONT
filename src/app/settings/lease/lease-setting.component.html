@@ -20,6 +20,10 @@
                     <a mat-tab-link routerLinkActive #extra_charge="routerLinkActive" [active]="extra_charge.isActive"
                        [routerLinkActiveOptions]="{exact: true}" [routerLink]="['extra_charge']">
                         <span class="nav-text"> {{ 'settings.lease.extra_charges.title' | translate }} </span></a>
+
+                    <a mat-tab-link routerLinkActive #contract="routerLinkActive" [active]="contract.isActive"
+                       [routerLinkActiveOptions]="{exact: true}" [routerLink]="['contract']">
+                        <span class="nav-text"> {{ 'settings.lease.contract.title' | translate }} </span></a>
                 </nav>
 
                 <router-outlet></router-outlet>

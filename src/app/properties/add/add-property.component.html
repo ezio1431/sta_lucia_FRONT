@@ -248,7 +248,7 @@
                                                         <mat-option
                                                                 *ngFor="let paymentMethod of paymentMethods$ | async"
                                                                 [value]="paymentMethod.id">
-                                                            {{paymentMethod.payment_method_display_name}}
+                                                            {{paymentMethod.display_name}}
                                                         </mat-option>
                                                     </mat-select>
                                                     <mat-error align="start" *ngIf="formErrors?.payment_method_id"

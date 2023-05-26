@@ -83,7 +83,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
     }
 
     ngOnInit() {
-        this.paymentMethods$ = this.paymentMethodService.list(['payment_method_name']);
+        this.paymentMethods$ = this.paymentMethodService.list(['display_name']);
 
         this.tenantServerSideFilteringCtrl.valueChanges
             .pipe(
@@ -172,7 +172,7 @@ export class AddPaymentComponent implements OnInit, OnDestroy  {
      * @param value
      */
     onPaymentMethodItemChange(value) {
-       // const paymentMethod = this.paymentMethods.find((item: any) => item.id === value)?.payment_method_name;
+       // const paymentMethod = this.paymentMethods.find((item: any) => item.id === value)?.display_name;
        // this.isBank = paymentMethod === 'BANK';
     }
 

@@ -26,15 +26,17 @@
 
                 <div class="table-responsive">
 
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="payment_method_name" matSortDirection="asc" matSortDisableClear>
-                        <ng-container matColumnDef="payment_method_name">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'settings.payments.method.payment_method_name' | translate }} </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.payment_method_name}} </mat-cell>
+                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="updated_at"
+                               matSortDirection="desc" matSortDisableClear>
+
+                        <ng-container matColumnDef="type">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> {{'settings.payments.method.type' | translate}} </mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{row.type}} </mat-cell>
                         </ng-container>
 
-                        <ng-container matColumnDef="payment_method_display_name">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'settings.payments.method.payment_method_display_name' | translate }} </mat-header-cell>
-                            <mat-cell *matCellDef="let row"> {{row.payment_method_display_name}} </mat-cell>
+                        <ng-container matColumnDef="display_name">
+                            <mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'settings.payments.method.payment_method_name' | translate }} </mat-header-cell>
+                            <mat-cell *matCellDef="let row"> {{row.display_name}} </mat-cell>
                         </ng-container>
 
                         <ng-container matColumnDef="actions">

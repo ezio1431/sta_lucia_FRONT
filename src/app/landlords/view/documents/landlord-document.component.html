@@ -1,0 +1,74 @@
+<div class="card">
+    <div class="row">
+        <div class="col-4 mb-4 mt-4">
+            <div>
+                <input type="file" #logoFileInput class="file-input" accept="file_name/*" (change)="onDocumentSelect($event.target.files)">
+                <button mat-button class="mat-raised-button" (click)="logoFileInput.click()">
+                    <i class="material-icons">attachment</i>
+                    {{ 'documents.upload.title' | translate }}</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row search-form-section">
+            <div class="col-12" [hidden]="!(isAdmin$ | async)">
+                <mat-form-field class="search-form-field">
+                    <input matInput #search placeholder="{{ 'filter' | translate }}" autocomplete="off" [disabled]="meta?.total===0">
+                    <button mat-button matSuffix mat-icon-button aria-label="Clear" *ngIf="search.value" (click)="clearSearch()">
+                        <mat-icon>close</mat-icon></button>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <mat-table #table [dataSource]="landlordDocumentDataSource" matSort matSortActive="created_at" matSortDirection="desc"
+                       matSortDisableClear>
+
+                <ng-container matColumnDef="created_at">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'documents.field.date' | translate }} </mat-header-cell>
+                    <mat-cell *matCellDef="let row"> {{row.created_at_str}} </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="document">
+                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'documents.field.document' | translate }} </mat-header-cell>
+                    <mat-cell *matCellDef="let row">
+                        <button mat-flat-button (click)="downloadDocument(row?.id)">
+                            <span class="link">{{row.document}}</span>
+                        </button>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                    <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                    <mat-cell *matCellDef="let row" class="button-row">
+                        <button *ngIf="isAdmin$ | async" mat-raised-button type="button"
+                                class="btn btn-link btn-sm btn-just-icon" (click)="openConfirmationDialog(row)">
+                            <mat-icon color="warn">delete</mat-icon>
+                        </button>
+                    </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: displayedColumns;"> </mat-row>
+            </mat-table>
+            <span *ngIf="meta?.total===0">{{ 'no_data' | translate }}</span>
+
+            <div class="d-flex justify-content-center spinner-container"
+                 *ngIf="(landlordDocumentDataSource?.loading$ | async) || loader">
+                <mat-progress-bar
+                        color="green"
+                        mode="query"
+                        value=50
+                        bufferValue=75>
+                </mat-progress-bar>
+            </div>
+
+            <mat-paginator #pagination
+                           [length]="meta?.total"
+                           [pageIndex]="pageIndex"
+                           [pageSizeOptions]="pageSizeOptions" showFirstLastButtons>
+            </mat-paginator>
+        </div>
+    </div>
+</div>

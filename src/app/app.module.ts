@@ -25,6 +25,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { StatementComponent } from './accounting/statement/statement.component';
 import { PdfStatementComponent } from './accounting/pdf-statement/pdf-statement.component';
+import { ViewAgreementComponent } from './settings/lease/agreement/view/view-agreement.component';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -52,7 +53,8 @@ export const defaultDataServiceConfig: DefaultDataServiceConfig = {
     AdminLayoutComponent,
     ConfirmationDialogComponent,
     StatementComponent,
-    PdfStatementComponent
+    PdfStatementComponent,
+    ViewAgreementComponent
   ],
   providers: [
     {

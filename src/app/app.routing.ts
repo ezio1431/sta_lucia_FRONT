@@ -79,7 +79,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
         canLoad: [PermGuard],
         data: {
-          permissions: ['view-invoice', 'am-landlord']
+          permissions: ['view-invoice', 'am-tenant', 'am-landlord']
         }
       },
       {
@@ -149,9 +149,29 @@ const routes: Routes = [
         }
       },
       {
+        path: 'landlord/documents',
+        loadChildren: () => import('./landlord-area/documents/landlord-document.module')
+            .then(m => m.LandlordDocumentModule),
+        canActivate: [AuthGuardLandlord],
+        canLoad: [PermGuard],
+        data: {
+          permissions: ['am-landlord']
+        }
+      },
+      {
         path: 'tenant/dashboard',
         loadChildren: () => import('./tenant-area/tenant-area.module').then(m => m.TenantAreaModule),
         resolve : {tenantData: TenantDashResolverService},
+        canActivate: [AuthGuardTenant],
+        canLoad: [PermGuard],
+        data: {
+          permissions: ['am-tenant']
+        }
+      },
+      {
+        path: 'tenant/documents',
+        loadChildren: () => import('./tenant-area/documents/tenant-document.module')
+            .then(m => m.TenantDocumentModule),
         canActivate: [AuthGuardTenant],
         canLoad: [PermGuard],
         data: {

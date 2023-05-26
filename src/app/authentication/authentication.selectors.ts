@@ -1,6 +1,7 @@
 import { createSelector } from '@ngrx/store';
 import * as jwt_decode from 'jwt-decode';
 import { USER_SCOPES } from '../shared/enums/user-scopes.enum';
+import { selectIsNightHour, selectNightTheme, selectTheme } from '../core/settings/settings.selectors';
 
 export const selectAuthenticationState = state => state.authentication;
 
@@ -100,6 +101,23 @@ export const selectorTheme = createSelector(
     g_settings => {
         if (g_settings) {
             return g_settings?.theme;
+        }
+    }
+);
+
+export const selectAuthenticationTheme = createSelector(
+    selectorTheme,
+    selectNightTheme,
+    selectIsNightHour,
+    (theme, nightTheme, isNightHour) =>
+        (isNightHour ? nightTheme : theme)?.toLowerCase()
+);
+
+export const selectorDefaultCurrency = createSelector(
+    selectorUserGeneralSettings,
+    g_settings => {
+        if (g_settings) {
+            return g_settings?.currency;
         }
     }
 );
