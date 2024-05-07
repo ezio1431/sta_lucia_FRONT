@@ -2,9 +2,17 @@
     <div class="container-fluid">
         <nav class="pull-left">
         </nav>
+
+        <div class="copyright" *ngIf="!isValid">
+            <span class="text-danger">Purchase Code: Invalid.</span>
+            Contact the system developers <a href = "mailto: robisignals@gmail.com">robisignals@gmail.com</a> OR
+            <a href="https://wa.me/+254724475357?text=Purchase20%a20%code" target="_blank">WhatsApp +254724475357</a>
+            for the purchase code and to remove this message.
+        </div>
+
         <div class="copyright">
             &copy;
-            {{test | date: 'yyyy'}} {{companyName}}
+            {{currentDate | date: 'yyyy'}} {{companyName}}
         </div>
     </div>
 </footer>

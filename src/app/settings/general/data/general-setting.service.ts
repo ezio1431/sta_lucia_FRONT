@@ -37,6 +37,11 @@ export class GeneralSettingService extends BaseService<GeneralSettingModel> {
         return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, item);
     }
 
+    public verify(): Observable<GeneralSettingModel> {
+        const itemUrl = 'verify';
+        return this.localHttpClient.post<any>(`${super.getResourceUrl()}/${itemUrl}`, {});
+    }
+
     /**
      *
      * @param file_path

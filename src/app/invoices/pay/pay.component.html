@@ -54,6 +54,21 @@
       </mat-form-field>
     </div>
 
+    <div class="col-12" *ngIf="isMpesa$ | async">
+      <mat-form-field class="input-group" color="primary" appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput type="number" min="0" formControlName="phone_number"
+               placeholder="Phone Number">
+        <mat-error align="start" *ngIf="formErrors?.phone_number" class="form__error">{{ formErrors.phone_number }}</mat-error>
+      </mat-form-field>
+
+      <div class="mr-2 text-success">Important: Keep your phone unlocked. Mpesa will prompt for PIN to complete payment.</div>
+
+      <button mat-raised-button  color="primary" [disabled]="!form.valid || loader">
+        Lipa Na Mpesa
+      </button>
+    </div>
+
     <div class="row"  *ngIf="formError$ | async">
       <div class="col-12 text-danger ml-4 mb-4">
         {{formError}}
@@ -67,19 +82,19 @@
       </div>-->
   </div>
 
-  <div class="row" [hidden]="!(isStripe$ | async)">
-    <!-- Display a stripe payment form -->
-    <form #checkout="ngForm" (ngSubmit)="onSubmit(checkout)" class="checkout">
-      <div class="form-row">
-        <div style="width: 30em" id="card-info" #cardInfo></div>
+    <div class="row" [hidden]="!(isStripe$ | async)">
+        <!-- Display a stripe payment form -->
+        <form #checkout="ngForm" (ngSubmit)="onSubmit(checkout)" class="checkout">
+            <div class="form-row">
+                <div style="width: 30em" id="card-info" #cardInfo></div>
 
-        <small class="text-danger mt-1" id="card-errors" role="alert" *ngIf="error">
-          {{ error }}
-        </small>
-      </div>
-      <button type="submit">{{'pay' | translate}} {{payAmount$ | async}}</button>
-    </form>
-  </div>
+                <small class="text-danger mt-1" id="card-errors" role="alert" *ngIf="error">
+                    {{ error }}
+                </small>
+            </div>
+            <button type="submit"> {{'pay' | translate}} {{payAmount$ | async}}</button>
+        </form>
+    </div>
 
   <div class="row" [hidden]="!(isPayPal$ | async) || loader">
     <div class="col-12">
@@ -114,7 +129,7 @@
   <!--<button [disabled]="loader" mat-button color="accent" [mat-dialog-close]="true" (click)="close()">
     {{ 'cancel' | translate }}
   </button>-->
-  <button mat-raised-button  color="primary" [disabled]="!form.valid || loader">
+<!--  <button mat-raised-button  color="primary" [disabled]="!form.valid || loader">
     {{ 'save' | translate }}
-  </button>
+  </button>-->
 </mat-dialog-actions>

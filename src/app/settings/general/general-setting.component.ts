@@ -15,7 +15,7 @@ import {
     actionSettingsChangeLanguage, actionSettingsChangeStickyHeader,
     actionSettingsChangeTheme
 } from '../../core/settings/settings.actions';
-import { AuthActions } from '../../authentication/action-types';
+import { AuthActions, AuthenticationActions } from '../../authentication/action-types';
 import { selectorAuthenticatedUser, selectorUserGeneralSettings } from '../../authentication/authentication.selectors';
 import { User } from '../../authentication/model/user.model';
 import { TranslateService } from '@ngx-translate/core';

@@ -4,11 +4,11 @@ import 'rxjs/add/operator/filter';
 import { Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import PerfectScrollbar from 'perfect-scrollbar';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { selectorScopes } from '../../authentication/auth.selectors';
 import { AppState } from '../../core/core.state';
-import { selectAuthenticationTheme } from '../../authentication/authentication.selectors';
+import { selectAuthenticationTheme, selectorLanguage } from '../../authentication/authentication.selectors';
 
 @Component({
   selector: 'robi-admin-layout',
@@ -25,6 +25,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
     language$: Observable<string>;
     theme$: Observable<string>;
     scopesAdmin$: Observable<string>;
+    lang$ = of('en');
+    dir$ = of('auto');
 
   constructor( public location: Location, private router: Router, private store: Store<AppState>) {}
 
@@ -68,6 +70,18 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit {
       }
       this.theme$ = this.store.pipe(select(selectAuthenticationTheme));
       this.scopesAdmin$ = this.store.pipe(select(selectorScopes));
+
+      this.language$ = this.store.pipe(select(selectorLanguage));
+
+      this.store.pipe(select(selectorLanguage)).subscribe(language => {
+          if (language === 'ar') {
+              this.lang$ = of('ar');
+              this.dir$ = of('rtl');
+          } else {
+              this.lang$ = of('en');
+              this.dir$ = of('auto');
+          }
+      });
 
     /*  this.scopesAdmin$.subscribe(scopes => {
           console.log('scopesAdmin', scopes);

@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { PayService } from './data/pay.service';
 import { debounceTime, delay, distinctUntilChanged, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 import {
     IPayPalConfig,
     ICreateOrderRequest
@@ -20,6 +21,8 @@ import { NotificationService } from '../../core/core.module';
 import { CurrencySettingService } from '../../settings/payment/currency/data/currency-setting.service';
 import { selectorDefaultCurrency } from '../../authentication/authentication.selectors';
 import { PaymentTypeModel } from './models/payment-type-model';
+import { AngularStripeService } from '@fireflysemantics/angular-stripe-service';
+import { PayItemModel } from './data/pay-item.model';
 
 @Component({
     selector: 'robi-pay',
@@ -69,12 +72,22 @@ export class PayComponent implements OnInit, OnDestroy, AfterViewInit {
     defaultCurrency: any;
     formError: any;
 
+    // Declare dummy data
+    id = '123';
+    name = 'powerbike';
+    email = 'nelsob44@yahoo.com';
+    price = 1200;
+    currency = 'gbp';
+    description = 'A very good bike';
+    private paymentIntentSub: Subscription;
+
     constructor(@Inject(MAT_DIALOG_DATA) row: any,
                 private cd: ChangeDetectorRef,
                 private payService: PayService,
                 private store: Store<AppState>,
                 private fb: FormBuilder,
                 private dialog: MatDialog,
+                private stripeService: AngularStripeService,
                 private currencyService: CurrencySettingService,
                 private invoiceService: InvoiceService,
                 private paymentMethodsService: PaymentMethodService,
@@ -95,7 +108,8 @@ export class PayComponent implements OnInit, OnDestroy, AfterViewInit {
         this.form = this.fb.group({
             payment_method: ['', [Validators.required]],
             currency: [this.defaultCurrency, [Validators.required]],
-            amount: [this.invoice?.summary?.amount_due_number, [Validators.required]]
+            amount: [this.invoice?.summary?.amount_due_number, [Validators.required]],
+            phone_number: ['']
         });
 
         // currency Server Side search
@@ -130,6 +144,10 @@ export class PayComponent implements OnInit, OnDestroy, AfterViewInit {
 
     getAmount() {
         return this.form.get('amount').value;
+    }
+
+    getPhoneNumber() {
+        return this.form.get('phone_number').value;
     }
 
     close() {
@@ -181,6 +199,16 @@ export class PayComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit() {
+        // const stripePubKey = environment.publishableKeyStripe;
+        const stripePubKey = 'pk_test_51KiLt8I3SMiaOBNtUhZ6X2IGalgRwVQv7H45sqaIMgiA6V22cRqOKAZQJRQJBwFMdifE6S3rTPANanTP8wLPXIdp002JhxKV9L';
+        this.stripeService.setPublishableKey(stripePubKey).then(
+            stripe => {
+                this.stripe = stripe;
+                const elements = stripe.elements();
+                this.card = elements.create('card');
+                this.card.mount(this.cardInfo.nativeElement);
+                this.card.addEventListener('change', this.cardHandler);
+            });
     }
 
 
@@ -202,12 +230,12 @@ export class PayComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    onClickStripe(form: NgForm) {
-    }
-
     ngOnDestroy() {
-        //  this.card.removeEventListener('change', this.cardHandler);
-        // this.card.destroy();
+        if (this.paymentIntentSub) {
+            this.paymentIntentSub.unsubscribe();
+        }
+        this.card.removeEventListener('change', this.cardHandler);
+        this.card.destroy();
     }
 
     private initConfig(): void {
@@ -264,5 +292,70 @@ export class PayComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onCurrencyItemChange(value: any) {
+    }
+
+    onClickStripe(form: NgForm) {
+        const formData = this.form.value;
+        const amount = formData?.amount;
+
+        const item: PayItemModel = {
+            client_id: this.invoice?.lease_id,
+            invoice_id: this.invoice?.id,
+            invoice_number: this.invoice?.invoice_number,
+            amount: amount,
+            currency: 'USD'
+        };
+        return this.paymentIntentSub = this.payService.addStripePaymentIntent(item).pipe(
+            switchMap(intent => {
+                this.clSecret = intent.intent.client_secret;
+
+                const itemIntentData: PayItemModel = {
+                    client_id: this.invoice?.lease_id,
+                    invoice_id: this.invoice?.id,
+                    invoice_number: this.invoice?.invoice_number,
+                    amount: amount,
+                    currency: 'USD',
+                    intentID: intent.intent.id,
+                };
+                return this.payService.storeStripePaymentIntent(itemIntentData);
+            })
+        ).subscribe((data) => {
+            console.log('switchMap - storePaymentIntent - data');
+            console.log(data);
+            this.stripe.confirmCardPayment(this.clSecret, {
+                receipt_email: this.email,
+                payment_method: {
+                    card: this.card,
+                    billing_details: {
+                        name: this.name,
+                        email: this.email
+                    }
+                }
+            }).then(res => {
+                console.log('confirmCardPayment - result');
+                console.log(res);
+                if (res.paymentIntent && res.paymentIntent.status === 'succeeded') {
+
+                    /// ask the server to verify the payment, then update the db
+                    return this.payService.verifyStripePayment(res).subscribe((response) => {
+                        if (response) {
+                            this.notification.success('Payment is successful');
+                        }
+                        console.log('verifyStripePayment - result');
+                        console.log(response);
+                    }, (error) => {
+                        console.log('verifyStripePayment - result');
+                        console.log(error);
+                    });
+
+                    alert('your payment was successful');
+                    form.reset();
+                    // this.router.navigate(['/home']);
+                } else {
+                    const errorCode = res.error.message;
+                    alert(errorCode);
+                }
+            });
+        });
     }
 }
